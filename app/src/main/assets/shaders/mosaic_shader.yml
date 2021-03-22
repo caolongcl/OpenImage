@@ -1,0 +1,34 @@
+name: mosaic
+
+vertex:
+  _#1_version 300 es
+
+  layout(location = 0) in vec4 aPosition;
+  layout(location = 1) in vec2 aTexCoords;
+  out vec2 vTexCoords;
+
+  void main() {
+  vTexCoords = aTexCoords;
+  gl_Position = aPosition;
+  }
+
+#compute:
+
+
+fragment:
+  _#1_version 300 es
+
+  precision mediump float;
+  uniform sampler2D uTexSampler;
+  uniform mediump vec2 uInputSize;
+  uniform mediump vec2 uMosaicSize;
+
+  in highp vec2 vTexCoords;
+  out vec4 oFragColor;
+
+  void main() {
+  vec2 intXY = vec2(vTexCoords.x * uInputSize.x, vTexCoords.y * uInputSize.y);
+  vec2 xyMosaic = vec2(floor(intXY.x/uMosaicSize.x)*uMosaicSize.x, floor(intXY.y/uMosaicSize.y)*uMosaicSize.y);
+  vec2 uvMosaic = vec2(xyMosaic.x/uInputSize.x, xyMosaic.y/uInputSize.y);
+  oFragColor = texture(uTexSampler, uvMosaic);
+  }

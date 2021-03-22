@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">开图</string>
+    <string name="camera_mode_capture">拍照</string>
+    <string name="camera_mode_record">录像</string>
+    <string name="camera_mode_calibrate">校正</string>
+</resources>

@@ -1,0 +1,33 @@
+name: oes
+
+vertex:
+  _#1_version 300 es
+
+  layout(location = 0) in vec4 aPosition;
+  layout(location = 1) in vec2 aTexCoords;
+  out vec2 vTexCoords;
+
+  void main() {
+  vTexCoords = vec2(aTexCoords.s, 1.0-aTexCoords.t);
+  gl_Position = aPosition;
+  }
+
+#compute:
+
+
+fragment:
+  _#1_version 300 es
+
+  _#1_extension GL_OES_EGL_image_external_essl3 _#2_ require
+
+  precision mediump float;
+  uniform samplerExternalOES uTexSampler;
+
+  in highp vec2 vTexCoords;
+  layout(location = 0) out vec4 oFragColor;
+  layout(location = 1) out vec4 oOtherFragColor;
+
+  void main() {
+  oFragColor = texture(uTexSampler, vTexCoords);
+  oOtherFragColor = oFragColor;
+  }

@@ -1,0 +1,47 @@
+name: whirlpool
+
+vertex:
+  _#1_version 300 es
+
+  layout(location = 0) in vec4 aPosition;
+  layout(location = 1) in vec2 aTexCoords;
+  out vec2 vTexCoords;
+
+  void main() {
+  vTexCoords = aTexCoords;
+  gl_Position = aPosition;
+  }
+
+#compute:
+
+
+fragment:
+  _#1_version 300 es
+
+  precision highp float;
+  uniform sampler2D uTexSampler;
+  uniform float uAngle;
+  uniform float uRadius;
+  uniform vec2 uInputSize;
+  uniform vec2 uCenter;
+
+  in highp vec2 vTexCoords;
+  out vec4 oFragColor;
+
+  void main() {
+  vec2 curTexCoords = vTexCoords;
+  vec2 center = uCenter / uInputSize;
+
+  vec2 pos = curTexCoords - center;
+  vec2 rl = vec2(uRadius, uRadius) / uInputSize;
+  float x = pos.x / rl.x;
+  float y = pos.y / rl.y;
+  if (x * x + y * y < 1.0) {
+    float beta = atan(pos.y, pos.x) + radians(uAngle) * 2.0 * (1.0 - (x * x + y * y));
+    pos = length(pos) * vec2(cos(beta), sin(beta));
+    curTexCoords = pos + center;
+  }
+
+  vec3 color = texture(uTexSampler, curTexCoords).rgb;
+  oFragColor = vec4(color, 1.0);
+  }

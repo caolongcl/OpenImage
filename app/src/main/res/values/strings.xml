@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">OpenImage</string>
+    <string name="camera_mode_capture">Capture</string>
+    <string name="camera_mode_record">Record</string>
+    <string name="camera_mode_calibrate">Calibrate</string>
+    <string name="main_dir" translatable="false">media</string>
+    <string name="function_dir" translatable="false">function</string>
+</resources>
