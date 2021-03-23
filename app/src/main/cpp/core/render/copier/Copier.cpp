@@ -335,12 +335,12 @@ void Copier::setTextForDebug() {
         info.position = {200.0f, 400.0f};
         return info;
     });
-    m_debugTexts.emplace_back([this](const Viewport &displayViewport,
-                                     const Viewport &realViewport) {
-        TextInfo info("author 1106912908@qq.com", displayViewport, realViewport);
-        info.position = {200.0f, 450.0f};
-        return info;
-    });
+//    m_debugTexts.emplace_back([this](const Viewport &displayViewport,
+//                                     const Viewport &realViewport) {
+//        TextInfo info("author 1106912908@qq.com", displayViewport, realViewport);
+//        info.position = {200.0f, 450.0f};
+//        return info;
+//    });
 }
 
 ///

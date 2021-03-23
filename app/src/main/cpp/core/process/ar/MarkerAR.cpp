@@ -95,6 +95,9 @@ void MarkerAR::process(const Buffer &buf) {
 
     } catch (std::exception &e) {
         Log::e(Log::PROCESSOR_TAG, "marker detect exception occur %s", e.what());
+        Flow::Self()->SendMsg(PolygonMsg(Copier::target, Copier::msg_detect_marker));
+        Flow::Self()->SendMsg(BaseModelMsg(BaseModel::target, BaseModel::msg_marker_ar));
+        return;
     }
 
     auto &makers = m_marker->GetMakers();
