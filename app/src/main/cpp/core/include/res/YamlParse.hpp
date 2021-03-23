@@ -13,11 +13,16 @@ namespace clt {
     class YamlParse {
     public:
         explicit YamlParse(const std::string &file) {
-            if (file.empty()) {
+            std::fstream f;
+            f.open(file, std::ios::in);
+            if (!f.is_open()) {
                 Log::w(Log::RES_TAG, "YamlParse %s invalid", file.c_str());
+                m_valid = false;
+            } else {
+                m_valid = true;
+                m_node = YAML::LoadFile(file);
             }
-
-            m_node = YAML::LoadFile(file);
+            f.close();
         }
 
         ~YamlParse() = default;
@@ -34,8 +39,13 @@ namespace clt {
         bool HasToken(const std::string &name) const {
             return m_node[name].IsDefined();
         }
+
+        bool Valid() const {
+            return m_valid;
+        }
     private:
         YAML::Node m_node;
+        bool m_valid;
     };
 
     class YamlCreator {
