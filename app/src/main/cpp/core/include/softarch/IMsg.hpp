@@ -25,10 +25,10 @@ namespace clt {
             MSG_OTHER,
         };
 
-        Msg(const std::string _target, const std::string _what, std::shared_ptr<MsgData> _data = nullptr) :
+        Msg(const std::string& _target, const std::string& _what, const std::shared_ptr<MsgData>& _data = nullptr) :
                 type(Type::MSG_OTHER), target(_target), what(_what), data(_data) {}
 
-        Msg(Type _type, const std::string _target, const std::string _what, std::shared_ptr<MsgData> _data = nullptr) :
+        Msg(Type _type, const std::string& _target, const std::string& _what, const std::shared_ptr<MsgData>& _data = nullptr) :
                 type(_type), target(_target), what(_what), data(_data) {}
 
         virtual ~Msg() = default;
@@ -39,29 +39,9 @@ namespace clt {
         std::shared_ptr<MsgData> data; // 消息数据
     };
 
-    struct PolygonMsg : public Msg {
-        PolygonMsg(const std::string _target, const std::string _what, std::shared_ptr<MsgData> _data = nullptr) :
-                Msg(Type::MSG_POLYGON, _target, _what, _data) {}
-    };
-
-    struct TextMsg : public Msg {
-        TextMsg(const std::string _target, const std::string _what, std::shared_ptr<MsgData> _data = nullptr) :
-                Msg(Type::MSG_TEXT, _target, _what, _data) {}
-    };
-
-    struct PosInfoMsg : public Msg {
-        PosInfoMsg(const std::string _target, const std::string _what) :
-                Msg(Type::MSG_POST_INFO, _target, _what) {}
-    };
-
-    struct BaseModelMsg : public Msg {
-        BaseModelMsg(const std::string _target, const std::string _what, std::shared_ptr<MsgData> _data = nullptr) :
-                Msg(Type::MSG_BASE_MODEL, _target, _what, _data) {}
-    };
-
-/**
- * 处理消息的接口
- */
+    /**
+     * 处理消息的接口
+     */
     struct IMsgHandler : public std::enable_shared_from_this<IMsgHandler> {
         IMsgHandler() = default;
 
@@ -90,9 +70,9 @@ namespace clt {
 
         virtual ~IMsg() = default;
 
-        virtual void AddMsgHandler(std::shared_ptr<IMsgHandler>) = 0;
+        virtual void AddMsgHandler(const std::shared_ptr<IMsgHandler> &) = 0;
 
-        virtual void RemoveMsgHandler(std::shared_ptr<IMsgHandler>) = 0;
+        virtual void RemoveMsgHandler(const std::shared_ptr<IMsgHandler> &) = 0;
 
         virtual void SendMsg(const Msg &msg) = 0;
 

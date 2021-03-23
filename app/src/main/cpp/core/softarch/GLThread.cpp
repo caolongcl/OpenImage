@@ -110,7 +110,7 @@ std::shared_ptr<EGLCore> GLThread::SelfEGL() {
 }
 
 /// 添加和删除只能在调用线程处理（即将来只能在调用线程处理消息）
-void GLThread::AddMsgHandler(std::shared_ptr<IMsgHandler> handler) {
+void GLThread::AddMsgHandler(const std::shared_ptr<IMsgHandler> &handler) {
     if (handler == nullptr || handler->Target().empty()) {
         return;
     }
@@ -122,7 +122,7 @@ void GLThread::AddMsgHandler(std::shared_ptr<IMsgHandler> handler) {
     }
 }
 
-void GLThread::RemoveMsgHandler(std::shared_ptr<IMsgHandler> handler) {
+void GLThread::RemoveMsgHandler(const std::shared_ptr<IMsgHandler> &handler) {
     if (handler == nullptr || handler->Target().empty()) {
         return;
     }

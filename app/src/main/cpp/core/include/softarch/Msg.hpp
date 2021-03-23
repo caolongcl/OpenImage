@@ -9,6 +9,27 @@
 #include <res/model/Model.hpp>
 
 namespace clt {
+    struct PolygonMsg : public Msg {
+        PolygonMsg(const std::string& _target, const std::string& _what, const std::shared_ptr<MsgData>& _data = nullptr) :
+                Msg(Type::MSG_POLYGON, _target, _what, _data) {}
+    };
+
+    struct TextMsg : public Msg {
+        TextMsg(const std::string& _target, const std::string& _what, const std::shared_ptr<MsgData>& _data = nullptr) :
+                Msg(Type::MSG_TEXT, _target, _what, _data) {}
+    };
+
+    struct PosInfoMsg : public Msg {
+        PosInfoMsg(const std::string& _target, const std::string& _what) :
+                Msg(Type::MSG_POST_INFO, _target, _what) {}
+    };
+
+    struct BaseModelMsg : public Msg {
+        BaseModelMsg(const std::string& _target, const std::string& _what, const std::shared_ptr<MsgData>& _data = nullptr) :
+                Msg(Type::MSG_BASE_MODEL, _target, _what, _data) {}
+    };
+
+
     struct PolygonMsgData : public MsgData {
         PolygonMsgData() = default;
 

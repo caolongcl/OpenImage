@@ -46,9 +46,9 @@ namespace clt {
         std::shared_ptr<GLThread> GetInvokeThread();
 
         /// 支持消息机制
-        void AddMsgHandler(std::shared_ptr<IMsgHandler> handler) override;
+        void AddMsgHandler(const std::shared_ptr<IMsgHandler> &handler) override;
 
-        void RemoveMsgHandler(std::shared_ptr<IMsgHandler> handler) override;
+        void RemoveMsgHandler(const std::shared_ptr<IMsgHandler> &handler) override;
 
         void SendMsg(const Msg &msg) override;
 

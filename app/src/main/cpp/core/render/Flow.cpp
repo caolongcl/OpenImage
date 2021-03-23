@@ -134,7 +134,7 @@ std::shared_ptr<GLThread> Flow::GetInvokeThread() {
 }
 
 /// 将消息处理器注册给此函数的调用线程
-void Flow::AddMsgHandler(std::shared_ptr<IMsgHandler> handler) {
+void Flow::AddMsgHandler(const std::shared_ptr<IMsgHandler> &handler) {
     if (handler == nullptr)
         return;
 
@@ -159,7 +159,7 @@ void Flow::AddMsgHandler(std::shared_ptr<IMsgHandler> handler) {
     }
 }
 
-void Flow::RemoveMsgHandler(std::shared_ptr<IMsgHandler> handler) {
+void Flow::RemoveMsgHandler(const std::shared_ptr<IMsgHandler> &handler) {
     if (handler == nullptr)
         return;
 
