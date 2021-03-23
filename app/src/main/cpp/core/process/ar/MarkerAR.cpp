@@ -27,12 +27,23 @@ bool MarkerAR::Init() {
     m_timesStatics.Init();
     m_marker->Init();
 
+    auto paramsFile = ResManager::Self()->GetCameraParamsFile();
+    std::fstream f;
+    f.open(paramsFile, std::ios::in);
+    if (!f.is_open()) {
+        Log::w(Log::PROCESSOR_TAG, "No camera calibrate file.");
+        Flow::Self()->SendMsg(PosInfoMsg(GLRender::target, "No camera calibrate file."));
+        f.close();
+        return true;
+    }
+    f.close();
+
     // 解析摄像头内参和畸变参数
-    YamlParse parse(ResManager::Self()->GetCameraParamsFile());
+    YamlParse parse(paramsFile);
     m_cameraDataGot = CameraData::Decode(parse.GetNode(), m_params);
 
     if (!m_cameraDataGot) {
-        Flow::Self()->SendMsg(PosInfoMsg(GLRender::target, "No camera calibrate file."));
+        Flow::Self()->SendMsg(PosInfoMsg(GLRender::target, "No camera calibrate params."));
     }
 
     return true;
