@@ -44,7 +44,8 @@ void CalibrateCamera::process() {
     Log::v(Log::PROCESSOR_TAG, "CalibrateCamera::process");
 
     if (m_images.empty()) {
-        Log::w(Log::PROCESSOR_TAG, "no calibrate images");
+        Log::w(Log::PROCESSOR_TAG, "no calibrate images.");
+        Flow::Self()->SendMsg(PosInfoMsg(GLRender::target, "no calibrate images!"));
         return;
     }
 
