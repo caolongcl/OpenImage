@@ -43,7 +43,7 @@ namespace clt {
         WorkerFlow() = default;
 
         static std::mutex s_mutex;
-        constexpr static const int POOL_SIZE = 4;
+        constexpr static const int POOL_SIZE = 8;
     };
 
 }

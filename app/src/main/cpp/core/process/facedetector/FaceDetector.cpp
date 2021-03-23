@@ -78,14 +78,10 @@ void FaceDetector::process(const Buffer &buf) {
 
     } catch (std::exception &e) {
         Log::e(Log::PROCESSOR_TAG, "face detect exception occur %s", e.what());
-        Flow::Self()->SendMsg(PolygonMsg(Copier::target, Copier::msg_detect_face));
-        Flow::Self()->SendMsg(TextMsg(Copier::target, Copier::msg_detect_face_info));
-        return;
     }
 
     if (faces.empty()) {
         Flow::Self()->SendMsg(PolygonMsg(Copier::target, Copier::msg_detect_face));
-        Flow::Self()->SendMsg(TextMsg(Copier::target, Copier::msg_detect_face_info));
         return;
     }
 

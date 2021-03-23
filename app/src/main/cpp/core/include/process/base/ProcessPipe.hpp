@@ -55,7 +55,10 @@ namespace clt {
 
         void popTask(const std::string &name);
 
-        void postNormalToWorker(const std::shared_ptr<IProcessTask> &task);
+        static void postNormalToWorker(const std::shared_ptr<IProcessTask> &task);
+
+        static void postBufferToWorker(const std::shared_ptr<IProcessTask> &task,
+                                       const std::shared_ptr<Buffer>& buf);
 
         void clearProcessTasks();
 

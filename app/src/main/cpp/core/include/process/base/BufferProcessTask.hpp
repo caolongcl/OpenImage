@@ -9,6 +9,8 @@
 
 namespace clt {
 
+    class GLThread;
+
     class BufferProcessTask final : public IBufferProcessTask {
     public:
         BufferProcessTask(std::string name, std::shared_ptr<IProcessTask> task);
@@ -23,7 +25,6 @@ namespace clt {
 
     private:
         std::string m_name;
-        // 具体任务
         std::shared_ptr<IProcessTask> m_task;
     };
 };

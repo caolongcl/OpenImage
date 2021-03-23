@@ -162,6 +162,16 @@ void ProcessPipe::postNormalToWorker(const std::shared_ptr<IProcessTask> &task) 
     });
 }
 
+void ProcessPipe::postBufferToWorker(const std::shared_ptr<IProcessTask> &task,
+                                     const std::shared_ptr<Buffer> &buf) {
+    if (task != nullptr && buf != nullptr) {
+        auto dataBuf = std::make_shared<Buffer>(buf->data, buf->width, buf->height, buf->channel);
+        WorkerFlow::Self()->Post([task, dataBuf]() {
+            task->Process(dataBuf);
+        });
+    }
+}
+
 void ProcessPipe::clearProcessTasks() {
     auto thread = Flow::Self()->GetThread(s_pipeThread);
     if (thread != nullptr) {
@@ -220,7 +230,7 @@ void ProcessPipe::dispatchBuffer() {
                 }
                 if (dispatch) {
                     for (auto &task : tmp) {
-                        task.second->Process(buf);
+                        postBufferToWorker(task.second, buf);
                     }
                 }
 
