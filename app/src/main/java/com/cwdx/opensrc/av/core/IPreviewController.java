@@ -103,4 +103,6 @@ public interface IPreviewController {
     void EnableProcess(String name, boolean enable);
 
     void UpdateTargetPos(int x, int y);
+
+    void SetFFmpegDebug(boolean debug);
 }

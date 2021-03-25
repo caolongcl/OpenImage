@@ -251,4 +251,9 @@ public class PreviewView extends SurfaceView implements IPreviewView, IPreviewCo
     public void UpdateTargetPos(int x, int y) {
         mController.UpdateTargetPos(x, y);
     }
+
+    @Override
+    public void SetFFmpegDebug(boolean debug) {
+        mController.SetFFmpegDebug(debug);
+    }
 }

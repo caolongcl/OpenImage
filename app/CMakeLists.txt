@@ -26,6 +26,7 @@ set(libs "${CMAKE_SOURCE_DIR}/src/main/jniLibs")
 
 include_directories(${root}/core/include)
 include_directories(${root}/core/3rdparty)
+include_directories(${root}/core/3rdparty/ffmpeg)
 include_directories(${root}/core/3rdparty/freetype2)
 
 add_library(libade STATIC IMPORTED)
@@ -136,6 +137,37 @@ set(opencv_libs libopencv_calib3d libopencv_core libopencv_features2d libopencv_
         libopencv_gapi libopencv_highgui libopencv_imgcodecs libopencv_imgproc libopencv_ml
         libopencv_objdetect libopencv_photo libopencv_stitching libopencv_video libopencv_videoio)
 
+##### ffmpeg
+add_library(libavcodec STATIC IMPORTED)
+set_target_properties(libavcodec PROPERTIES
+        IMPORTED_LOCATION "${libs}/${ANDROID_ABI}/libavcodec.a")
+
+add_library(libavdevice STATIC IMPORTED)
+set_target_properties(libavdevice PROPERTIES
+        IMPORTED_LOCATION "${libs}/${ANDROID_ABI}/libavdevice.a")
+
+add_library(libavfilter STATIC IMPORTED)
+set_target_properties(libavfilter PROPERTIES
+        IMPORTED_LOCATION "${libs}/${ANDROID_ABI}/libavfilter.a")
+
+add_library(libavformat STATIC IMPORTED)
+set_target_properties(libavformat PROPERTIES
+        IMPORTED_LOCATION "${libs}/${ANDROID_ABI}/libavformat.a")
+
+add_library(libavutil STATIC IMPORTED)
+set_target_properties(libavutil PROPERTIES
+        IMPORTED_LOCATION "${libs}/${ANDROID_ABI}/libavutil.a")
+
+add_library(libswresample STATIC IMPORTED)
+set_target_properties(libswresample PROPERTIES
+        IMPORTED_LOCATION "${libs}/${ANDROID_ABI}/libswresample.a")
+
+add_library(libswscale STATIC IMPORTED)
+set_target_properties(libswscale PROPERTIES
+        IMPORTED_LOCATION "${libs}/${ANDROID_ABI}/libswscale.a")
+
+set(ffmpeg_libs libavcodec libavdevice libavfilter libavformat libavutil libswresample libswscale)
+
 ##### freetype2
 add_library(libfreetype STATIC IMPORTED)
 set_target_properties(libfreetype PROPERTIES
@@ -219,10 +251,10 @@ add_library(${MODULE_CORE} SHARED ${MODULE_SRC})
 
 target_link_libraries(
         ${MODULE_CORE}
-        log android EGL GLESv3 z
+        log android EGL GLESv3 z OpenSLES
         yaml-cpp
 
         -Wl,--start-group
-        ${3dparty_libs} ${opencv_libs} ${freetype_lib}
+        ${3dparty_libs} ${opencv_libs} ${freetype_lib} ${ffmpeg_libs}
         -Wl,--end-group
 )

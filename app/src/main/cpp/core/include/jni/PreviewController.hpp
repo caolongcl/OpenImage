@@ -127,12 +127,18 @@ namespace clt {
          */
         void OnCallback(CallbackType type) override;
 
+        static void SetFFmpegDebug(bool debug);
+
     private:
         /**
          * 缓存Jni方法，将从C/C++回调到Java的方法缓存下来
          * @param env
          */
         void cacheJniMethod(JNIEnv *env);
+
+        void releaseJni(JNIEnv *env);
+
+        static void ffmpegLogCallback(void *ptr, int level, const char *fmt, va_list vl);
 
     private:
         // jni

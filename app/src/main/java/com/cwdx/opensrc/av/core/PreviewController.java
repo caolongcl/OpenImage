@@ -52,6 +52,8 @@ public class PreviewController implements IPreviewController {
     private boolean mRecording = false;
     private Context mContext;
     private File mLastVideoFile;
+    private final FFmpegUtils mFFmpegUtils = new FFmpegUtils();
+
     /**
      * 处理照片拍摄
      */
@@ -343,6 +345,11 @@ public class PreviewController implements IPreviewController {
         NativeUpdateTargetPos(x, y);
     }
 
+    @Override
+    public void SetFFmpegDebug(boolean debug) {
+        mFFmpegUtils.SetFFmpegDebug(debug);
+    }
+
     private void FromNativePostInfo(String info) {
         if (mContext != null && mMainHandler != null) {
             mMainHandler.post(() -> {
@@ -479,7 +486,7 @@ public class PreviewController implements IPreviewController {
         int[] color = ImageUtils.convert(data, width, height);
         Bitmap bitmap = Bitmap.createBitmap(color, width, height, Bitmap.Config.ARGB_8888);
 
-        File file = null;
+        File file;
         if (mNormalCapture) {
             file = ImageUtils.createFile(mMediaDirs[0], ImageUtils.FILENAME, ImageUtils.PHOTO_EXTENSION);
         } else {

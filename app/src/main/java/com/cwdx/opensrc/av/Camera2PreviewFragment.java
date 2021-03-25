@@ -92,6 +92,7 @@ public class Camera2PreviewFragment extends Fragment {
 
         mPreviewView.SetController(mPreviewController);
         mPreviewView.Create(getContext());
+        mPreviewView.SetFFmpegDebug(true);
         mPreviewView.SetMediaDir(((MainActivity) getActivity()).getMediaDir());
         mPreviewView.SetMainHandler(new MyHandler(new WeakReference<>(getContext())));
 

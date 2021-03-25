@@ -12,6 +12,7 @@
 #include <softarch/VarType.hpp>
 #include <render/Flow.hpp>
 #include <process/base/WorkerFlow.hpp>
+#include <softarch/ffmpeglib.hpp>
 
 using namespace clt;
 
@@ -39,18 +40,13 @@ void PreviewController::Create(JavaVM *jvm, jobject thiz) {
             // 加载资源
             if (m_LoadAssetsMethod != nullptr) {
                 auto assetsPath = (jstring) env->CallObjectMethod(m_Thiz, m_LoadAssetsMethod);
-
-                jboolean isCopy = JNI_TRUE;
-                const char *nameChar = env->GetStringUTFChars(assetsPath, &isCopy);
-                const int nameCharLen = env->GetStringUTFLength(assetsPath);
-                std::string path(nameChar, nameCharLen);
-                env->ReleaseStringUTFChars(assetsPath, nameChar);
+                std::string path = JniUtils::GetString(env, assetsPath);
 
                 // 在共享渲染线程加载资源
 //                Flow::Self()->PostToShared([this, path]() {
-                    Log::v(Log::PREVIEW_CTRL_TAG, "LoadResource %s", path.c_str());
-                    ResManager::Self()->Init();
-                    ResManager::Self()->ScanAndLoad(path);
+                Log::v(Log::PREVIEW_CTRL_TAG, "LoadResource %s", path.c_str());
+                ResManager::Self()->Init();
+                ResManager::Self()->ScanAndLoad(path);
 //                });
             }
         }, "PreviewController::Init");
@@ -69,14 +65,7 @@ void PreviewController::Destroy() {
     Flow::Self()->PostToRender([this]() {
         // 请除缓存的JNI资源
         JniUtils::DoOutCurJvm(m_JavaVM, [this](JNIEnv *env) {
-            m_SetPreviewTextureMethod = nullptr;
-            m_StartPreviewMethod = nullptr;
-            m_StopPreviewMethod = nullptr;
-            m_UpdateFrameMethod = nullptr;
-            m_LoadAssetsMethod = nullptr;
-            m_PostInfoMethod = nullptr;
-            m_ConfigEncoderMethod = nullptr;
-            m_CreateImageReaderMethod = nullptr;
+            releaseJni(env);
         });
 
         // 销毁字体文件等资源
@@ -288,11 +277,11 @@ void PreviewController::SetString(const std::string &name, const std::string &st
                 Log::v(Log::PREVIEW_CTRL_TAG, "SetString %s %s", name.c_str(), str.c_str());
                 if (name == "basedir") {
 //                    Flow::Self()->PostToShared([str]() {
-                        ResManager::Self()->RegisterBaseDir(str);
+                    ResManager::Self()->RegisterBaseDir(str);
 //                    });
                 } else if (name == "funcdir") {
 //                    Flow::Self()->PostToShared([str]() {
-                        ResManager::Self()->RegisterFunctionDir(str);
+                    ResManager::Self()->RegisterFunctionDir(str);
 //                    });
                 }
             });
@@ -375,6 +364,36 @@ void PreviewController::OnCallback(CallbackType type) {
     }
 }
 
+void PreviewController::SetFFmpegDebug(bool debug) {
+    if (debug) {
+        av_log_set_callback(ffmpegLogCallback);
+    } else {
+        av_log_set_callback(nullptr);
+    }
+}
+
+void PreviewController::ffmpegLogCallback(void *ptr, int level, const char *fmt, va_list vl) {
+    switch (level) {
+        case AV_LOG_DEBUG:
+            Log::d(Log::FFMPEG_TAG, fmt, vl);
+            break;
+        case AV_LOG_VERBOSE:
+            Log::v(Log::FFMPEG_TAG, fmt, vl);
+            break;
+        case AV_LOG_INFO:
+            Log::i(Log::FFMPEG_TAG, fmt, vl);
+            break;
+        case AV_LOG_WARNING:
+            Log::w(Log::FFMPEG_TAG, fmt, vl);
+            break;
+        case AV_LOG_ERROR:
+            Log::e(Log::FFMPEG_TAG, fmt, vl);
+            break;
+        default:
+            break;
+    }
+}
+
 void PreviewController::cacheJniMethod(JNIEnv *env) {
     jclass previewClass = env->GetObjectClass(m_Thiz);
     assert(previewClass != nullptr);
@@ -410,4 +429,17 @@ void PreviewController::cacheJniMethod(JNIEnv *env) {
     // 通过Java层显示信息
     m_PostInfoMethod = env->GetMethodID(previewClass, "FromNativePostInfo", "(Ljava/lang/String;)V");
     CheckMethodIDExit(m_PostInfoMethod, FromNativePostInfo);
+
+    env->DeleteLocalRef(previewClass);
+}
+
+void PreviewController::releaseJni(JNIEnv *env) {
+    m_SetPreviewTextureMethod = nullptr;
+    m_StartPreviewMethod = nullptr;
+    m_StopPreviewMethod = nullptr;
+    m_UpdateFrameMethod = nullptr;
+    m_LoadAssetsMethod = nullptr;
+    m_PostInfoMethod = nullptr;
+    m_ConfigEncoderMethod = nullptr;
+    m_CreateImageReaderMethod = nullptr;
 }

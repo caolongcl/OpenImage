@@ -66,6 +66,7 @@ namespace clt {
         static const char *RES_TAG;
         static const char *PROCESSOR_TAG;
         static const char *GLTHREAD_TAG;
+        static const char *FFMPEG_TAG;
 
     private:
         enum LogLevel {

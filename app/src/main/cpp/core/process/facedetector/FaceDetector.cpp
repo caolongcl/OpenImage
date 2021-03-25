@@ -65,7 +65,7 @@ void FaceDetector::process(const Buffer &buf) {
     std::vector<cv::Rect> faces;
 
     try {
-        cv::Mat frame(buf.height, buf.width, CV_8UC4, buf.data.get());// buf是RGBA的，frame把它当成BGRA的
+        cv::Mat frame(buf.height, buf.width, CV_8UC4, buf.data.get()); // buf是RGBA的，frame把它当成BGRA的
         cv::Mat frameGray;
         cv::cvtColor(frame, frameGray, cv::COLOR_RGBA2GRAY);
         cv::flip(frameGray, frameGray, 0); // 上下翻转

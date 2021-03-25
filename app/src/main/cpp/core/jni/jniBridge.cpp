@@ -6,6 +6,7 @@
 #include <softarch/VarType.hpp>
 #include <softarch/ComType.hpp>
 #include <jni/JniUtils.hpp>
+#include <softarch/ffmpeglib.hpp>
 
 using namespace clt;
 
@@ -193,6 +194,8 @@ extern "C" JNIEXPORT void JNICALL NativeSetFloatVar(JNIEnv *env,
         JniUtils::UseString(env, name, [elems, count](const std::string &varName) {
             gPreviewController->SetVar(varName, Float{elems, count});
         });
+
+        env->ReleaseFloatArrayElements(var, elems, 0);
     }
 }
 
@@ -228,6 +231,8 @@ extern "C" JNIEXPORT void JNICALL NativeSetIntVar(JNIEnv *env,
         JniUtils::UseString(env, name, [elems, count](const std::string &varName) {
             gPreviewController->SetVar(varName, Integer{elems, count});
         });
+
+        env->ReleaseIntArrayElements(var, elems, 0);
     }
 }
 
@@ -283,6 +288,14 @@ extern "C" JNIEXPORT void JNICALL NativeUpdateTargetPos(JNIEnv *env,
     }
 }
 
+extern "C" JNIEXPORT void JNICALL NativeSetFFmpegDebug(JNIEnv *env,
+                                                       jobject thiz,
+                                                       jboolean debug) {
+    if (gPreviewController != nullptr) {
+        gPreviewController->SetFFmpegDebug(debug == JNI_TRUE);
+    }
+}
+
 // 为注册的jni接口的类名
 static const char *JNIREG_CLASS = "com/cwdx/opensrc/av/core/PreviewController";
 static JNINativeMethod sMethods[] = {
@@ -309,10 +322,15 @@ static JNINativeMethod sMethods[] = {
         {"NativeUpdateTargetPos",      "(II)V",                                   (void *) NativeUpdateTargetPos},
 };
 
+static const char *JNIREG_FFMPEG_CLASS = "com/cwdx/opensrc/av/core/FFmpegUtils";
+static JNINativeMethod sFFmpegMethods[] = {
+        {"NativeSetFFmpegDebug", "(Z)V", (void *) NativeSetFFmpegDebug},
+};
+
 static int registerNativeMethods(JNIEnv *env, const char *className,
                                  JNINativeMethod *gMethods, int numMethods) {
     jclass clazz;
-    clazz = env->FindClass(JNIREG_CLASS);
+    clazz = env->FindClass(className);
     if (clazz == nullptr) {
         return JNI_FALSE;
     }
@@ -339,6 +357,17 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
                                sizeof(sMethods) / sizeof(JNINativeMethod))) {
         return -1;
     }
+
+    if (!registerNativeMethods(env,
+                               JNIREG_FFMPEG_CLASS,
+                               sFFmpegMethods,
+                               sizeof(sFFmpegMethods) / sizeof(JNINativeMethod))) {
+        return -1;
+    }
+
+    // 支持 h264 硬解
+    av_jni_set_java_vm(vm, nullptr);
+
     /* success -- return valid version number */
     result = JNI_VERSION_1_6;
 
