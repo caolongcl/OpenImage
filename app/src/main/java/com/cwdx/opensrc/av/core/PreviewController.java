@@ -118,9 +118,10 @@ public class PreviewController implements IPreviewController {
             }
             mWorkThread = null;
             mWorkerHandler = null;
-
-            mMainHandler = null;
+            mHwEncoder = null;
         }
+
+        mMainHandler = null;
     }
 
     @Override

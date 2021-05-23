@@ -13,7 +13,7 @@ class AssetCopier {
 
     private static void copyAssetsToDst(Context context, String srcPath, String dstPath) {
         try {
-            String fileNames[] = context.getAssets().list(srcPath);
+            String[] fileNames = context.getAssets().list(srcPath);
             if (fileNames.length > 0) {
                 File file = new File(dstPath);
                 file.mkdirs();

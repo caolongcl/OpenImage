@@ -178,30 +178,40 @@ void Flow::RemoveMsgHandler(const std::shared_ptr<IMsgHandler> &handler) {
 }
 
 void Flow::SendMsg(const Msg &msg) {
-    if (m_msgTargets.find(msg.target) != m_msgTargets.end()) {
-        auto id = m_msgTargets.at(msg.target);
+    std::thread::id id;
 
-        if (m_render != nullptr && id == m_render->Id()) {
-            m_render->SendMsg(msg);
-        } else if (m_shared != nullptr && id == m_shared->Id()) {
-            m_shared->SendMsg(msg);
-        } else if (m_flowsById.find(id) != m_flowsById.end()) {
-            m_flowsById.at(id)->SendMsg(msg);
+    {
+        std::lock_guard<std::mutex> locker(s_mutex);
+        if (m_msgTargets.find(msg.target) != m_msgTargets.end()) {
+            id = m_msgTargets.at(msg.target);
         }
+    }
+
+    if (m_render != nullptr && id == m_render->Id()) {
+        m_render->SendMsg(msg);
+    } else if (m_shared != nullptr && id == m_shared->Id()) {
+        m_shared->SendMsg(msg);
+    } else if (m_flowsById.find(id) != m_flowsById.end()) {
+        m_flowsById.at(id)->SendMsg(msg);
     }
 }
 
 void Flow::PostMsg(const Msg &msg) {
-    if (m_msgTargets.find(msg.target) != m_msgTargets.end()) {
-        auto id = m_msgTargets.at(msg.target);
+    std::thread::id id;
 
-        if (m_render != nullptr && id == m_render->Id()) {
-            m_render->PostMsg(msg);
-        } else if (m_shared != nullptr && id == m_shared->Id()) {
-            m_shared->PostMsg(msg);
-        } else if (m_flowsById.find(id) != m_flowsById.end()) {
-            m_flowsById.at(id)->PostMsg(msg);
+    {
+        std::lock_guard<std::mutex> locker(s_mutex);
+        if (m_msgTargets.find(msg.target) != m_msgTargets.end()) {
+            id = m_msgTargets.at(msg.target);
         }
+    }
+
+    if (m_render != nullptr && id == m_render->Id()) {
+        m_render->PostMsg(msg);
+    } else if (m_shared != nullptr && id == m_shared->Id()) {
+        m_shared->PostMsg(msg);
+    } else if (m_flowsById.find(id) != m_flowsById.end()) {
+        m_flowsById.at(id)->PostMsg(msg);
     }
 }
 

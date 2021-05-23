@@ -337,6 +337,7 @@ static int registerNativeMethods(JNIEnv *env, const char *className,
     if (env->RegisterNatives(clazz, gMethods, numMethods) < 0) {
         return JNI_FALSE;
     }
+    env->DeleteLocalRef(clazz);
 
     return JNI_TRUE;
 }

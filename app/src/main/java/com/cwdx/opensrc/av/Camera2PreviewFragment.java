@@ -57,6 +57,10 @@ public class Camera2PreviewFragment extends Fragment {
         return sInstance;
     }
 
+    public static void releaseFragment() {
+        sInstance = null;
+    }
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

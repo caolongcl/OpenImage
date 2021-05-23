@@ -1,8 +1,11 @@
 package com.cwdx.opensrc;
 
 import android.Manifest;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.util.LruCache;
 import android.view.View;
 import android.widget.Toast;
 
@@ -59,6 +62,11 @@ public class MainActivity extends AppCompatActivity {
 
         adapter.setData(items);
 
+//        ActivityManager activityManager = (ActivityManager)getSystemService(Context.ACTIVITY_SERVICE);
+//        Utils.d("MainActivity", "memery " + activityManager.getMemoryClass());
+
+//        LruCache<>
+
         String[] normalPermissions = {
                 Manifest.permission.CAMERA,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -99,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Camera2PreviewFragment.releaseFragment();
     }
 
     @Override
