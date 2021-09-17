@@ -39,7 +39,7 @@
 
 - 人脸检测的人脸图片 `face_detector_samples.png`
 - 相机校正棋盘格图片 `chessboard.bmp`
-  - 行内点数为 6，列内点数为 8
+  - 行内点数为 6，列内点数为 8 （注意，行内点标识有多少行，列内点标识有多少列）
 - 基于标签的 AR 所用的 Marker 图片，目前代码只支持 marker code 为 0，1，2，3，4 的
   - `marker_detect.png` 共有 4 个 marker
   - `marker_detect_3.png` 对应 marker code 为 3
@@ -57,7 +57,9 @@
   - 棋盘格格子实际测量的高度（mm）
   - Marker 实际测量的宽度（mm）
   - Marker 实际测量的高度（mm）
-- 从各个角度拍摄棋盘格 5 张图片，然后短按校正按钮，开始标定
+- 从各个角度拍摄棋盘格 5 张图片，然后短按校正按钮，开始标定（标定结束时会弹出 Toast，根据机器性能时间可能稍长）
+  - 查看日志，搜索日志 "calibrate average err"，假如在 10.0 上下，说明标定准确率尚可
+  - 如果最后 Marker AR 的效果不正常，可查看标定时否找到了角点（可查看 /sdcard/Android/media/com.cwdx.opensrc/media/function 目录下对应图片）
 - 切换到拍照模式，可以从弹出菜单中开启 “opencv AR”。将摄像头对准 Marker 图片，正常情况下会有一个彩色立方体位于 Marker 图片上
 
 ## 测试 UI

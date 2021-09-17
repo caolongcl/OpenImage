@@ -139,8 +139,6 @@ void ResManager::loadFonts() {
 }
 
 void ResManager::clearOldCalibrateImages() {
-    std::lock_guard<std::mutex> locker(s_mutex);
-
     DIR *dirItem;
     struct dirent *dir;
 
@@ -150,7 +148,8 @@ void ResManager::clearOldCalibrateImages() {
             auto pos = dirName.find_last_of('.');
             if (dirName != "." && dirName != ".." && dirName.substr(pos) == ".jpg") {
                 Log::d(Log::PROCESSOR_TAG, "remove old calibrate file %s", dirName.c_str());
-                std::remove(dirName.c_str());
+                std::string fullPath = m_functionPath + "/" + dirName;
+                std::remove(fullPath.c_str());
             }
         }
 
@@ -198,6 +197,8 @@ void ResManager::SaveCalibrateParams(Integer2 boardSize,
         || boardSquareSize.h != m_calibrateData.GetBoardSquareSize().h
         || markerSize.w != m_calibrateData.GetMarkerSize().w
         || markerSize.h != m_calibrateData.GetMarkerSize().h) {
+        Log::d(Log::RES_TAG, "SaveCalibrateParams calibrate_params changed");
+
         std::lock_guard<std::mutex> locker(s_mutex);
 
         m_calibrateData = {{boardSize.w,       boardSize.h},
@@ -210,6 +211,8 @@ void ResManager::SaveCalibrateParams(Integer2 boardSize,
 
         // 清除旧参数拍摄的校正图片
         clearOldCalibrateImages();
+    } else {
+      Log::w(Log::RES_TAG, "SaveCalibrateParams calibrate_params unchanged");
     }
 }
 

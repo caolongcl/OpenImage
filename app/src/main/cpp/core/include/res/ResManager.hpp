@@ -75,8 +75,8 @@ namespace clt {
                              node["info"]["board_height"].as<int>()};
             rhs.boardSquareSize = {node["info"]["board_square_width"].as<float>(),
                                    node["info"]["board_square_height"].as<float>()};
-            rhs.boardSize = {node["info"]["marker_width"].as<int>(),
-                             node["info"]["marker_height"].as<int>()};
+            rhs.markerSize = {node["info"]["marker_width"].as<float>(),
+                             node["info"]["marker_height"].as<float>()};
             return true;
         }
 
@@ -94,12 +94,12 @@ namespace clt {
 
         std::string GetJsonString() const {
             std::stringstream ss;
-            ss << "{" << "\"board_width:\"" << boardSize.w << ","
-               << "\"board_height:\"" << boardSize.h << ","
-               << "\"board_square_width:\"" << boardSquareSize.w << ","
-               << "\"board_square_height:\"" << boardSquareSize.h << ","
-               << "\"marker_width:\"" << markerSize.w << ","
-               << "\"marker_height:\"" << markerSize.h << "}";
+            ss << "{" << "\"board_width\":" << boardSize.w << ","
+               << "\"board_height\":" << boardSize.h << ","
+               << "\"board_square_width\":" << boardSquareSize.w << ","
+               << "\"board_square_height\":" << boardSquareSize.h << ","
+               << "\"marker_width\":" << markerSize.w << ","
+               << "\"marker_height\":" << markerSize.h << "}";
             return ss.str();
         }
 

@@ -42,6 +42,8 @@ bool MarkerAR::Init() {
     // 加载校正参数
     m_calibrateData = ResManager::Self()->LoadCalibrateParams();
 
+    Log::d(Log::PROCESSOR_TAG, "marker detect calibrate params:%s", m_calibrateData.GetJsonString().c_str());
+
     return true;
 }
 
@@ -122,6 +124,7 @@ void MarkerAR::process(const Buffer &buf) {
 
     /// 2. 绘制 AR 模型
     if (!m_cameraDataGot) {
+        Log::e(Log::PROCESSOR_TAG, "no camera params");
         return;
     }
 
@@ -145,12 +148,12 @@ void MarkerAR::process(const Buffer &buf) {
         m_params.GetCameraMatrix(cameraMatrix);
         m_params.GetCameraDistCoeffs(distCoeffs);
 
-        // marker 3D 坐标
+        // 根据 marker 建立 3D 坐标系（OpenCV 坐标系 X 朝右，Y 朝下，Z 朝内）
         std::vector<cv::Point3f> realCoords;
         getMarkerRealCoordinates(realCoords, m_calibrateData.GetMarkerSize());
 
         for (auto &marker : makers) {
-            // marker 像素坐标
+            // marker 在预览图像上的像素坐标
             std::vector<cv::Point2f> coords;
             getMarkerCoordinates(marker.corners, coords, bufRatio);
 
@@ -158,7 +161,7 @@ void MarkerAR::process(const Buffer &buf) {
             cv::Mat rMat, tVec;
             estimateCameraView(realCoords, coords, cameraMatrix, distCoeffs, rMat, tVec);
 
-            // 获取模视矩阵
+            // 获取模视矩阵（绕X轴旋转180度，从 OpenCV 坐标系变换为 OpenGL 坐标系， X 朝右，Y 朝上，Z 朝内）
             cv::Mat modelView;
             estimateModelView(rMat, tVec, modelView);
 
@@ -175,12 +178,12 @@ void MarkerAR::process(const Buffer &buf) {
             Float2 markerSize = m_calibrateData.GetMarkerSize();
             float scale = (markerSize.w + markerSize.h) / 2.0f;
             glm::mat4 scaleModel = glm::scale(glm::mat4(), glm::vec3(scale, scale, scale));
+//            glm::mat4 scaleModel = glm::scale(glm::mat4(), glm::vec3(markerSize.w, markerSize.h, scale));
             glModelView = glModelView * scaleModel;
 
-            // 立方体中心是原点
-            glm::mat4 transModel = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, -scale / 2));
+            glm::mat4 transModel = glm::translate(glm::mat4(), glm::vec3(-scale / 2.0f, 0.0f, 0.0f));
 
-            baseModelObjects.emplace_back(BaseModelObject::Type::CUBE,
+            baseModelObjects.emplace_back(BaseModelObject::Type::PYRAMID,
                                           glProjection, glm::mat4(1.0), transModel * glModelView,
                                           BlueColor);
         }

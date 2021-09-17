@@ -147,12 +147,14 @@ public class Camera2PreviewFragment extends Fragment {
 
         // 长按弹出设置校正参数弹框
         mCameraModeSelectV.SetCalibrateParams(() -> {
-            if (mCalibrateParamsDialog.isHidden()) {
+            if (!mCalibrateParamsDialog.isVisible()) {
                 String params = mPreviewView.GetParamsFromNative("calibrate_params");
                 if (params == null || params.equals("")) {
                     Utils.e(TAG, "get calibrate_params failed");
                     return;
                 }
+
+                Utils.d(TAG, "get calibrate_params: " + params);
 
                 try {
                     JSONObject paramsJson = new JSONObject(params);
@@ -161,7 +163,7 @@ public class Camera2PreviewFragment extends Fragment {
                     float boardSquareWidth = (float) paramsJson.getDouble("board_square_width");
                     float boardSquareHeight = (float) paramsJson.getDouble("board_square_height");
                     float markerWidth = (float) paramsJson.getDouble("marker_width");
-                    float markerHeight = (float) paramsJson.getDouble("marker_width");
+                    float markerHeight = (float) paramsJson.getDouble("marker_height");
 
                     mCalibrateParamsDialog.UpdateCalibrateData(new CalibrateParamsDialog
                             .CalibrateData(boardSizeWidth, boardSizeHeight,

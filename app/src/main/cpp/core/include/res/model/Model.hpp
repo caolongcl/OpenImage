@@ -49,6 +49,7 @@ namespace clt {
     struct BaseModelObject {
         enum class Type {
             CUBE,
+            PYRAMID,
         };
 
         BaseModelObject(Type _type,

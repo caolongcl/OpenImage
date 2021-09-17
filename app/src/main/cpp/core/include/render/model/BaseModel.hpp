@@ -34,6 +34,10 @@ namespace clt {
             GLuint cubeEbo{0};
             int count{0};
         };
+      struct Pyramid {
+        GLuint pyramidEbo{0};
+        int count{0};
+      };
     public:
         BaseModel();
 
@@ -71,6 +75,10 @@ namespace clt {
 
         static std::vector<unsigned short> createCubeIndex();
 
+        static std::vector<float> createPyramidVertex();
+
+        static std::vector<unsigned short> createPyramidIndex();
+
         /**
          * 构造摄像机内参矩阵，得到投影矩阵
          * @param width 绘制区域宽
@@ -104,6 +112,7 @@ namespace clt {
         GLuint m_vao{0};
         GLuint m_vbo{0};
         Cube m_cube;
+        Pyramid m_pyramid;
 
         GLint m_uniformLocProjection{-1};
         GLint m_uniformLocView{-1};

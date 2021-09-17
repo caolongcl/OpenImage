@@ -76,9 +76,9 @@ void CalibrateCamera::process() {
                   m_calibrateData.GetBoardSize(), m_calibrateData.GetBoardSquareSize(),
                   cameraMatrix, distCoeffs);
 
-//        for (int i = 0; i < count; ++i) {
-//            unDistort(m_images[i], cameraMatrix, distCoeffs);
-//        }
+        for (int i = 0; i < count; ++i) {
+            unDistort(m_images[i], cameraMatrix, distCoeffs);
+        }
 
         Flow::Self()->SendMsg(PosInfoMsg(GLRender::target, "calibrate successfully"));
 
@@ -174,9 +174,9 @@ bool CalibrateCamera::findCorners(const std::string &file,
     cv::TermCriteria criteria(cv::TermCriteria::EPS | cv::TermCriteria::Type::MAX_ITER, 30, 0.001);
     cv::cornerSubPix(gray, corners, cv::Size(11, 11), cv::Size(-1, -1), criteria);
 
-//    cv::drawChessboardCorners(image, boardSize, corners, true);
+    cv::drawChessboardCorners(image, boardSize, corners, true);
 
-//    ResManager::Self()->SaveMatImageImmediate(file + "ChessboardCorners", image);
+    ResManager::Self()->SaveMatImageImmediate(file + "ChessboardCorners", image);
 
     return true;
 }
@@ -213,7 +213,9 @@ void CalibrateCamera::scanImages(const std::string &functionDir) {
         while ((dir = readdir(dirItem)) != nullptr) {
             std::string dirName(dir->d_name);
             auto pos = dirName.find_last_of('.');
-            if (dirName != "." && dirName != ".." && dirName.substr(pos) == ".jpg") {
+            if (dirName != "." && dirName != ".." && dirName.substr(pos) == ".jpg"
+            && dirName.find("ChessboardCorners") == std::string::npos
+            && dirName.find("undistort") == std::string::npos) {
                 m_images.emplace_back(dirName);
                 Log::v(Log::PROCESSOR_TAG, "function file : %s", dirName.c_str());
             }

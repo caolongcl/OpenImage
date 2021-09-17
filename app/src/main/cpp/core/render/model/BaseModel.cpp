@@ -36,6 +36,7 @@ void BaseModel::DeInit() {
     gles::DeleteVao(m_vao);
     gles::DeleteXbo(m_vbo);
     gles::DeleteXbo(m_cube.cubeEbo);
+    gles::DeleteXbo(m_pyramid.pyramidEbo);
 
     m_colorVars.Clear();
     m_mat4Vars.Clear();
@@ -72,16 +73,27 @@ void BaseModel::Render(const Viewport &viewport) {
 }
 
 void BaseModel::loadModels() {
-    auto cubeVertex = createCubeVertex();
-    auto cubeIndex = createCubeIndex();
+//    auto cubeVertex = createCubeVertex();
+//    auto cubeIndex = createCubeIndex();
+//
+//    gles::CreateXbo(GL_ARRAY_BUFFER, GL_STATIC_DRAW,
+//                    cubeVertex.size() * sizeof(float), (void *) cubeVertex.data(), m_vbo);
+//
+//    gles::CreateXbo(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW,
+//                    cubeIndex.size() * sizeof(unsigned short), (void *) cubeIndex.data(), m_cube.cubeEbo);
+
+//    m_cube.count = cubeIndex.size();
+
+    auto pyramidVertex = createPyramidVertex();
+    auto pyramidIndex = createPyramidIndex();
 
     gles::CreateXbo(GL_ARRAY_BUFFER, GL_STATIC_DRAW,
-                    cubeVertex.size() * sizeof(float), (void *) cubeVertex.data(), m_vbo);
+                    pyramidVertex.size() * sizeof(float), (void *) pyramidVertex.data(), m_vbo);
 
     gles::CreateXbo(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW,
-                    cubeIndex.size() * sizeof(unsigned short), (void *) cubeIndex.data(), m_cube.cubeEbo);
+                    pyramidIndex.size() * sizeof(unsigned short), (void *) pyramidIndex.data(), m_pyramid.pyramidEbo);
 
-    m_cube.count = cubeIndex.size();
+    m_pyramid.count = pyramidIndex.size();
 
     gles::CreateVao(m_vao);
     gles::UseVao(m_vao, [this, pos = m_shader->PositionAttributeLocation(),
@@ -143,9 +155,13 @@ void BaseModel::draw() {
                     updateValue(object.projection, object.view, object.model, object.color);
 
                     switch (object.type) {
-                        case BaseModelObject::Type::CUBE:
-                            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_cube.cubeEbo);
-                            glDrawElements(GL_TRIANGLES, m_cube.count, GL_UNSIGNED_SHORT, nullptr);
+//                        case BaseModelObject::Type::CUBE:
+//                            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_cube.cubeEbo);
+//                            glDrawElements(GL_TRIANGLES, m_cube.count, GL_UNSIGNED_SHORT, nullptr);
+//                            break;
+                        case BaseModelObject::Type::PYRAMID:
+                            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_pyramid.pyramidEbo);
+                            glDrawElements(GL_TRIANGLES, m_pyramid.count, GL_UNSIGNED_SHORT, nullptr);
                             break;
                         default:
                             break;
@@ -167,14 +183,14 @@ void BaseModel::updateValue(const glm::mat4 &_projection,
 }
 
 std::vector<float> BaseModel::createCubeVertex() {
-    return {0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,// 上面
-            0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-            -0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,
-            -0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-            0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f,// 下面
-            0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-            -0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,};
+    return {0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f,// 上面 0
+            0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // 1
+            -0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, // 2
+            -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // 3
+            0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f,// 下面 4
+            0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, // 5
+            -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, // 6
+            -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f,}; // 7
 }
 
 std::vector<unsigned short> BaseModel::createCubeIndex() {
@@ -190,6 +206,43 @@ std::vector<unsigned short> BaseModel::createCubeIndex() {
             4, 0, 6, 0, 2, 6,
             //后
             7, 3, 5, 3, 1, 5};
+}
+
+std::vector<float> BaseModel::createPyramidVertex() {
+//    return {0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, // 0
+//            0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, // 1
+//            -0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, // 2
+//            -0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, // 3
+//            0.0f, 0.25f, -0.5f, 0.0f, 0.0f, 1.0f, // 4 上顶点
+//            0.0f, -0.25f, -0.5f, 0.0f, 0.0f, 1.0f, // 5 下顶点
+//            };
+
+    return {0.0f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // 0
+            0.0f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, // 1
+            1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // 2
+            0.34f, 0.0f, -1.0f, 1.0f, 0.0f, 0.0f, // 3
+    };
+}
+
+std::vector<unsigned short> BaseModel::createPyramidIndex() {
+//    return {// 前面
+//        0, 2, 1, 2, 3, 1,
+//        // 上
+//        0, 4, 2,
+//        //左
+//        2, 4, 3, 4, 5, 3,
+//        //右
+//        0, 1, 4, 1, 5, 4,
+//        // 下
+//        3, 5, 1};
+    return {// 前
+        0, 1, 2,
+        // 左
+        0, 3, 1,
+        // 右
+        0, 2, 3,
+        // 下
+        2, 1, 3,};
 }
 
 void BaseModel::getRealWorldProjection(int width, int height, float near, float far, glm::mat4 &projection) {
