@@ -1,5 +1,8 @@
 package com.cwdx.opensrc.av;
 
+import static com.cwdx.opensrc.av.core.PreviewController.MSG_ADD_PICTURE;
+import static com.cwdx.opensrc.av.core.PreviewController.MSG_ADD_VIDEO;
+
 import android.content.Context;
 import android.media.MediaScannerConnection;
 import android.os.Bundle;
@@ -22,17 +25,18 @@ import com.cwdx.opensrc.av.core.CameraSelector;
 import com.cwdx.opensrc.av.core.IPreviewController;
 import com.cwdx.opensrc.av.core.PreviewController;
 import com.cwdx.opensrc.av.core.PreviewView;
+import com.cwdx.opensrc.av.view.CalibrateParamsDialog;
 import com.cwdx.opensrc.av.view.CameraModeSelectView;
 import com.cwdx.opensrc.av.view.CameraParamSelectView;
 import com.cwdx.opensrc.common.Utils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.cwdx.opensrc.av.core.PreviewController.MSG_ADD_PICTURE;
-import static com.cwdx.opensrc.av.core.PreviewController.MSG_ADD_VIDEO;
 
 
 public class Camera2PreviewFragment extends Fragment {
@@ -45,6 +49,8 @@ public class Camera2PreviewFragment extends Fragment {
     private CameraModeSelectView mCameraModeSelectV;
     private CameraParamSelectView mCameraParamSelectView;
     private ViewGroup mCameraParamDetailVG;
+    private CalibrateParamsDialog mCalibrateParamsDialog;
+    private File[] mediaDirs;
 
     public static Camera2PreviewFragment getInstance() {
         if (sInstance != null) return sInstance;
@@ -94,13 +100,24 @@ public class Camera2PreviewFragment extends Fragment {
             return true;
         });
 
+        mediaDirs = ((MainActivity) getActivity()).getMediaDir();
         mPreviewView.SetController(mPreviewController);
         mPreviewView.Create(getContext());
         mPreviewView.SetFFmpegDebug(true);
-        mPreviewView.SetMediaDir(((MainActivity) getActivity()).getMediaDir());
+        mPreviewView.SetMediaDir(mediaDirs);
         mPreviewView.SetMainHandler(new MyHandler(new WeakReference<>(getContext())));
 
         setSettingParamView(mCameraParamSelectView);
+
+        mCalibrateParamsDialog = new CalibrateParamsDialog();
+        mCalibrateParamsDialog.SetCallback((confirm, calibrateData) -> {
+                    if (confirm) {
+                        mPreviewView.SetCalibrateParams(calibrateData.boardSizeWidth, calibrateData.boardSizeHeight,
+                                calibrateData.boardSquareWidth, calibrateData.boardSquareHeight,
+                                calibrateData.markerWidth, calibrateData.markerHeight);
+                    }
+                }
+        );
     }
 
     @Override
@@ -127,9 +144,39 @@ public class Camera2PreviewFragment extends Fragment {
                 return mPreviewView.Recording();
             }
         });
-        mCameraModeSelectV.SetCalibrateFunc(() -> {
-            mPreviewView.EnableProcess("CalibrateCamera", true);
+
+        // 长按弹出设置校正参数弹框
+        mCameraModeSelectV.SetCalibrateParams(() -> {
+            if (mCalibrateParamsDialog.isHidden()) {
+                String params = mPreviewView.GetParamsFromNative("calibrate_params");
+                if (params == null || params.equals("")) {
+                    Utils.e(TAG, "get calibrate_params failed");
+                    return;
+                }
+
+                try {
+                    JSONObject paramsJson = new JSONObject(params);
+                    int boardSizeWidth = paramsJson.getInt("board_width");
+                    int boardSizeHeight = paramsJson.getInt("board_height");
+                    float boardSquareWidth = (float) paramsJson.getDouble("board_square_width");
+                    float boardSquareHeight = (float) paramsJson.getDouble("board_square_height");
+                    float markerWidth = (float) paramsJson.getDouble("marker_width");
+                    float markerHeight = (float) paramsJson.getDouble("marker_width");
+
+                    mCalibrateParamsDialog.UpdateCalibrateData(new CalibrateParamsDialog
+                            .CalibrateData(boardSizeWidth, boardSizeHeight,
+                            boardSquareWidth, boardSquareHeight,
+                            markerWidth, markerHeight));
+
+                    mCalibrateParamsDialog.show(getFragmentManager(), "CalibrateParams");
+                } catch (JSONException e) {
+                    Utils.e(TAG, "json parse failed :" + params);
+                }
+            }
         });
+        // 短按开始校正
+        mCameraModeSelectV.SetCalibrateFunc(() ->
+                mPreviewView.EnableProcess("CalibrateCamera", true));
     }
 
     @Override
@@ -148,6 +195,7 @@ public class Camera2PreviewFragment extends Fragment {
     public void onDestroyView() {
         Utils.d(TAG, "onDestroyView");
         mCameraParamSelectView.HideDetailContainerVG();
+        mCalibrateParamsDialog.SetCallback(null);
         super.onDestroyView();
     }
 

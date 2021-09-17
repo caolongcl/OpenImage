@@ -113,10 +113,12 @@ void PreviewController::SetPreviewMode(int rotate, int ratio,
 
                 // 将预览纹理设置给View
                 JniUtils::DoOutCurJvm(m_JavaVM, [this](JNIEnv *env) {
-                    Log::d(Log::PREVIEW_CTRL_TAG, "CreatePreviewTex :%d", m_render->GetPreviewTexId());
+                    Log::d(Log::PREVIEW_CTRL_TAG, "CreatePreviewTex :%d",
+                           m_render->GetPreviewTexId());
 
                     if (m_SetPreviewTextureMethod != nullptr)
-                        env->CallVoidMethod(m_Thiz, m_SetPreviewTextureMethod, m_render->GetPreviewTexId());
+                        env->CallVoidMethod(m_Thiz, m_SetPreviewTextureMethod,
+                                            m_render->GetPreviewTexId());
                 }, "PreviewController::SetPreviewMode");
             });
 }
@@ -206,7 +208,8 @@ void PreviewController::SetSurface(int type, ANativeWindow *window) {
     Flow::Self()->PostToRender(
             [this, type, window]() {
                 Log::d(Log::PREVIEW_CTRL_TAG, "SetSurface %s's surface %s",
-                       Constants::SurfaceTypeName(type).c_str(), Utils::GetBoolStr(window != nullptr).c_str());
+                       Constants::SurfaceTypeName(type).c_str(),
+                       Utils::GetBoolStr(window != nullptr).c_str());
                 m_render->SetSurface(type, window);
             });
 }
@@ -290,7 +293,8 @@ void PreviewController::SetString(const std::string &name, const std::string &st
 void PreviewController::EnableFilter(const std::string &name, bool enable) {
     Flow::Self()->PostToRender(
             [this, name, enable]() {
-                Log::d(Log::PREVIEW_CTRL_TAG, "EnableFilter %s %s", name.c_str(), Utils::GetBoolStr(enable).c_str());
+                Log::d(Log::PREVIEW_CTRL_TAG, "EnableFilter %s %s", name.c_str(),
+                       Utils::GetBoolStr(enable).c_str());
                 if (m_previewing) {
                     m_render->EnableFilter(name, enable);
                 }
@@ -300,7 +304,8 @@ void PreviewController::EnableFilter(const std::string &name, bool enable) {
 void PreviewController::EnableProcess(const std::string &name, bool enable) {
     Flow::Self()->PostToRender(
             [this, name, enable]() {
-                Log::d(Log::PREVIEW_CTRL_TAG, "EnableProcess %s %s", name.c_str(), Utils::GetBoolStr(enable).c_str());
+                Log::d(Log::PREVIEW_CTRL_TAG, "EnableProcess %s %s", name.c_str(),
+                       Utils::GetBoolStr(enable).c_str());
                 if (m_previewing) {
                     m_render->EnableProcess(name, enable);
                 }
@@ -328,7 +333,8 @@ void PreviewController::OnCallback(CallbackType type) {
             m_render->GetCaptureSize(width, height);
 
             JniUtils::DoOutCurJvm(m_JavaVM, [this, width, height](JNIEnv *env) {
-                Log::d(Log::PREVIEW_CTRL_TAG, "CaptureSizeChanged Update ImageReader (%d %d)", width, height);
+                Log::d(Log::PREVIEW_CTRL_TAG, "CaptureSizeChanged Update ImageReader (%d %d)",
+                       width, height);
 
                 env->CallVoidMethod(m_Thiz, m_CreateImageReaderMethod, width, height);
             });
@@ -337,17 +343,20 @@ void PreviewController::OnCallback(CallbackType type) {
             bool recording = m_render->GetRecordState(fps, bitrate);
 
             if (recording) {
-                Log::d(Log::PREVIEW_CTRL_TAG, "CaptureSizeChanged Reconfig Encoder (%d %d)", width, height);
+                Log::d(Log::PREVIEW_CTRL_TAG, "CaptureSizeChanged Reconfig Encoder (%d %d)", width,
+                       height);
 
                 m_render->Record(false, 0, 0);
                 JniUtils::DoOutCurJvm(m_JavaVM, [this, width, height, fps, bitrate](JNIEnv *env) {
-                    env->CallVoidMethod(m_Thiz, m_ConfigEncoderMethod, false, width, height, fps, bitrate);
+                    env->CallVoidMethod(m_Thiz, m_ConfigEncoderMethod, false, width, height, fps,
+                                        bitrate);
                 });
 
                 // restart recording
                 m_render->Record(true, fps, bitrate);
                 JniUtils::DoOutCurJvm(m_JavaVM, [this, width, height, fps, bitrate](JNIEnv *env) {
-                    env->CallVoidMethod(m_Thiz, m_ConfigEncoderMethod, true, width, height, fps, bitrate);
+                    env->CallVoidMethod(m_Thiz, m_ConfigEncoderMethod, true, width, height, fps,
+                                        bitrate);
                 });
             }
         }
@@ -370,6 +379,29 @@ void PreviewController::SetFFmpegDebug(bool debug) {
     } else {
         av_log_set_callback(nullptr);
     }
+}
+
+void PreviewController::SetCalibrateParams(int boardSizeWidth, int boardSizeHeight,
+                                           float boardSquareSizeWidth, float boardSquareSizeHeight,
+                                           float markerSizeWidth, float markerSizeHeight) {
+    Flow::Self()->PostToRender(
+            [this, boardSizeWidth, boardSizeHeight,
+                    boardSquareSizeWidth, boardSquareSizeHeight,
+                    markerSizeWidth, markerSizeHeight]() {
+                ResManager::Self()->SaveCalibrateParams(
+                        {boardSizeWidth, boardSizeHeight},
+                        {boardSquareSizeWidth, boardSquareSizeHeight},
+                        {markerSizeWidth, markerSizeHeight});
+            });
+}
+
+std::string PreviewController::GetParams(const std::string &paramsGroupName) {
+    if (paramsGroupName == "calibrate_params") {
+        CalibrateData calibrateData = ResManager::Self()->LoadCalibrateParams();
+        return calibrateData.GetJsonString();
+    }
+
+    return "";
 }
 
 void PreviewController::ffmpegLogCallback(void *ptr, int level, const char *fmt, va_list vl) {
@@ -399,7 +431,8 @@ void PreviewController::cacheJniMethod(JNIEnv *env) {
     assert(previewClass != nullptr);
 
     // 将纹理ID返给Java层
-    m_SetPreviewTextureMethod = env->GetMethodID(previewClass, "FromNativeSetPreviewTexture", "(I)V");
+    m_SetPreviewTextureMethod = env->GetMethodID(previewClass, "FromNativeSetPreviewTexture",
+                                                 "(I)V");
     CheckMethodIDExit(m_SetPreviewTextureMethod, FromNativeSetPreviewTexture);
 
     // 开启Java层预览
@@ -415,7 +448,8 @@ void PreviewController::cacheJniMethod(JNIEnv *env) {
     CheckMethodIDExit(m_UpdateFrameMethod, FromNativeUpdateFrame);
 
     // 创建Java层拍照surface
-    m_CreateImageReaderMethod = env->GetMethodID(previewClass, "FromNativeCreateImageReader", "(II)V");
+    m_CreateImageReaderMethod = env->GetMethodID(previewClass, "FromNativeCreateImageReader",
+                                                 "(II)V");
     CheckMethodIDExit(m_CreateImageReaderMethod, FromNativeCreateImageReader);
 
     // 创建Java层录制surface及创建MediaCodec
@@ -423,11 +457,13 @@ void PreviewController::cacheJniMethod(JNIEnv *env) {
     CheckMethodIDExit(m_ConfigEncoderMethod, FromNativeConfigEncoder);
 
     // 在Java层将资源拷贝到应用目录下
-    m_LoadAssetsMethod = env->GetMethodID(previewClass, "FromNativeLoadAssets", "()Ljava/lang/String;");
+    m_LoadAssetsMethod = env->GetMethodID(previewClass, "FromNativeLoadAssets",
+                                          "()Ljava/lang/String;");
     CheckMethodIDExit(m_LoadAssetsMethod, FromNativeLoadAssets);
 
     // 通过Java层显示信息
-    m_PostInfoMethod = env->GetMethodID(previewClass, "FromNativePostInfo", "(Ljava/lang/String;)V");
+    m_PostInfoMethod = env->GetMethodID(previewClass, "FromNativePostInfo",
+                                        "(Ljava/lang/String;)V");
     CheckMethodIDExit(m_PostInfoMethod, FromNativePostInfo);
 
     env->DeleteLocalRef(previewClass);

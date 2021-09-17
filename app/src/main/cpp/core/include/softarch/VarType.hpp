@@ -470,7 +470,7 @@ namespace clt {
         }
 
         bool operator()(const Var &var) {
-            return Var::TypeIdentity(var, type) ? setter(var), true : false;
+            return Var::TypeIdentity(var, type) && (setter(var), true);
         }
 
         VarSetter setter;

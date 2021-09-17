@@ -351,6 +351,25 @@ public class PreviewController implements IPreviewController {
         mFFmpegUtils.SetFFmpegDebug(debug);
     }
 
+    @Override
+    public void SetCalibrateParams(int boardSizeWidth, int boardSizeHeight,
+                                   float boardSquareSizeWidth, float boardSquareSizeHeight,
+                                   float markerSizeWidth, float markerSizeHeight) {
+        if (mHasInit) {
+            NativeSetCalibrateParams(boardSizeWidth, boardSizeHeight,
+                    boardSquareSizeWidth, boardSquareSizeHeight,
+                    markerSizeWidth, markerSizeHeight);
+        }
+    }
+
+    @Override
+    public String GetParamsFromNative(String paramsGroupName) {
+        if (mHasInit && paramsGroupName != null) {
+            return NativeGetParams(paramsGroupName);
+        }
+        return "";
+    }
+
     private void FromNativePostInfo(String info) {
         if (mContext != null && mMainHandler != null) {
             mMainHandler.post(() -> {
@@ -616,6 +635,12 @@ public class PreviewController implements IPreviewController {
      * 视频录制
      */
     private native void NativeRecord(boolean start, int fps, float factor);
+
+    private native void NativeSetCalibrateParams(int boardSizeWidth, int boardSizeHeight,
+                                                 float boardSquareSizeWidth, float boardSquareSizeHeight,
+                                                 float markerSizeWidth, float markerSizeHeight);
+
+    private native String NativeGetParams(String paramGroupName);
 
     /**
      * 定义预览状态

@@ -79,6 +79,14 @@ public class CameraModeSelectView extends FrameLayout {
         });
     }
 
+    public void SetCalibrateParams(Runnable runnable) {
+        mCalibrateV.setOnLongClickListener(v -> {
+            playButtonEffect(v);
+            runnable.run();
+            return true;
+        });
+    }
+
     public void SetCaptureFunc(CaptureModeFunc func) {
         mCaptureV.setOnClickListener(v -> {
             playButtonEffect(v);

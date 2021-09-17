@@ -26,7 +26,7 @@ bool MarkerAR::Init() {
 
     m_timesStatics.Init();
     m_marker->Init();
-    
+
     // 解析摄像头内参和畸变参数
     YamlParse parse(ResManager::Self()->GetCameraParamsFile());
 
@@ -39,6 +39,8 @@ bool MarkerAR::Init() {
         Flow::Self()->SendMsg(PosInfoMsg(GLRender::target, "No camera calibrate file."));
     }
 
+    // 加载校正参数
+    m_calibrateData = ResManager::Self()->LoadCalibrateParams();
 
     return true;
 }
@@ -124,7 +126,7 @@ void MarkerAR::process(const Buffer &buf) {
     }
 
     // 计算预览图像实际宽高
-    float bufRatio = ResManager::Self()->GetResParams().bufRatio;
+    float bufRatio = ResManager::Self()->GetBufferRatio();
     float width = buf.width / bufRatio;
     float height = buf.height / bufRatio;
 
@@ -145,12 +147,12 @@ void MarkerAR::process(const Buffer &buf) {
 
         // marker 3D 坐标
         std::vector<cv::Point3f> realCoords;
-        getMarkerRealCoordinates(realCoords);
+        getMarkerRealCoordinates(realCoords, m_calibrateData.GetMarkerSize());
 
         for (auto &marker : makers) {
             // marker 像素坐标
             std::vector<cv::Point2f> coords;
-            getMarkerCoordinates(marker.corners, coords);
+            getMarkerCoordinates(marker.corners, coords, bufRatio);
 
             // 获取摄像机外参数，旋转和平移参数
             cv::Mat rMat, tVec;
@@ -170,7 +172,7 @@ void MarkerAR::process(const Buffer &buf) {
             convertMatToGlm(modelView, projection, glModelView, glProjection);
 
             // 实际模型长宽高限制在（-1.0, 1.0）间，故还需要放大到实际大小
-            Float2 markerSize = ResManager::Self()->GetResParams().markerSize;
+            Float2 markerSize = m_calibrateData.GetMarkerSize();
             float scale = (markerSize.w + markerSize.h) / 2.0f;
             glm::mat4 scaleModel = glm::scale(glm::mat4(), glm::vec3(scale, scale, scale));
             glModelView = glModelView * scaleModel;
@@ -179,14 +181,16 @@ void MarkerAR::process(const Buffer &buf) {
             glm::mat4 transModel = glm::translate(glm::mat4(), glm::vec3(0.0f, 0.0f, -scale / 2));
 
             baseModelObjects.emplace_back(BaseModelObject::Type::CUBE,
-                                          glProjection, glm::mat4(1.0), transModel * glModelView, BlueColor);
+                                          glProjection, glm::mat4(1.0), transModel * glModelView,
+                                          BlueColor);
         }
     } catch (std::exception &e) {
         Log::e(Log::PROCESSOR_TAG, "camera estimate exception occur %s", e.what());
     }
 
     Flow::Self()->SendMsg(BaseModelMsg(BaseModel::target, BaseModel::msg_marker_ar,
-                                       std::make_shared<BaseModelMsgData>(std::move(baseModelObjects))));
+                                       std::make_shared<BaseModelMsgData>(
+                                               std::move(baseModelObjects))));
 }
 
 
@@ -295,18 +299,16 @@ void MarkerAR::convertMatToGlm(const cv::Mat &modelView, const cv::Mat &projecti
     glProjection[3][2] = projection.at<double>(2, 3);
 }
 
-void MarkerAR::getMarkerRealCoordinates(std::vector<cv::Point3f> &coords) {
+void MarkerAR::getMarkerRealCoordinates(std::vector<cv::Point3f> &coords, Float2 markerSize) {
     coords.clear();
-
-    Float2 markerRealSize = ResManager::Self()->GetResParams().markerSize;
 
     // 根据 marker 实际大小建立世界坐标系，原点在中心，marker 位于 XY 平面。
     // 当 marker 处于正方向时（左上角是参考点，4 个点逆时针顺序），X 朝右，Y 朝下，Z 朝内
 
-    coords.emplace_back(-0.5 * markerRealSize.w, -0.5 * markerRealSize.h, 0.0); // 左上角
-    coords.emplace_back(-0.5 * markerRealSize.w, 0.5 * markerRealSize.h, 0.0); // 左下角
-    coords.emplace_back(0.5 * markerRealSize.w, 0.5 * markerRealSize.h, 0.0); // 右下角
-    coords.emplace_back(0.5 * markerRealSize.w, -0.5 * markerRealSize.h, 0.0); // 右上角
+    coords.emplace_back(-0.5 * markerSize.w, -0.5 * markerSize.h, 0.0); // 左上角
+    coords.emplace_back(-0.5 * markerSize.w, 0.5 * markerSize.h, 0.0); // 左下角
+    coords.emplace_back(0.5 * markerSize.w, 0.5 * markerSize.h, 0.0); // 右下角
+    coords.emplace_back(0.5 * markerSize.w, -0.5 * markerSize.h, 0.0); // 右上角
 
 //    for (int i = 0; i < coords.size(); ++i) {
 //        Log::e(Log::PROCESSOR_TAG, "3d coords %f %f %f", coords[i].x, coords[i].y, coords[i].z);
@@ -314,11 +316,10 @@ void MarkerAR::getMarkerRealCoordinates(std::vector<cv::Point3f> &coords) {
 }
 
 void MarkerAR::getMarkerCoordinates(const std::vector<cv::Point2f> &bufCoords,
-                                    std::vector<cv::Point2f> &coords) {
+                                    std::vector<cv::Point2f> &coords, float bufRatio) {
     coords.clear();
     coords.reserve(bufCoords.size());
 
-    float bufRatio = ResManager::Self()->GetResParams().bufRatio;
     for (auto &point : bufCoords) {
         coords.emplace_back(point.x / bufRatio, point.y / bufRatio);
     }

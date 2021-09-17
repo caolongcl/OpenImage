@@ -256,4 +256,18 @@ public class PreviewView extends SurfaceView implements IPreviewView, IPreviewCo
     public void SetFFmpegDebug(boolean debug) {
         mController.SetFFmpegDebug(debug);
     }
+
+    @Override
+    public void SetCalibrateParams(int boardSizeWidth, int boardSizeHeight,
+                                   float boardSquareSizeWidth, float boardSquareSizeHeight,
+                                   float markerSizeWidth, float markerSizeHeight) {
+        mController.SetCalibrateParams(boardSizeWidth, boardSizeHeight,
+                boardSquareSizeWidth, boardSquareSizeHeight,
+                markerSizeWidth, markerSizeHeight);
+    }
+
+    @Override
+    public String GetParamsFromNative(String paramsGroupName) {
+        return mController.GetParamsFromNative(paramsGroupName);
+    }
 }

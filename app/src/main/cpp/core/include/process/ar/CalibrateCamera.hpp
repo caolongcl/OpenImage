@@ -10,6 +10,7 @@
 #include <softarch/VarType.hpp>
 #include <opencv2/opencv.hpp>
 #include <res/YamlParse.hpp>
+#include <res/ResManager.hpp>
 
 namespace clt {
 
@@ -47,10 +48,10 @@ namespace clt {
          * @param imageSize
          * @return
          */
-        bool findCorners(const std::string &file,
+        static bool findCorners(const std::string &file,
                          const cv::Size &boardSize,
                          std::vector<cv::Point2f> &corners,
-                         cv::Size &imageSize) const;
+                         cv::Size &imageSize) ;
 
         /**
          * 校正，获取摄像机内参矩阵
@@ -65,6 +66,8 @@ namespace clt {
         static void calibrate(const std::vector<std::vector<cv::Point3f>> &realCorners,
                               const std::vector<std::vector<cv::Point2f>> &corners,
                               const cv::Size &imageSize,
+                              const Integer2 &boardSize,
+                              const Float2 &boardSquareSize,
                               cv::Mat &cameraMatrix,
                               cv::Mat &distCoeffs);
 
@@ -103,6 +106,8 @@ namespace clt {
         static void saveCalibrateParams(const cv::Mat &cameraMatrix,
                                         const cv::Mat &distCoeffs,
                                         const cv::Size &imageSize,
+                                        const Integer2 &boardSize,
+                                        const Float2 &boardSquareSize,
                                         const double avgErr);
 
         /**
@@ -112,10 +117,8 @@ namespace clt {
         void scanImages(const std::string &functionDir);
 
     private:
-        std::string m_cameraCalibrateFile;
         std::vector<std::string> m_images;
-        Integer2 m_boardSize;
-        Float2 m_boardSquareSize;
+        CalibrateData m_calibrateData;
         TimeStatics m_fpsStatics;
     };
 

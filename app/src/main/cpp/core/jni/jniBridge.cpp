@@ -296,6 +296,33 @@ extern "C" JNIEXPORT void JNICALL NativeSetFFmpegDebug(JNIEnv *env,
     }
 }
 
+extern "C" JNIEXPORT void JNICALL NativeSetCalibrateParams(JNIEnv *env,
+                                                           jobject thiz,
+                                                           jint boardSizeWidth,
+                                                           jint boardSizeHeight,
+                                                           jfloat boardSquareSizeWidth,
+                                                           jfloat boardSquareSizeHeight,
+                                                           jfloat markerSizeWidth,
+                                                           jfloat markerSizeHeight) {
+    if (gPreviewController != nullptr) {
+        gPreviewController->SetCalibrateParams(boardSizeWidth, boardSizeHeight,
+                                               boardSquareSizeWidth, boardSquareSizeHeight,
+                                               markerSizeWidth, markerSizeHeight);
+    }
+}
+
+extern "C" JNIEXPORT jstring JNICALL NativeGetParams(JNIEnv *env,
+                                                     jobject thiz,
+                                                     jstring paramGroupName) {
+    if (gPreviewController != nullptr) {
+        std::string params = gPreviewController->GetParams(
+                JniUtils::GetString(env, paramGroupName));
+        return env->NewStringUTF(params.c_str());
+    }
+
+    return env->NewStringUTF("");
+}
+
 // 为注册的jni接口的类名
 static const char *JNIREG_CLASS = "com/cwdx/opensrc/av/core/PreviewController";
 static JNINativeMethod sMethods[] = {
@@ -320,6 +347,8 @@ static JNINativeMethod sMethods[] = {
         {"NativeEnableFilter",         "(Ljava/lang/String;Z)V",                  (void *) NativeEnableFilter},
         {"NativeEnableProcess",        "(Ljava/lang/String;Z)V",                  (void *) NativeEnableProcess},
         {"NativeUpdateTargetPos",      "(II)V",                                   (void *) NativeUpdateTargetPos},
+        {"NativeSetCalibrateParams",   "(IIFFFF)V",                               (void *) NativeSetCalibrateParams},
+        {"NativeGetParams",            "(Ljava/lang/String;)Ljava/lang/String;",  (void *) NativeGetParams},
 };
 
 static const char *JNIREG_FFMPEG_CLASS = "com/cwdx/opensrc/av/core/FFmpegUtils";

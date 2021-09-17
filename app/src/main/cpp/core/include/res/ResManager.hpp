@@ -39,6 +39,76 @@ namespace clt {
         float bufRatio;
     };
 
+    /**
+     * 校正工具参数
+     */
+    struct CalibrateData {
+        CalibrateData() = default;
+
+        CalibrateData(
+                const Integer2 &_boardSize,
+                const Float2 &_boardSquareSize,
+                const Float2 &_markerSize) :
+                boardSize(_boardSize),
+                boardSquareSize(_boardSquareSize),
+                markerSize(_markerSize) {}
+
+        static YAML::Node Encode(const CalibrateData &rhs) {
+            YAML::Node node;
+            YAML::Node infoNode;
+            infoNode["board_width"] = rhs.boardSize.w;
+            infoNode["board_height"] = rhs.boardSize.h;
+            infoNode["board_square_width"] = rhs.boardSquareSize.w;
+            infoNode["board_square_height"] = rhs.boardSquareSize.h;
+            infoNode["marker_width"] = rhs.markerSize.w;
+            infoNode["marker_height"] = rhs.markerSize.h;
+            node["info"] = infoNode;
+            return node;
+        }
+
+        static bool Decode(const YAML::Node &node, CalibrateData &rhs) {
+            if (!node.IsDefined()
+                || !node["info"].IsDefined()) {
+                return false;
+            }
+            rhs.boardSize = {node["info"]["board_width"].as<int>(),
+                             node["info"]["board_height"].as<int>()};
+            rhs.boardSquareSize = {node["info"]["board_square_width"].as<float>(),
+                                   node["info"]["board_square_height"].as<float>()};
+            rhs.boardSize = {node["info"]["marker_width"].as<int>(),
+                             node["info"]["marker_height"].as<int>()};
+            return true;
+        }
+
+        const Integer2 GetBoardSize() const {
+            return boardSize;
+        }
+
+        const Float2 GetBoardSquareSize() const {
+            return boardSquareSize;
+        }
+
+        const Float2 GetMarkerSize() const {
+            return markerSize;
+        }
+
+        std::string GetJsonString() const {
+            std::stringstream ss;
+            ss << "{" << "\"board_width:\"" << boardSize.w << ","
+               << "\"board_height:\"" << boardSize.h << ","
+               << "\"board_square_width:\"" << boardSquareSize.w << ","
+               << "\"board_square_height:\"" << boardSquareSize.h << ","
+               << "\"marker_width:\"" << markerSize.w << ","
+               << "\"marker_height:\"" << markerSize.h << "}";
+            return ss.str();
+        }
+
+    private:
+        Integer2 boardSize;
+        Float2 boardSquareSize;
+        Float2 markerSize;
+    };
+
     class ResManager final
             : public IComFunc<> {
     public:
@@ -81,9 +151,15 @@ namespace clt {
 
         std::string GetCameraParamsFile() const;
 
-        const ResParams &GetResParams() const;
-
         void UpdateResParamsBufRatio(float ratio);
+
+        const CalibrateData &LoadCalibrateParams();
+
+        const float GetBufferRatio() const {
+            return m_realWorldParam.bufRatio;
+        }
+
+        void SaveCalibrateParams(Integer2 boardSize, Float2 boardSquareSize, Float2 markerSize);
 
     private:
         static std::string getShaderName(const YamlParse &yaml);
@@ -108,6 +184,8 @@ namespace clt {
 
         void loadFonts();
 
+        void clearOldCalibrateImages();
+
     private:
         ResHub<Shader> m_shaders;
         ResHub<Font> m_fonts;
@@ -117,7 +195,8 @@ namespace clt {
         std::string m_resPath;  // 读取资源的地方
         std::string m_basePath; // 保存文件地方
         std::string m_functionPath; // 保存功能文件文件地方
-        ResParams m_realWorldParam;
+        ResParams m_realWorldParam; // 原始默认参数
+        CalibrateData m_calibrateData;
 
     private:
         // 预定义的最小化运行资源
