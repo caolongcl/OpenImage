@@ -8,6 +8,8 @@
 #include <res/ResManager.hpp>
 #include <res/Shader.hpp>
 #include <res/font/Font.hpp>
+#include <dirent.h>
+#include <cstdio>
 
 using namespace clt;
 
@@ -21,6 +23,10 @@ bool ResManager::Init() {
 
     m_shaders.Init();
     m_fonts.Init();
+
+    m_calibrateData = {{m_realWorldParam.boardSize.w,       m_realWorldParam.boardSize.h},
+                       {m_realWorldParam.boardSquareSize.w, m_realWorldParam.boardSquareSize.h},
+                       {m_realWorldParam.markerSize.w,      m_realWorldParam.markerSize.h}};
 
     Printer::Self()->Init();
 
@@ -119,10 +125,6 @@ std::string ResManager::GetCameraParamsFile() const {
     return m_functionPath + "/" + "camera_params.yml";
 }
 
-const ResParams &ResManager::GetResParams() const {
-    return m_realWorldParam;
-}
-
 void ResManager::UpdateResParamsBufRatio(float ratio) {
     std::lock_guard<std::mutex> locker(s_mutex);
     m_realWorldParam.bufRatio = ratio;
@@ -134,6 +136,81 @@ void ResManager::loadFonts() {
     std::string root = m_resPath + "/fonts";
 
     registerFonts(ArialFont::sName, std::make_shared<ArialFont>(root));
+}
+
+void ResManager::clearOldCalibrateImages() {
+    std::lock_guard<std::mutex> locker(s_mutex);
+
+    DIR *dirItem;
+    struct dirent *dir;
+
+    if ((dirItem = opendir(m_functionPath.c_str())) != nullptr) {
+        while ((dir = readdir(dirItem)) != nullptr) {
+            std::string dirName(dir->d_name);
+            auto pos = dirName.find_last_of('.');
+            if (dirName != "." && dirName != ".." && dirName.substr(pos) == ".jpg") {
+                Log::d(Log::PROCESSOR_TAG, "remove old calibrate file %s", dirName.c_str());
+                std::remove(dirName.c_str());
+            }
+        }
+
+        closedir(dirItem);
+    }
+}
+
+const CalibrateData &ResManager::LoadCalibrateParams() {
+    std::lock_guard<std::mutex> locker(s_mutex);
+
+    std::string fileName = m_functionPath + "/" + "calibrate_params.yml";
+    std::ifstream f(fileName.c_str());
+    if (!f.good()) {
+        f.close();
+        Log::w(Log::RES_TAG, "no calibrate_params.yml, load default");
+
+        YamlCreator creator(fileName);
+        creator.Emit() << CalibrateData::Encode(m_calibrateData);
+        creator.Save();
+    } else {
+        f.close();
+
+        // 解析校正工具参数
+        bool got = false;
+        YamlParse parse(fileName);
+        if (parse.Valid()) {
+            got = CalibrateData::Decode(parse.GetNode(), m_calibrateData);
+        }
+
+        if (!got) {
+            Log::e(Log::RES_TAG, "parse calibrate_params.yml failed, load default");
+        } else {
+            Log::d(Log::RES_TAG, "parse calibrate_params.yml success");
+        }
+    }
+
+    return m_calibrateData;
+}
+
+void ResManager::SaveCalibrateParams(Integer2 boardSize,
+                                     Float2 boardSquareSize, Float2 markerSize) {
+    if (boardSize.w != m_calibrateData.GetBoardSize().w
+        || boardSize.h != m_calibrateData.GetBoardSize().h
+        || boardSquareSize.w != m_calibrateData.GetBoardSquareSize().w
+        || boardSquareSize.h != m_calibrateData.GetBoardSquareSize().h
+        || markerSize.w != m_calibrateData.GetMarkerSize().w
+        || markerSize.h != m_calibrateData.GetMarkerSize().h) {
+        std::lock_guard<std::mutex> locker(s_mutex);
+
+        m_calibrateData = {{boardSize.w,       boardSize.h},
+                           {boardSquareSize.w, boardSquareSize.h},
+                           {markerSize.w,      markerSize.h}};
+
+        YamlCreator creator(m_functionPath + "/" + "calibrate_params.yml");
+        creator.Emit() << CalibrateData::Encode(m_calibrateData);
+        creator.Save();
+
+        // 清除旧参数拍摄的校正图片
+        clearOldCalibrateImages();
+    }
 }
 
 std::shared_ptr<Shader> ResManager::makeShader(const YamlParse &yaml) {

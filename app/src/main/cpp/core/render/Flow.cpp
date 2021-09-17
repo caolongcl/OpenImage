@@ -131,6 +131,7 @@ std::shared_ptr<GLThread> Flow::GetInvokeThread() {
         // 超出了Flow的作用域，不可能
         assert(false);
     }
+    return nullptr;
 }
 
 /// 将消息处理器注册给此函数的调用线程

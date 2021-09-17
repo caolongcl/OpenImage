@@ -10,6 +10,7 @@
 #include <process/base/ProcessUtils.hpp>
 #include <process/ar/CalibrateCamera.hpp>
 #include <softarch/Math.hpp>
+#include <res/ResManager.hpp>
 
 namespace clt {
 
@@ -76,17 +77,18 @@ namespace clt {
          * 获取 marker 的三维空间坐标
          * @param coords
          */
-        static void getMarkerRealCoordinates(std::vector<cv::Point3f> &coords);
+        static void getMarkerRealCoordinates(std::vector<cv::Point3f> &coords, Float2 markerSize);
 
         /**
          * 获取 marker 的像素坐标
          * @param coords
          */
         static void getMarkerCoordinates(const std::vector<cv::Point2f> &bufCoords,
-                                         std::vector<cv::Point2f> &coords);
+                                         std::vector<cv::Point2f> &coords, float bufRatio);
     private:
         std::shared_ptr<Marker> m_marker;
         CameraData m_params;
+        CalibrateData m_calibrateData;
         bool m_cameraDataGot;
         TimeStatics m_timesStatics;
     };

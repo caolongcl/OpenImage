@@ -129,6 +129,14 @@ namespace clt {
 
         static void SetFFmpegDebug(bool debug);
 
+        void SetCalibrateParams(int boardSizeWidth, int boardSizeHeight,
+                                float boardSquareSizeWidth,
+                                float boardSquareSizeHeight,
+                                float markerSizeWidth,
+                                float markerSizeHeight);
+
+        std::string GetParams(const std::string& paramsGroupName);
+
     private:
         /**
          * 缓存Jni方法，将从C/C++回调到Java的方法缓存下来

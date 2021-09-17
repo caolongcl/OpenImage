@@ -105,4 +105,10 @@ public interface IPreviewController {
     void UpdateTargetPos(int x, int y);
 
     void SetFFmpegDebug(boolean debug);
+
+    void SetCalibrateParams(int boardSizeWidth, int boardSizeHeight,
+                            float boardSquareSizeWidth, float boardSquareSizeHeight,
+                            float markerSizeWidth, float markerSizeHeight);
+
+    String GetParamsFromNative(String paramsGroupName);
 }

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:id="@+id/board_size"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#AEEA00"
+            android:text="1. 设置棋盘每一行及列的内点数（不包括两端最外边的点）" />
+
+        <EditText
+            android:id="@+id/board_size_width"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="行内点数"
+            android:theme="@style/EditTextStyle" />
+
+        <EditText
+            android:id="@+id/board_size_height"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="列内点数"
+            android:theme="@style/EditTextStyle" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/board_square_size"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/board_size">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#AEEA00"
+            android:text="2. 设置棋盘每个格子的宽高（单位 mm）" />
+
+        <EditText
+            android:id="@+id/board_square_size_width"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="格子宽度"
+            android:theme="@style/EditTextStyle" />
+
+        <EditText
+            android:id="@+id/board_square_size_height"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="格子高度"
+            android:theme="@style/EditTextStyle" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/marker_size"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/board_square_size">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#AEEA00"
+            android:text="3. 设置 Marker 的宽高（单位 mm）" />
+
+        <EditText
+            android:id="@+id/marker_size_width"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Marker 宽度"
+            android:theme="@style/EditTextStyle" />
+
+        <EditText
+            android:id="@+id/marker_size_height"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Marker 高度"
+            android:theme="@style/EditTextStyle" />
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/marker_size">
+
+        <Button
+            android:id="@+id/set_params_cancel"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ripple_bg_base"
+            android:elevation="16dp"
+            android:text="取消"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:translationZ="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/set_params_ok"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ripple_bg_base"
+            android:elevation="16dp"
+            android:text="确定"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:translationZ="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

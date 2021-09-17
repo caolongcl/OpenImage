@@ -15,16 +15,14 @@
 using namespace clt;
 
 CalibrateCamera::CalibrateCamera()
-        : m_cameraCalibrateFile(),
-          m_images() {}
+        : m_images() {}
 
 bool CalibrateCamera::Init() {
     Log::v(Log::PROCESSOR_TAG, "CalibrateCamera::Init");
 
     std::string functionDir = ResManager::Self()->GetFunctionAbsolutePath();
 
-    m_boardSize = ResManager::Self()->GetResParams().boardSize;
-    m_boardSquareSize = ResManager::Self()->GetResParams().boardSquareSize;
+    m_calibrateData = ResManager::Self()->LoadCalibrateParams();
 
     scanImages(functionDir);
 
@@ -51,8 +49,10 @@ void CalibrateCamera::process() {
 
     try {
         std::vector<cv::Point3f> corners3f;
-        generateChessboardRealCorners(cv::Size(m_boardSize.w, m_boardSize.h),
-                                      cv::Size(m_boardSquareSize.w, m_boardSquareSize.h), corners3f);
+        generateChessboardRealCorners(cv::Size(m_calibrateData.GetBoardSize().w,
+                                               m_calibrateData.GetBoardSize().h),
+                                      cv::Size(m_calibrateData.GetBoardSquareSize().w,
+                                               m_calibrateData.GetBoardSquareSize().h), corners3f);
 
         int count = m_images.size();
         if (count > 5) count = 5;
@@ -64,13 +64,17 @@ void CalibrateCamera::process() {
         cv::Size imageSize;
         for (int i = 0; i < count; ++i) {
             std::vector<cv::Point2f> corners2f;
-            if (findCorners(m_images[i], cv::Size(m_boardSize.w, m_boardSize.h), corners2f, imageSize)) {
+            if (findCorners(m_images[i], cv::Size(m_calibrateData.GetBoardSize().w,
+                                                  m_calibrateData.GetBoardSize().h),
+                            corners2f, imageSize)) {
                 boardCorners.push_back(corners2f);
                 realCorners.push_back(corners3f);
             }
         }
 
-        calibrate(realCorners, boardCorners, imageSize, cameraMatrix, distCoeffs);
+        calibrate(realCorners, boardCorners, imageSize,
+                  m_calibrateData.GetBoardSize(), m_calibrateData.GetBoardSquareSize(),
+                  cameraMatrix, distCoeffs);
 
 //        for (int i = 0; i < count; ++i) {
 //            unDistort(m_images[i], cameraMatrix, distCoeffs);
@@ -81,13 +85,16 @@ void CalibrateCamera::process() {
     } catch (std::exception &e) {
         Log::e(Log::PROCESSOR_TAG, "calibrate exception occur %s", e.what());
 
-        Flow::Self()->SendMsg(PosInfoMsg(GLRender::target, "calibrate failed, " + std::string(e.what())));
+        Flow::Self()->SendMsg(
+                PosInfoMsg(GLRender::target, "calibrate failed, " + std::string(e.what())));
     }
 }
 
 void CalibrateCamera::calibrate(const std::vector<std::vector<cv::Point3f> > &realCorners,
                                 const std::vector<std::vector<cv::Point2f> > &corners,
                                 const cv::Size &imageSize,
+                                const Integer2 &boardSize,
+                                const Float2 &boardSquareSize,
                                 cv::Mat &cameraMatrix,
                                 cv::Mat &distCoeffs) {
 
@@ -114,12 +121,14 @@ void CalibrateCamera::calibrate(const std::vector<std::vector<cv::Point3f> > &re
 
     Log::d(Log::PROCESSOR_TAG, "calibrate params :\n %s", ss.str().c_str());
 
-    saveCalibrateParams(cameraMatrix, distCoeffs, imageSize, avgErr);
+    saveCalibrateParams(cameraMatrix, distCoeffs, imageSize, boardSize, boardSquareSize, avgErr);
 }
 
 void CalibrateCamera::saveCalibrateParams(const cv::Mat &cameraMatrix,
                                           const cv::Mat &distCoeffs,
                                           const cv::Size &imageSize,
+                                          const Integer2 &boardSize,
+                                          const Float2 &boardSquareSize,
                                           const double avgErr) {
 
     std::vector<double> matrix;
@@ -135,25 +144,24 @@ void CalibrateCamera::saveCalibrateParams(const cv::Mat &cameraMatrix,
     dist.emplace_back(distCoeffs.at<double>(0, 3)); // p2
     dist.emplace_back(distCoeffs.at<double>(0, 4)); // k3
 
-    Integer2 boardSize = ResManager::Self()->GetResParams().boardSize;
-    Float2 boardSquareSize = ResManager::Self()->GetResParams().boardSquareSize;
     Integer2 _imageSize = {imageSize.width, imageSize.height};
 
     YamlCreator creator(ResManager::Self()->GetCameraParamsFile());
-    creator.Emit() << CameraData::Encode({matrix, dist, _imageSize, boardSize, boardSquareSize, avgErr});
+    creator.Emit()
+            << CameraData::Encode({matrix, dist, _imageSize, boardSize, boardSquareSize, avgErr});
     creator.Save();
 }
 
 bool CalibrateCamera::findCorners(const std::string &file,
                                   const cv::Size &boardSize,
                                   std::vector<cv::Point2f> &corners,
-                                  cv::Size &imageSize) const {
+                                  cv::Size &imageSize) {
     cv::Mat image = cv::imread(ResManager::Self()->GetFunctionAbsolutePath() + "/" + file);
 
     imageSize.width = image.cols;
     imageSize.height = image.rows;
 
-    if (!cv::findChessboardCorners(image, cv::Size(m_boardSize.w, m_boardSize.h), corners)) {
+    if (!cv::findChessboardCorners(image, cv::Size(boardSize.width, boardSize.height), corners)) {
         Log::w(Log::PROCESSOR_TAG, "calibrate images %s find no corners", file.c_str());
         return false;
     }
@@ -215,11 +223,13 @@ void CalibrateCamera::scanImages(const std::string &functionDir) {
     }
 }
 
-double CalibrateCamera::computeProjectionErrors(const std::vector<std::vector<cv::Point3f> > &objectPoints,
-                                                const std::vector<std::vector<cv::Point2f> > &imagePoints,
-                                                const cv::Mat &cameraMatrix, const cv::Mat &distCoeffs,
-                                                const std::vector<cv::Mat> &rvecs, const std::vector<cv::Mat> &tvecs,
-                                                std::vector<float> &perViewErrors) {
+double
+CalibrateCamera::computeProjectionErrors(const std::vector<std::vector<cv::Point3f> > &objectPoints,
+                                         const std::vector<std::vector<cv::Point2f> > &imagePoints,
+                                         const cv::Mat &cameraMatrix, const cv::Mat &distCoeffs,
+                                         const std::vector<cv::Mat> &rvecs,
+                                         const std::vector<cv::Mat> &tvecs,
+                                         std::vector<float> &perViewErrors) {
     std::vector<cv::Point2f> imagePoints2;
     size_t totalPoints = 0;
     double totalErr = 0, err;
@@ -261,5 +271,6 @@ void CameraData::GetCameraDistCoeffs(cv::Mat &_dist) {
     }
 
     Log::n(Log::PROCESSOR_TAG, "GetCameraDistCoeffs %f %f %f %f %f", _dist.at<double>(0, 0),
-           _dist.at<double>(0, 1), _dist.at<double>(0, 2), _dist.at<double>(0, 3), _dist.at<double>(0, 4));
+           _dist.at<double>(0, 1), _dist.at<double>(0, 2), _dist.at<double>(0, 3),
+           _dist.at<double>(0, 4));
 }
