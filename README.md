@@ -37,7 +37,7 @@
 
 ### 调试测试用文件
 
-- 测试人脸检测的人脸图片 `face_detector_samples.png`
+- 人脸检测的人脸图片 `face_detector_samples.png`
 - 相机校正棋盘格图片 `chessboard.bmp`
   - 行内点数为 6，列内点数为 8
 - 基于标签的 AR 所用的 Marker 图片，目前代码只支持 marker code 为 0，1，2，3，4 的
@@ -79,3 +79,55 @@
    - “brightness”、“contrast”、“saturation” 调节亮度，对比度，饱和度，长按其中任何一个相应按钮将启用或关闭此滤镜。开启后，点击将出现相应不同的效果。
    - “face detect” 人脸检测，点击按钮开启和关闭。
    - “opencv AR” 基于标签的 AR，点击按钮开启和关闭。
+
+## 架构说明
+
+### Java 层
+Java 层主要负责相机预览的开启、相机切换、相机关闭，及获取 native 层的纹理 id 来创建预览 Surface 、将数据填充到预览 Surface 上等；主要功能逻辑、参数等都会委托给 native 进行处理，`jniBridge.cpp` 文件是 Java 层和 native 层的桥梁。
+
+### native 层
+
+整体是一个多线程架构
+- `Flow` 线程创建者，可以创建 `GLThread` 类型的线程，默认创建了渲染线程 `render`，资源加载线程 `shared`
+   - `render` 是渲染线程，负责将相机采集的图像绘制到纹理上，然后经过渲染管道进行滤镜处理，最终输出到预览 Surface 、录制 Surface 或拍照的 Surface 上；除此之外，`render` 线程也会将相机采集的图像纹理输入到实时图像处理管道中，读取纹理像素，通过 OpenCV 进行图像处理，如人脸检测，基于 Marker 的 AR 效果等。
+  - `shared` 是共享 `render` 线程 EGL 的任务线程，主要用于与 `render` 线程共享纹理资源等，如加载矢量字体到纹理上、加载扩展 shader 等。
+- `WorkerFlow` 工作线程池 用来处理实时图像处理任务等。
+
+## 关键组件
+
+### 线程组件
+共有三种线程
+- Java 线程，需要依赖 `JNIEnv` 时，必须使任务在 Java 线程中执行，如 native 层回调数据到 Java 层
+- `GLThread` 线程，是拥有 `EGLContext` 的线程，可以使用 OpenGL ES API，渲染、操作纹理、shader 等；同时这种线程也支持消息机制，可以互相发送同步或异步消息
+- `std::thread` 线程，普通线程，用来做运算密集任务
+
+### EGL / OpenGL ES 环境
+`GLThread` 是拥有 `EGLCore` 的线程，`EGLCore` 是封装了 Android 平台用来构建 OpengGL ES 环境逻辑的对象。通过切换不同的 `EGLCore` 可以在不同线程使用 OpengGL ES 的 API。
+
+### PreviewController
+Java 层相机预览在 native 层的代理，是整个 native 层逻辑的顶层对象。
+
+### GLRender
+`GLRender` 是整个渲染的核心，是滤镜渲染管道 `FilterPipe` 及图像处理管道 `ProcessPipe` 纹理的生产者，它接受相机预览帧的通知，将从相机获得的图像纹理输入到滤镜渲染管道和图像处理管道中进行渲染或处理。
+
+### ResManager
+`ResManager` 是用来加载纹理、字体、读取编译构建 shader、配置文件、人脸检测模型文件等资源的管理组件。
+
+### PixelReaderPbo
+读取纹理像素组件，读出的像素数据经过缩放后通过图像处理管道进行处理。
+
+### Printer
+通过加载的矢量字体纹理，绘制文字，支持配置文字位置、颜色、背景色、阴影的特性。
+
+### PolygonDrawer / BaseModel
+`PolygonDrawer` 支持绘制多边形，比如人脸检测框，Marker 检测框；`BaseModel` 支持绘制基本的几何体，如 Marker AR 中的立方体。
+
+### FaceDetector
+人脸检测组件，调用 OpenCV API `cv::CascadeClassifier` 进行人脸检测和性能统计。
+
+### CalibrateCamera / Marker / MarkerAR
+`CalibrateCamera` 相机校正组件，校正结果可以获得相机的内参矩阵和畸变参数，进一步可以计算出相机视图矩阵（View，结合 Model、 Projection 矩阵就可以构建模拟真实世界的三维环境了，这是实现 AR 的关键一步）
+
+`Marker` 组件用来对 Marker 图像进行识别、解析
+
+`MarkerAR` 是在 `CalibrateCamera` 和 `Marker` 结果之上，通过识别 `Marker`，将三维物体模拟放置在真实三维环境中，实现 AR 效果。
