@@ -10,6 +10,7 @@ namespace clt {
 
     /**
      * 存储图像数据
+     * 比如从 ProcessPipe 管道中读取的纹理像素值
      */
     struct Buffer final {
         using DataType = unsigned char;

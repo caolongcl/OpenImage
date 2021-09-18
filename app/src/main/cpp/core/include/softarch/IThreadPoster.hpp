@@ -8,9 +8,9 @@
 
 namespace clt {
 
-/**
- * 具有将任务加入到线程中的能力
- */
+    /**
+     * 具有将任务加入到线程中的能力
+     */
     struct IThreadPoster {
         IThreadPoster() = default;
 

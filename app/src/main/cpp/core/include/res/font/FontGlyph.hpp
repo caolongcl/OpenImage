@@ -29,9 +29,9 @@ namespace clt {
         Texture::BufferPtr buffer{nullptr};
     };
 
-/**
-   * 将所有字符拼接成一个纹理
-   */
+    /**
+     * 将所有字符拼接成一个纹理
+     */
     class CharsGroupGlyph {
     public:
         CharsGroupGlyph() = default;

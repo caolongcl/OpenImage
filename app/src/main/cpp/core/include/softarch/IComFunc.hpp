@@ -6,6 +6,10 @@
 
 namespace clt {
 
+    /**
+     * 关键组件的超基类，利用统一接口，规范设计
+     * @tparam Args
+     */
     template<typename ...Args>
     class IComFunc {
     public:
@@ -30,10 +34,10 @@ namespace clt {
         virtual void DeInit() = 0;
     };
 
-/**
- * 提供更新
- * @tparam Args
- */
+    /**
+     * 提供更新
+     * @tparam Args
+     */
     template<typename ...Args>
     struct IComUpdate {
         IComUpdate() = default;

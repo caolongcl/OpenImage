@@ -10,6 +10,7 @@ namespace clt {
 
     /**
      * 观察者组件
+     * 继承类可以观察被观察者，会收到被观察者的相应通知
      * @tparam T
      */
     template<typename T>
@@ -27,6 +28,7 @@ namespace clt {
 
     /**
      * 被观察者组件
+     * 继承则类具有被观察的特性
      * @tparam T
      */
     template<typename T>

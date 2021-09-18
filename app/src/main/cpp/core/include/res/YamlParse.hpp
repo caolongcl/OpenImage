@@ -9,7 +9,9 @@
 #include <softarch/std.hpp>
 
 namespace clt {
-
+    /**
+     * 所有的配置信息都使用 YAML 格式存储
+     */
     class YamlParse {
     public:
         explicit YamlParse(const std::string &file) {

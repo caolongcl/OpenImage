@@ -9,8 +9,8 @@
 
 namespace clt {
     /**
- * 描述文本绘制信息
- */
+     * 描述文本绘制信息
+     */
     struct TextInfo {
         TextInfo() : TextInfo("") {}
 
@@ -45,12 +45,12 @@ namespace clt {
         std::string text;
 
         /**
-         * 文本显示区域
+         * 文本显示区域（对应屏幕坐标系）
          */
         Viewport displayViewport;
 
         /**
-         * 如果要显示到实际的帧上
+         * 如果要显示到实际的帧上（对应预览帧坐标系）
          */
         Viewport realViewport;
         /**
@@ -90,6 +90,9 @@ namespace clt {
          */
         bool baseAdjust;
 
+        /**
+         * 是否填充背景
+         */
         bool fillBg;
 
         // 绕起点逆时针旋转角度

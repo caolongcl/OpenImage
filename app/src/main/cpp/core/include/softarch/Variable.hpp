@@ -9,6 +9,7 @@
 
 namespace clt {
     /**
+     * 抽象出统一设置参数的接口
      * 不同类型变量设置接口
      * @tparam T
      */
@@ -30,6 +31,10 @@ namespace clt {
         Setter setter;
     };
 
+    /**
+     * 注册变量，以及变量设置方式
+     * @tparam T
+     */
     template<typename T>
     struct IVariableRegister {
         virtual ~IVariableRegister() = default;
@@ -43,6 +48,10 @@ namespace clt {
         virtual void Clear() = 0;
     };
 
+    /**
+     * 其他组件依赖此类可以获得配置参数的能力
+     * @tparam T
+     */
     template<typename T>
     struct VariableGroup final : public IVariableSet<T>, public IVariableRegister<T> {
         void Register(const std::string &varName, VariableSetter<T> &&setter) override {

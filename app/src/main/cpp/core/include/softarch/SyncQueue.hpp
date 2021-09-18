@@ -8,10 +8,10 @@
 
 namespace clt {
 
-/**
- * 同步队列
- * @tparam T
- */
+    /**
+     * 同步队列，构成线程池任务添加和删除队列
+     * @tparam T
+     */
     template<typename T>
     class SyncQueue {
     public:

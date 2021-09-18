@@ -196,7 +196,7 @@ namespace clt {
         std::string m_basePath; // 保存文件地方
         std::string m_functionPath; // 保存功能文件文件地方
         ResParams m_realWorldParam; // 原始默认参数
-        CalibrateData m_calibrateData;
+        CalibrateData m_calibrateData; // 相机校正参数
 
     private:
         // 预定义的最小化运行资源

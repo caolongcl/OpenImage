@@ -10,15 +10,27 @@ namespace clt {
 
     class Constants {
     public:
+        /**
+         * 预览帧旋转角度
+         */
         static const int ROTATION_0 = 0;
         static const int ROTATION_90 = 90;
         static const int ROTATION_180 = 180;
         static const int ROTATION_270 = 270;
 
+        /**
+         * 预览帧比例
+         */
         static const int RATIO_4_3 = 0;
         static const int RATIO_16_9 = 1;
         static const int RATIO_OTHER = 2;
 
+        /**
+         * Surface 类型
+         * MAIN_TYPE : 预览 Surface
+         * CAPTURE_TYPE ：截帧 Surface，用于拍照
+         * RECORD_TYPE ：录制 Surface 对应 MediaCodec 的输入 Surface
+         */
         static const int MAIN_TYPE = 0;
         static const int CAPTURE_TYPE = 1;
         static const int RECORD_TYPE = 2;
