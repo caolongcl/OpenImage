@@ -3,10 +3,10 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         avcore {
-//            storeFile file('C:\\Enter\\dev\\androiddev\\androiddev.jks')
-//            storePassword 'caolong'
-//            keyAlias 'androiddev'
-//            keyPassword 'caolong'
+            storeFile file('androiddev')
+            storePassword 'caolong'
+            keyAlias 'androiddev'
+            keyPassword 'caolong'
         }
     }
     compileSdkVersion 29
