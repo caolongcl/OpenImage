@@ -60,7 +60,7 @@
 - 从各个角度拍摄棋盘格 5 张图片，然后短按校正按钮，开始标定（标定结束时会弹出 Toast，根据机器性能时间可能稍长）
   - 查看日志，搜索日志 "calibrate average err"，假如在 10.0 上下，说明标定准确率尚可
   - 如果最后 Marker AR 的效果不正常，可查看标定时否找到了角点（可查看 /sdcard/Android/media/com.cwdx.opensrc/media/function 目录下对应图片）
-- 切换到拍照模式，可以从弹出菜单中开启 “opencv AR”。将摄像头对准 Marker 图片，正常情况下会有一个彩色立方体位于 Marker 图片上
+- 切换到拍照模式，可以从弹出菜单中开启 “opencv AR”。将摄像头对准 Marker 图片，正常情况下会有一个彩色金字塔位于 Marker 图片上
 
 ## 测试 UI
 
