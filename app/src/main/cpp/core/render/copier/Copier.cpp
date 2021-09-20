@@ -267,7 +267,7 @@ void Copier::setTextForDebug() {
     std::string text = "surface size:";
     text += std::to_string(m_displayParams.width);
     text += " ";
-    text += std::to_string(m_displayParams.width);
+    text += std::to_string(m_displayParams.height);
 
     TextInfo info(text, displayViewport, previewViewport);
     info.position = {100.0f, 50.0f};
