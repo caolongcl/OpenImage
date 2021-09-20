@@ -12,73 +12,80 @@
 
 namespace clt {
 
-    class EGLCore;
+  class EGLCore;
 
-    class SingleThreadPool;
+  class SingleThreadPool;
 
-    class GLThread final : public IComFunc<std::shared_ptr<EGLCore>, bool>,
-                           public IEGL,
-                           public IMsg {
-    public:
-        explicit GLThread(const std::string &name);
+  /**
+   * 不同于普通的线程，GLThread 可以拥有 EGL 环境
+   */
+  class GLThread final : public IComFunc<std::shared_ptr<EGLCore>, bool>,
+                         public IEGL,
+                         public IMsg {
+  public:
+    explicit GLThread(const std::string &name);
 
-        ~GLThread() = default;
+    ~GLThread() = default;
 
-        bool Init(std::shared_ptr<EGLCore>, bool needEgl) override;
+    bool Init(std::shared_ptr<EGLCore>, bool needEgl) override;
 
-        void DeInit() override;
+    void DeInit() override;
 
-        void Post(const Task &t);
+    void Post(const Task &t);
 
-        std::thread::id Id() const;
+    std::thread::id Id() const;
 
-        /// 以下方法必须在本线程调用，且有 EGL的情况下
-        void CreateWindowSurface(const std::string &name, ANativeWindow *window) override;
+    /// 以下方法必须在本线程调用，且有 EGL的情况下
+    void CreateWindowSurface(const std::string &name, ANativeWindow *window) override;
 
-        void CreateOffScreenSurface(const std::string &name) override;
+    void CreateOffScreenSurface(const std::string &name) override;
 
-        void DestroyWindowSurface(const std::string &name) override;
+    void DestroyWindowSurface(const std::string &name) override;
 
-        void ActiveContext(const std::string &name) override;
+    void ActiveContext(const std::string &name) override;
 
-        void DeActiveContext() override;
+    void DeActiveContext() override;
 
-        void Update(const std::string &name) override;
+    void Update(const std::string &name) override;
 
-        void SetPresentationTime(const std::string &name, khronos_stime_nanoseconds_t nsecs) override;
+    void SetPresentationTime(const std::string &name, khronos_stime_nanoseconds_t nsecs) override;
 
-        std::shared_ptr<EGLCore> SelfEGL();
+    /**
+     * 返回本线程的 EGL，其他 GLThread 可以共享
+     * @return
+     */
+    std::shared_ptr<EGLCore> SelfEGL();
 
-        /// 支持消息
-        void AddMsgHandler(const std::shared_ptr<IMsgHandler> &handler) override;
+    /// 支持消息
+    void AddMsgHandler(const std::shared_ptr<IMsgHandler> &handler) override;
 
-        void RemoveMsgHandler(const std::shared_ptr<IMsgHandler> &handler) override;
+    void RemoveMsgHandler(const std::shared_ptr<IMsgHandler> &handler) override;
 
-        void SendMsg(const Msg &msg) override;
+    void SendMsg(const Msg &msg) override;
 
-        void PostMsg(const Msg &msg) override;
+    void PostMsg(const Msg &msg) override;
 
-        // 调用线程就是自己
-        bool InvokeInSelf() const;
+    // 检查调用线程是否就是自己
+    bool InvokeInSelf() const;
 
-    private:
-        /**
-         * 确保某些方法必须在m_thread线程中调用
-         */
-        void assertThread();
+  private:
+    /**
+     * 确保某些方法必须在m_thread线程中调用
+     */
+    void assertThread();
 
-        void assertNoEgl();
+    void assertNoEgl();
 
-        void onMsgHandle(const Msg &);
+    void onMsgHandle(const Msg &);
 
-    private:
-        std::shared_ptr<SingleThreadPool> m_thread;
-        std::shared_ptr<EGLCore> m_egl;
-        std::string m_name;
-        bool m_needEgl;
+  private:
+    std::shared_ptr<SingleThreadPool> m_thread;
+    std::shared_ptr<EGLCore> m_egl;
+    std::string m_name;
+    bool m_needEgl;
 
-        // handler 持有着名字
-        std::unordered_map<std::string, std::shared_ptr<IMsgHandler>> m_msgHandlers;
-    };
+    // IMsgHandler 持有者名字，Target()，保存了要此线程处理消息的对象
+    std::unordered_map<std::string, std::shared_ptr<IMsgHandler>> m_msgHandlers;
+  };
 
 }

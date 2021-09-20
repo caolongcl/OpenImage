@@ -7,35 +7,35 @@
 #include <render/filter/FilterCom.hpp>
 
 namespace clt {
-/**
- * 给每个颜色通道设置一个比例
- */
-    class RGBFilter : public FilterWithShader {
-    ClassDeclare(RGBFilter)
-    VarDeclare(r)
-    VarDeclare(g)
-    VarDeclare(b)
-    public:
-        RGBFilter();
+  /**
+   * 给每个颜色通道设置一个比例
+   */
+  class RGBFilter : public FilterWithShader {
+  ClassDeclare(RGBFilter)
+  VarDeclare(r)
+  VarDeclare(g)
+  VarDeclare(b)
+  public:
+    RGBFilter();
 
-        ~RGBFilter() = default;
+    ~RGBFilter() = default;
 
-    private:
-        void loadShader() override;
+  private:
+    void loadShader() override;
 
-        void updateValue() override;
+    void updateValue() override;
 
-        void registerVar() override;
+    void registerVar() override;
 
-        RGBFilter &setR(const Float &r);
+    RGBFilter &setR(const Float &r);
 
-        RGBFilter &setG(const Float &g);
+    RGBFilter &setG(const Float &g);
 
-        RGBFilter &setB(const Float &b);
+    RGBFilter &setB(const Float &b);
 
-    private:
-        Float3 m_color;
+  private:
+    Float3 m_color;
 
-        GLint m_uniformLocRGB{};
-    };
+    GLint m_uniformLocRGB{};
+  };
 }

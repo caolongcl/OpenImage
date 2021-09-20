@@ -10,32 +10,32 @@
 
 namespace clt {
 
-    /**
-     * 拍照
-     */
-    class Surface;
+  /**
+   * 拍照
+   */
+  class Surface;
 
-    class Copier;
+  class Copier;
 
-    class Capturer final
-            : public IComFunc<std::shared_ptr<Copier>>,
-              public ICopierSurface<std::shared_ptr<Surface>> {
-    public:
-        Capturer();
+  class Capturer final
+      : public IComFunc<std::shared_ptr<Copier>>,
+        public ICopierSurface<std::shared_ptr<Surface>> {
+  public:
+    Capturer();
 
-        ~Capturer() = default;
+    ~Capturer() = default;
 
-        bool Init(std::shared_ptr<Copier>) override;
+    bool Init(std::shared_ptr<Copier>) override;
 
-        void DeInit() override;
+    void DeInit() override;
 
-        void RegisterSurface(std::shared_ptr<Surface> args) override;
+    void RegisterSurface(std::shared_ptr<Surface> args) override;
 
-        void Render() override;
+    void Render() override;
 
-    private:
-        std::shared_ptr<Surface> m_surface;
-        std::shared_ptr<Copier> m_copier;
-    };
+  private:
+    std::shared_ptr<Surface> m_surface;
+    std::shared_ptr<Copier> m_copier;
+  };
 
 }

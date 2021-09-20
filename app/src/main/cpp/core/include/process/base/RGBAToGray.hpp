@@ -8,38 +8,38 @@
 
 namespace clt {
 
-    class Shader;
+  class Shader;
 
-    class SquareModel;
+  class SquareModel;
 
-    class RGBAToGray : public FilterCom {
-    public:
-        RGBAToGray();
+  class RGBAToGray : public FilterCom {
+  public:
+    RGBAToGray();
 
-        ~RGBAToGray() = default;
+    ~RGBAToGray() = default;
 
-        virtual bool Init() override;
+    virtual bool Init() override;
 
-        virtual bool Update() override { return true; }
+    virtual bool Update() override { return true; }
 
-        virtual void DeInit() override;
+    virtual void DeInit() override;
 
-        void Filter() override;
+    void Filter() override;
 
-        bool VarIn(const std::string &name) override { return false; }
+    bool VarIn(const std::string &name) override { return false; }
 
-        void VarSet(const std::string &varName, const clt::Var &var) override {}
+    void VarSet(const std::string &varName, const clt::Var &var) override {}
 
-    private:
-        void loadShader();
+  private:
+    void loadShader();
 
-        void updateValue();
+    void updateValue();
 
-        void registerVar();
+    void registerVar();
 
-    private:
-        std::shared_ptr<Shader> m_shader;
-        std::shared_ptr<SquareModel> m_square;
-    };
+  private:
+    std::shared_ptr<Shader> m_shader;
+    std::shared_ptr<SquareModel> m_square;
+  };
 
 }

@@ -8,94 +8,95 @@
 #include <softarch/VarType.hpp>
 
 namespace clt {
+  /**
+   * 描述文本绘制信息
+   */
+  struct TextInfo {
+    TextInfo() : TextInfo("") {}
+
+    TextInfo(const std::string &_text,
+             const Viewport &_displayViewport,
+             const Viewport &_realViewport)
+        : text(_text),
+          displayViewport(_displayViewport),
+          previewViewport(_realViewport),
+          position{0.0f, 0.0f},
+          color(WhiteColor),
+          bgColor(TransColor),
+          scale(1.0f),
+          shadowColor(BlackColor),
+          shadowDelta{1.5f, -1.5f},
+          shadow(true),
+          baseAdjust(true),
+          fillBg(false),
+          rotate(0.0f) {
+    }
+
+    TextInfo(const std::string &_text)
+        : TextInfo(_text, {}, {}) {}
+
+    bool Empty() {
+      return text.empty();
+    }
+
     /**
-     * 描述文本绘制信息
+     * 文本
      */
-    struct TextInfo {
-        TextInfo() : TextInfo("") {}
+    std::string text;
 
-        TextInfo(const std::string &_text,
-                 const Viewport &_displayViewport,
-                 const Viewport &_realViewport)
-                : text(_text),
-                  displayViewport(_displayViewport),
-                  realViewport(_realViewport),
-                  position{0.0f, 0.0f},
-                  color(WhiteColor),
-                  bgColor(TransColor),
-                  scale(1.0f),
-                  shadowColor(BlackColor),
-                  shadowDelta{1.5f, -1.5f},
-                  shadow(true),
-                  baseAdjust(true),
-                  fillBg(false),
-                  rotate(0.0f) {
-        }
+    /**
+     * 文本显示区域（对应屏幕坐标系）
+     */
+    Viewport displayViewport;
 
-        TextInfo(const std::string &_text)
-                : TextInfo(_text, {}, {}) {}
+    /**
+     * 如果要显示到实际的帧上（对应预览帧坐标系）
+     */
+    Viewport previewViewport;
 
-        bool Empty() {
-            return text.empty();
-        }
+    /**
+     * 起始位置，是displayViewport大小的窗口坐标系
+     */
+    Float2 position;
 
-        /**
-         * 文本
-         */
-        std::string text;
+    /**
+     * 文本颜色
+     */
+    Float4 color;
 
-        /**
-         * 文本显示区域（对应屏幕坐标系）
-         */
-        Viewport displayViewport;
+    Float4 bgColor;
 
-        /**
-         * 如果要显示到实际的帧上（对应预览帧坐标系）
-         */
-        Viewport realViewport;
-        /**
-         * 起始位置，是displayViewport大小的窗口坐标系
-         */
-        Float2 position;
+    /**
+     * 字体缩放
+     */
+    float scale;
 
-        /**
-         * 文本颜色
-         */
-        Float4 color;
+    /**
+     * 阴影颜色
+     */
+    Float4 shadowColor;
 
-        Float4 bgColor;
+    /**
+     * 显示偏移，用于阴影效果
+     */
+    Float2 shadowDelta;
 
-        /**
-         * 字体缩放
-         */
-        float scale;
+    /**
+     * 是否显示文本阴影
+     */
+    bool shadow;
 
-        /**
-         * 阴影颜色
-         */
-        Float4 shadowColor;
+    /**
+     * 是否调整基线位置，字体基线原点是否向下调整一个字符容器大小
+     */
+    bool baseAdjust;
 
-        /**
-         * 显示偏移，用于阴影效果
-         */
-        Float2 shadowDelta;
+    /**
+     * 是否填充背景
+     */
+    bool fillBg;
 
-        /**
-         * 是否显示文本阴影
-         */
-        bool shadow;
-
-        /**
-         * 是否调整基线位置，字体基线原点是否向下调整一个字符容器大小
-         */
-        bool baseAdjust;
-
-        /**
-         * 是否填充背景
-         */
-        bool fillBg;
-
-        // 绕起点逆时针旋转角度
-        float rotate;
-    };
+    // 绕起点逆时针旋转角度
+    float rotate;
+  };
 }

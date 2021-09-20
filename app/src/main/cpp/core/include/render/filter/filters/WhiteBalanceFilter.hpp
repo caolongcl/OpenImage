@@ -8,31 +8,31 @@
 
 namespace clt {
 
-    class WhiteBalanceFilter : public FilterWithShader {
-    ClassDeclare(WhiteBalanceFilter)
-    VarDeclare(temperature)
-    VarDeclare(tint)
-    public:
-        WhiteBalanceFilter();
+  class WhiteBalanceFilter : public FilterWithShader {
+  ClassDeclare(WhiteBalanceFilter)
+  VarDeclare(temperature)
+  VarDeclare(tint)
+  public:
+    WhiteBalanceFilter();
 
-        ~WhiteBalanceFilter() = default;
+    ~WhiteBalanceFilter() = default;
 
-    private:
-        void loadShader() override;
+  private:
+    void loadShader() override;
 
-        void updateValue() override;
+    void updateValue() override;
 
-        void registerVar() override;
+    void registerVar() override;
 
-        WhiteBalanceFilter &setTemperature(const Float &temperature);
+    WhiteBalanceFilter &setTemperature(const Float &temperature);
 
-        WhiteBalanceFilter &setTint(const Float &tint);
+    WhiteBalanceFilter &setTint(const Float &tint);
 
-    private:
-        Float1 m_temperature;
-        Float1 m_tint;
+  private:
+    Float1 m_temperature;
+    Float1 m_tint;
 
-        GLint m_uniformLocTemperature{};
-        GLint m_uniformLocTint{};
-    };
+    GLint m_uniformLocTemperature{};
+    GLint m_uniformLocTint{};
+  };
 }

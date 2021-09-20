@@ -9,20 +9,20 @@
 
 namespace clt {
 
-    struct IRenderText {
-        IRenderText() = default;
+  struct IRenderText {
+    IRenderText() = default;
 
-        virtual ~IRenderText() = default;
+    virtual ~IRenderText() = default;
 
-        virtual void RenderText(const TextInfo &info) = 0;
-    };
+    virtual void RenderText(const TextInfo &info) = 0;
+  };
 
-    struct IPrint {
-        IPrint() = default;
+  struct IPrint {
+    IPrint() = default;
 
-        virtual ~IPrint() = default;
+    virtual ~IPrint() = default;
 
-        virtual void Print(const TextInfo &info) = 0;
-    };
+    virtual void Print(const TextInfo &info) = 0;
+  };
 
 }

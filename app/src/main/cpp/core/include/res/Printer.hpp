@@ -12,55 +12,55 @@
 
 namespace clt {
 
-    class Printer final
-            : public IComFunc<>,
-              public IPrint {
-    public:
+  class Printer final
+      : public IComFunc<>,
+        public IPrint {
+  public:
 
-        bool Init() override;
+    bool Init() override;
 
-        void DeInit() override;
+    void DeInit() override;
 
-        void Print(const TextInfo &info) override;
+    void Print(const TextInfo &info) override;
 
-        /**
-         * 绘制任务
-         */
-        struct PrintTask {
-            using InnerTask = std::function<TextInfo(const Viewport &displayViewport, const Viewport &realViewport)>;
+    /**
+     * 绘制任务
+     */
+    struct PrintTask {
+      using InnerTask = std::function<TextInfo(const Viewport &displayViewport, const Viewport &realViewport)>;
 
-            PrintTask(InnerTask &&_task) : task(std::forward<InnerTask>(_task)) {}
+      PrintTask(InnerTask &&_task) : task(std::forward<InnerTask>(_task)) {}
 
-            void operator()(const Viewport &displayVp, const Viewport &realVp) {
-                Printer::Self()->Print(task(displayVp, realVp));
-            }
+      void operator()(const Viewport &displayVp, const Viewport &realVp) {
+        Printer::Self()->Print(task(displayVp, realVp));
+      }
 
-            InnerTask task;
-        };
-
-        /**
-         * singleton
-         */
-    public:
-        static std::shared_ptr<Printer> Self() {
-            std::lock_guard<std::mutex> locker(s_mutex);
-            static std::shared_ptr<Printer> instance(new Printer());
-            return instance;
-        }
-
-        Printer(const Printer &) = delete;
-
-        Printer &operator=(const Printer &) = delete;
-
-        Printer(Printer &&) = delete;
-
-        Printer &operator=(Printer &&) = delete;
-
-        ~Printer() = default;
-
-    private:
-        Printer() = default;
-
-        static std::mutex s_mutex;
+      InnerTask task;
     };
+
+    /**
+     * singleton
+     */
+  public:
+    static std::shared_ptr<Printer> Self() {
+      std::lock_guard<std::mutex> locker(s_mutex);
+      static std::shared_ptr<Printer> instance(new Printer());
+      return instance;
+    }
+
+    Printer(const Printer &) = delete;
+
+    Printer &operator=(const Printer &) = delete;
+
+    Printer(Printer &&) = delete;
+
+    Printer &operator=(Printer &&) = delete;
+
+    ~Printer() = default;
+
+  private:
+    Printer() = default;
+
+    static std::mutex s_mutex;
+  };
 }

@@ -9,21 +9,21 @@
 
 namespace clt {
 
-    class NormalProcessTask final : public INormalProcessTask {
-    public:
-        NormalProcessTask(std::string name, std::shared_ptr<IProcessTask> task);
+  class NormalProcessTask final : public INormalProcessTask {
+  public:
+    NormalProcessTask(std::string name, std::shared_ptr<IProcessTask> task);
 
-        ~NormalProcessTask();
+    ~NormalProcessTask();
 
-        bool Init() override;
+    bool Init() override;
 
-        void DeInit() override;
+    void DeInit() override;
 
-        void Process() override;
+    void Process() override;
 
-    private:
-        std::string m_name;
-        // 具体任务
-        std::shared_ptr<IProcessTask> m_task;
-    };
+  private:
+    std::string m_name;
+    // 具体任务
+    std::shared_ptr<IProcessTask> m_task;
+  };
 };

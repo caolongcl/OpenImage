@@ -7,27 +7,27 @@
 #include <render/filter/FilterCom.hpp>
 
 namespace clt {
-/**
- * 随时间变化的颜色
- */
-    class TimeColorFilter : public FilterWithShader {
-    ClassDeclare(TimeColorFilter)
+  /**
+   * 随时间变化的颜色
+   */
+  class TimeColorFilter : public FilterWithShader {
+  ClassDeclare(TimeColorFilter)
 
-    public:
-        TimeColorFilter();
+  public:
+    TimeColorFilter();
 
-        ~TimeColorFilter() = default;
+    ~TimeColorFilter() = default;
 
-    private:
-        void loadShader() override;
+  private:
+    void loadShader() override;
 
-        void updateValue() override;
+    void updateValue() override;
 
-        void registerVar() override {};
+    void registerVar() override {};
 
-    private:
-        long m_startTime;
+  private:
+    long m_startTime;
 
-        GLint m_uniformTime{};
-    };
+    GLint m_uniformTime{};
+  };
 }

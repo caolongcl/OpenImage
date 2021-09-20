@@ -15,33 +15,33 @@ import com.cwdx.opensrc.R;
 import com.cwdx.opensrc.opengl.MyGLSurfaceView;
 
 public class OpenGLFragment extends Fragment {
-    public static OpenGLFragment instance;
-    private GLSurfaceView mGLSv;
+  public static OpenGLFragment instance;
+  private GLSurfaceView mGLSv;
 
-    public static OpenGLFragment get() {
+  public static OpenGLFragment get() {
+    if (instance == null) {
+      synchronized (OpenGLFragment.class) {
         if (instance == null) {
-            synchronized (OpenGLFragment.class) {
-                if (instance == null) {
-                    instance = new OpenGLFragment();
-                }
-            }
+          instance = new OpenGLFragment();
         }
-        return instance;
+      }
     }
+    return instance;
+  }
 
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_opengl, container, false);
-    }
+  @Nullable
+  @Override
+  public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    return inflater.inflate(R.layout.fragment_opengl, container, false);
+  }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        mGLSv = new MyGLSurfaceView(getContext());
-        FrameLayout container = view.findViewById(R.id.container1);
-        container.addView(mGLSv);
+  @Override
+  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
+    mGLSv = new MyGLSurfaceView(getContext());
+    FrameLayout container = view.findViewById(R.id.container1);
+    container.addView(mGLSv);
 //    ConstraintLayout constraintLayout = (ConstraintLayout)view;
 //    constraintLayout.addView(mGLSv);
-    }
+  }
 }

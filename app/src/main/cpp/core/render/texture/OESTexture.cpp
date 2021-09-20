@@ -11,41 +11,41 @@ using namespace clt;
 OESTexture::OESTexture() = default;
 
 bool OESTexture::Init() {
-    Texture::Init();
+  Texture::Init();
 
-    Log::v(Log::RENDER_TAG, "OESTexture::Init id %d", m_id);
+  Log::v(Log::RENDER_TAG, "OESTexture::Init id %d", m_id);
 
-    bool hasError = false;
+  bool hasError = false;
 
-    glActiveTexture(m_textureIndex);
-    glBindTexture(GL_TEXTURE_EXTERNAL_OES, m_id);
-    hasError |= gles::hasGlError("glBindTexture");
+  glActiveTexture(m_textureIndex);
+  glBindTexture(GL_TEXTURE_EXTERNAL_OES, m_id);
+  hasError |= gles::hasGlError("glBindTexture");
 
-    glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    glBindTexture(GL_TEXTURE_EXTERNAL_OES, 0);
+  glBindTexture(GL_TEXTURE_EXTERNAL_OES, 0);
 
-    if (hasError) {
-        Log::e("OESTexture", "Init false");
-    }
-    return !hasError;
+  if (hasError) {
+    Log::e("OESTexture", "Init false");
+  }
+  return !hasError;
 }
 
 void OESTexture::DeInit() {
-    Texture::DeInit();
+  Texture::DeInit();
 }
 
 void OESTexture::Bind(GLuint uniformSamplerLoc) const {
-    glActiveTexture(m_textureIndex);
-    glBindTexture(GL_TEXTURE_EXTERNAL_OES, m_id);
-    glUniform1i(uniformSamplerLoc, Texture::parseTextureIndex());
+  glActiveTexture(m_textureIndex);
+  glBindTexture(GL_TEXTURE_EXTERNAL_OES, m_id);
+  glUniform1i(uniformSamplerLoc, Texture::parseTextureIndex());
 }
 
 void OESTexture::UnBind() const {
-    glActiveTexture(m_textureIndex);
-    glBindTexture(GL_TEXTURE_EXTERNAL_OES, 0);
+  glActiveTexture(m_textureIndex);
+  glBindTexture(GL_TEXTURE_EXTERNAL_OES, 0);
 }
 

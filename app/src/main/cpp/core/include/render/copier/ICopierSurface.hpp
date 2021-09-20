@@ -5,25 +5,25 @@
 #pragma once
 
 namespace clt {
+  /**
+   * 定义 Copier 输出的类型，如输出到 ANativeWindow、Texture、pbbuffer
+   * @tparam Args
+   */
+  template<typename ...Args>
+  struct ICopierSurface {
+    ICopierSurface() = default;
+
+    virtual ~ICopierSurface() = default;
+
     /**
-     * 定义Copier输出的类型，如输出到ANativeWindow、Texture、pbbuffer
-     * @tparam Args
+     * 注册Copier的输出Target
+     * @param args
      */
-    template<typename ...Args>
-    struct ICopierSurface {
-        ICopierSurface() = default;
+    virtual void RegisterSurface(Args ...args) = 0;
 
-        virtual ~ICopierSurface() = default;
-
-        /**
-         * 注册Copier的输出Target
-         * @param args
-         */
-        virtual void RegisterSurface(Args ...args) = 0;
-
-        /**
-         * Copier输出操作
-         */
-        virtual void Render() = 0;
-    };
+    /**
+     * Copier输出操作
+     */
+    virtual void Render() = 0;
+  };
 }

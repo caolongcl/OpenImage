@@ -8,39 +8,39 @@
 using namespace clt;
 
 bool FilterWithShader::Init(std::shared_ptr<SquareModel> model) {
-    assert(model != nullptr);
+  assert(model != nullptr);
 
-    m_model = model;
-    m_varGroup = std::make_shared<VarGroup>();
+  m_model = model;
+  m_varGroup = std::make_shared<VarGroup>();
 
-    loadShader();
-    registerVar();
+  loadShader();
+  registerVar();
 
-    return true;
+  return true;
 }
 
 void FilterWithShader::DeInit() {
-    m_shader = nullptr;
-    m_varGroup = nullptr;
-    m_model = nullptr;
+  m_shader = nullptr;
+  m_varGroup = nullptr;
+  m_model = nullptr;
 }
 
 bool FilterWithShader::VarIn(const std::string &name) {
-    return m_varGroup->VarIn(name);
+  return m_varGroup->VarIn(name);
 }
 
 void FilterWithShader::VarSet(const std::string &varName, const Var &var) {
-    m_varGroup->VarSet(varName, var);
+  m_varGroup->VarSet(varName, var);
 }
 
 void FilterWithShader::Filter() {
-    assert(m_input != nullptr);
+  assert(m_input != nullptr);
 
-    m_model->Bind(m_shader->PositionAttributeLocation(),
-                  m_shader->TexCoordinateAttributeLocation());
-    m_shader->Use();
-    m_input->Bind(m_shader->SamplerUniformLocation());
-    updateValue();
-    m_model->Draw();
-    m_input->UnBind();
+  m_model->Bind(m_shader->PositionAttributeLocation(),
+                m_shader->TexCoordinateAttributeLocation());
+  m_shader->Use();
+  m_input->Bind(m_shader->SamplerUniformLocation());
+  updateValue();
+  m_model->Draw();
+  m_input->UnBind();
 }

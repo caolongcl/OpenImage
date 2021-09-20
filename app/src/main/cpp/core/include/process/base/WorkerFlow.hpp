@@ -9,41 +9,41 @@
 
 namespace clt {
 
-    class WorkerFlow final : public IComFunc<> {
-    public:
-        bool Init() override;
+  class WorkerFlow final : public IComFunc<> {
+  public:
+    bool Init() override;
 
-        void DeInit() override;
+    void DeInit() override;
 
-        void Post(const Task &t);
+    void Post(const Task &t);
 
-        void Post(Task &&t);
+    void Post(Task &&t);
 
-    private:
-        std::shared_ptr<ThreadPool> m_pool;
+  private:
+    std::shared_ptr<ThreadPool> m_pool;
 
-    public:
-        WorkerFlow(const WorkerFlow &) = delete;
+  public:
+    WorkerFlow(const WorkerFlow &) = delete;
 
-        WorkerFlow &operator=(const WorkerFlow &) = delete;
+    WorkerFlow &operator=(const WorkerFlow &) = delete;
 
-        WorkerFlow(WorkerFlow &&) = delete;
+    WorkerFlow(WorkerFlow &&) = delete;
 
-        WorkerFlow &operator=(WorkerFlow &&) = delete;
+    WorkerFlow &operator=(WorkerFlow &&) = delete;
 
-        ~WorkerFlow() = default;
+    ~WorkerFlow() = default;
 
-        static std::shared_ptr<WorkerFlow> Self() {
-            std::lock_guard<std::mutex> locker(s_mutex);
-            static std::shared_ptr<WorkerFlow> instance(new WorkerFlow());
-            return instance;
-        }
+    static std::shared_ptr<WorkerFlow> Self() {
+      std::lock_guard<std::mutex> locker(s_mutex);
+      static std::shared_ptr<WorkerFlow> instance(new WorkerFlow());
+      return instance;
+    }
 
-    private:
-        WorkerFlow() = default;
+  private:
+    WorkerFlow() = default;
 
-        static std::mutex s_mutex;
-        constexpr static const int POOL_SIZE = 8;
-    };
+    static std::mutex s_mutex;
+    constexpr static const int POOL_SIZE = 8;
+  };
 
 }

@@ -17,94 +17,94 @@
 
 namespace clt {
 
-    class CharsGroupGlyph;
+  class CharsGroupGlyph;
 
-    class FontRender;
+  class FontRender;
 
-    class Font : public IComFunc<>,
-                 public IRenderText {
-        using Face = FT_Face;
+  class Font : public IComFunc<>,
+               public IRenderText {
+    using Face = FT_Face;
 
-    public:
-        Font(std::string path);
+  public:
+    Font(std::string path);
 
-        virtual ~Font() = default;
+    virtual ~Font() = default;
 
-        bool Init() override;
+    bool Init() override;
 
-        void DeInit() override;
-
-        /**
-         * 加载字体
-         */
-        virtual void Load();
-
-        virtual bool Loaded();
-
-        /**
-         *
-         * @param info
-         */
-        void RenderText(const TextInfo &info) override;
-
-    private:
-        /**
-         * 加载freetype字体
-         * @return
-         */
-        bool loadFont();
-
-        /**
-         * 根据字体字形，统计各个可用字符的字形信息
-         * @param face
-         * @return
-         */
-        bool loadChars(Face &face);
-
-        /**
-         * 绘制文本
-         * @param text
-         * @param viewport
-         * @param pos
-         * @param color
-         * @param scale
-         * @param shadow
-         */
-        virtual void renderText(const TextInfo &info);
-
-        void printGlyphBitmap(const Texture::BufferPtr &buffer, int bytes);
-
-    private:
-        std::atomic<bool> m_loaded;
-        /**
-         * 加载字库生成字形需要的大小参数
-         */
-        Integer2 m_charGlyphSizeHint;
-
-        std::shared_ptr<CharsGroupGlyph> m_glyph;
-        std::shared_ptr<FontRender> m_fontRender;
-
-    protected:
-        /**
-         * 字库文件
-         */
-        std::string m_path;
-
-    private:
-        /**
-         * 默认每行显示多少个字符
-         */
-        const int cTextCountPerWidth;
-    };
+    void DeInit() override;
 
     /**
-     * 默认字体
+     * 加载字体
      */
-    class ArialFont : public Font {
-    public:
-        ArialFont(std::string path) : Font(path + "/arial.ttf") {}
+    virtual void Load();
 
-        static const char *sName;
-    };
+    virtual bool Loaded();
+
+    /**
+     *
+     * @param info
+     */
+    void RenderText(const TextInfo &info) override;
+
+  private:
+    /**
+     * 加载freetype字体
+     * @return
+     */
+    bool loadFont();
+
+    /**
+     * 根据字体字形，统计各个可用字符的字形信息
+     * @param face
+     * @return
+     */
+    bool loadChars(Face &face);
+
+    /**
+     * 绘制文本
+     * @param text
+     * @param viewport
+     * @param pos
+     * @param color
+     * @param scale
+     * @param shadow
+     */
+    virtual void renderText(const TextInfo &info);
+
+    void printGlyphBitmap(const Texture::BufferPtr &buffer, int bytes);
+
+  private:
+    std::atomic<bool> m_loaded;
+    /**
+     * 加载字库生成字形需要的大小参数
+     */
+    Integer2 m_charGlyphSizeHint;
+
+    std::shared_ptr<CharsGroupGlyph> m_glyph;
+    std::shared_ptr<FontRender> m_fontRender;
+
+  protected:
+    /**
+     * 字库文件
+     */
+    std::string m_path;
+
+  private:
+    /**
+     * 默认每行显示多少个字符
+     */
+    const int cTextCountPerWidth;
+  };
+
+  /**
+   * 默认字体
+   */
+  class ArialFont : public Font {
+  public:
+    ArialFont(std::string path) : Font(path + "/arial.ttf") {}
+
+    static const char *sName;
+  };
 
 }

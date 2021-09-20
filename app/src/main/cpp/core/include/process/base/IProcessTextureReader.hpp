@@ -8,16 +8,16 @@
 
 namespace clt {
 
-    struct IProcessTextureReader {
-        IProcessTextureReader() = default;
+  struct IProcessTextureReader {
+    IProcessTextureReader() = default;
 
-        virtual ~IProcessTextureReader() = default;
+    virtual ~IProcessTextureReader() = default;
 
-        virtual std::shared_ptr<Texture> PopWriteTexture() = 0;
+    virtual std::shared_ptr<Texture> PopWriteTexture() = 0;
 
-        virtual void PushReadTexture(std::shared_ptr<Texture>) = 0;
+    virtual void PushReadTexture(std::shared_ptr<Texture>) = 0;
 
-        virtual void Process() = 0;
-    };
+    virtual void Process() = 0;
+  };
 
 };

@@ -7,21 +7,21 @@
 #include <render/filter/FilterCom.hpp>
 
 namespace clt {
-    class BlurFilter : public FilterWithShader {
-    ClassDeclare(BlurFilter)
-    public:
-        BlurFilter();
+  class BlurFilter : public FilterWithShader {
+  ClassDeclare(BlurFilter)
+  public:
+    BlurFilter();
 
-        ~BlurFilter() = default;
+    ~BlurFilter() = default;
 
-    private:
-        void loadShader() override;
+  private:
+    void loadShader() override;
 
-        void updateValue() override;
+    void updateValue() override;
 
-        void registerVar() override {}
+    void registerVar() override {}
 
-    private:
-        GLint m_uniformLocResolution{};
-    };
+  private:
+    GLint m_uniformLocResolution{};
+  };
 }

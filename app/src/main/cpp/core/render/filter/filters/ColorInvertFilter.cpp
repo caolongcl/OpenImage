@@ -8,11 +8,11 @@
 using namespace clt;
 
 ColorInvertFilter::ColorInvertFilter()
-        : FilterWithShader(target) {
+    : FilterWithShader(target) {
 
 }
 
 void ColorInvertFilter::loadShader() {
-    m_shader = ResManager::Self()->LoadShader("color_invert");
-    assert(m_shader != nullptr);
+  m_shader = ResManager::Self()->LoadShader("color_invert");
+  assert(m_shader != nullptr);
 }

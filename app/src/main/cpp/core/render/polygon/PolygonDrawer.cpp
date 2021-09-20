@@ -7,29 +7,29 @@
 using namespace clt;
 
 bool PolygonDrawer::Init() {
-    m_varGroup = std::make_shared<VarGroup>();
+  m_varGroup = std::make_shared<VarGroup>();
 
-    loadShader();
-    registerVar();
+  loadShader();
+  registerVar();
 
-    return true;
+  return true;
 }
 
 void PolygonDrawer::DeInit() {
-    m_shader = nullptr;
-    m_varGroup = nullptr;
+  m_shader = nullptr;
+  m_varGroup = nullptr;
 }
 
 bool PolygonDrawer::VarIn(const std::string &name) {
-    return m_varGroup->VarIn(name);
+  return m_varGroup->VarIn(name);
 }
 
 void PolygonDrawer::VarSet(const std::string &varName, const Var &var) {
-    m_varGroup->VarSet(varName, var);
+  m_varGroup->VarSet(varName, var);
 }
 
 void PolygonDrawer::Filter() {
-    m_shader->Use();
-    updateValue();
-    draw();
+  m_shader->Use();
+  updateValue();
+  draw();
 }

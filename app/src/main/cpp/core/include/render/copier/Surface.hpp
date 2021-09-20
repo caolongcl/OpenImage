@@ -9,25 +9,35 @@
 
 namespace clt {
 
-    class Surface final
-            : public IComFunc<ANativeWindow *> {
-    public:
-        Surface(std::string name);
+  class Surface final
+      : public IComFunc<ANativeWindow *> {
+  public:
+    Surface(std::string name);
 
-        ~Surface() = default;
+    ~Surface() = default;
 
-        bool Init(ANativeWindow *window) override;
+    bool Init(ANativeWindow *window) override;
 
-        void DeInit() override;
+    void DeInit() override;
 
-        void Prepare();
+    /**
+     * 对应 eglMakeCurrent
+     */
+    void Prepare();
 
-        void Swap();
+    /**
+     * 对应 eglSwapBuffers
+     */
+    void Swap();
 
-        void SetPresentationTime(khronos_stime_nanoseconds_t nsecs);
+    /**
+     * 对应 eglPresentationTimeANDROID
+     * @param nsecs
+     */
+    void SetPresentationTime(khronos_stime_nanoseconds_t nsecs);
 
-    private:
-        std::string m_name;
-    };
+  private:
+    std::string m_name;
+  };
 
 }

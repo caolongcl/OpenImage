@@ -10,41 +10,52 @@
 
 namespace clt {
 
-    class Copier;
+  class Copier;
 
-    class Surface;
+  class Surface;
 
-    class Recorder final
-            : public IComFunc<std::shared_ptr<Copier>>,
-              public ICopierSurface<std::shared_ptr<Surface>> {
-    public:
-        Recorder();
+  class Recorder final
+      : public IComFunc<std::shared_ptr<Copier>>,
+        public ICopierSurface<std::shared_ptr<Surface>> {
+  public:
+    Recorder();
 
-        ~Recorder() = default;
+    ~Recorder() = default;
 
-        bool Init(std::shared_ptr<Copier>) override;
+    /**
+     * Copier 是渲染数据的来源，是 FilterPipe 的输出
+     * @return
+     */
+    bool Init(std::shared_ptr<Copier>) override;
 
-        void DeInit() override;
+    void DeInit() override;
 
-        void RegisterSurface(std::shared_ptr<Surface> args) override;
+    /**
+     * Surface 是渲染数据的目的地
+     * @param args
+     */
+    void RegisterSurface(std::shared_ptr<Surface> args) override;
 
-        void Record(bool start, int fps, int bitrate);
+    void Record(bool start, int fps, int bitrate);
 
-        void Render() override;
+    /**
+     * Copier 拷贝一帧到 Surface 上
+     */
+    void Render() override;
 
-        bool Recording() const;
+    bool Recording() const;
 
-        void GetRecordParams(int &fps, int &bitrate) const;
+    void GetRecordParams(int &fps, int &bitrate) const;
 
-    private:
-        int m_fps{};
-        int m_bitrate{};
-        long m_startTime{};
-        int m_encodedFrameCount{};
-        bool m_recording;
+  private:
+    int m_fps{};
+    int m_bitrate{};
+    long m_startTime{};
+    int m_encodedFrameCount{};
+    bool m_recording;
 
-        std::shared_ptr<Surface> m_surface;
-        std::shared_ptr<Copier> m_copier;
-    };
+    std::shared_ptr<Surface> m_surface;
+    std::shared_ptr<Copier> m_copier;
+  };
 
 }

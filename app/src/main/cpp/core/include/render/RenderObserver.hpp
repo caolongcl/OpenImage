@@ -11,36 +11,36 @@
 
 namespace clt {
 
-    struct RenderObserver : public IComFunc<std::shared_ptr<PreviewControllerCallback>>,
-                            public Observer<OPreviewSize>,
-                            public Observer<ObserverToJava> {
-        using ParamType = PreviewControllerCallback;
-        using MemberType = std::shared_ptr<ParamType>;
+  struct RenderObserver : public IComFunc<std::shared_ptr<PreviewControllerCallback>>,
+                          public Observer<OPreviewSize>,
+                          public Observer<ObserverToJava> {
+    using ParamType = PreviewControllerCallback;
+    using MemberType = std::shared_ptr<ParamType>;
 
-        bool Init(MemberType callback) override {
-            m_callback = std::move(callback);
-            return m_callback != nullptr;
-        }
+    bool Init(MemberType callback) override {
+      m_callback = std::move(callback);
+      return m_callback != nullptr;
+    }
 
-        void DeInit() override {
-            m_callback = nullptr;
-        }
+    void DeInit() override {
+      m_callback = nullptr;
+    }
 
-        void OnUpdate(OPreviewSize &&t) override {
-            if (m_callback != nullptr) {
-                m_callback->OnCallback(ParamType::CallbackType::CaptureSizeChanged);
-            }
-        }
+    void OnUpdate(OPreviewSize &&t) override {
+      if (m_callback != nullptr) {
+        m_callback->OnCallback(ParamType::CallbackType::CaptureSizeChanged);
+      }
+    }
 
-        void OnUpdate(ObserverToJava &&) override {
-            if (m_callback != nullptr) {
-                m_callback->OnCallback(ParamType::CallbackType::PostInfo);
-            }
-        }
+    void OnUpdate(ObserverToJava &&) override {
+      if (m_callback != nullptr) {
+        m_callback->OnCallback(ParamType::CallbackType::PostInfo);
+      }
+    }
 
-    private:
-        MemberType m_callback;
-    };
+  private:
+    MemberType m_callback;
+  };
 
 }
 

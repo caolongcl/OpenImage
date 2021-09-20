@@ -8,22 +8,25 @@
 
 namespace clt {
 
-    class GrayscaleTexture final : public Texture {
-    public:
-        GrayscaleTexture() = default;
+  /**
+   * 单通道纹理，主要用来渲染字体
+   */
+  class GrayscaleTexture final : public Texture {
+  public:
+    GrayscaleTexture() = default;
 
-        GrayscaleTexture(GLenum index) : Texture(index) {}
+    GrayscaleTexture(GLenum index) : Texture(index) {}
 
-        ~GrayscaleTexture() = default;
+    ~GrayscaleTexture() = default;
 
-        bool Init() override;
+    bool Init() override;
 
-        void DeInit() override;
+    void DeInit() override;
 
-        void Bind(GLuint uniformSamplerLoc) const override;
+    void Bind(GLuint uniformSamplerLoc) const override;
 
-        void UnBind() const override;
+    void UnBind() const override;
 
-        void upload(BufferPtr buffer) override;
-    };
+    void upload(BufferPtr buffer) override;
+  };
 }

@@ -7,30 +7,30 @@
 #include <render/filter/FilterCom.hpp>
 
 namespace clt {
-/**
- * Mosaic效果
- */
-    class MosaicFilter : public FilterWithShader {
-    ClassDeclare(MosaicFilter)
-    VarDeclare(mosaic_size)
-    public:
-        MosaicFilter();
+  /**
+   * Mosaic效果
+   */
+  class MosaicFilter : public FilterWithShader {
+  ClassDeclare(MosaicFilter)
+  VarDeclare(mosaic_size)
+  public:
+    MosaicFilter();
 
-        ~MosaicFilter() = default;
+    ~MosaicFilter() = default;
 
-    private:
-        void loadShader() override;
+  private:
+    void loadShader() override;
 
-        void updateValue() override;
+    void updateValue() override;
 
-        void registerVar() override;
+    void registerVar() override;
 
-        MosaicFilter &setMosaicSize(const Float &mosaicSize);
+    MosaicFilter &setMosaicSize(const Float &mosaicSize);
 
-    private:
-        Float2 m_mosaicSize;
+  private:
+    Float2 m_mosaicSize;
 
-        GLint m_uniformLocMosaicSize{};
-        GLint m_uniformLocInputSize{};
-    };
+    GLint m_uniformLocMosaicSize{};
+    GLint m_uniformLocInputSize{};
+  };
 }

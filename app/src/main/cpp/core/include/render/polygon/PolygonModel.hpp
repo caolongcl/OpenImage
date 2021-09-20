@@ -10,49 +10,49 @@
 
 namespace clt {
 
-    struct PolygonModelUpdater {
-        PolygonModelUpdater() = default;
+  struct PolygonModelUpdater {
+    PolygonModelUpdater() = default;
 
-        virtual ~PolygonModelUpdater() = default;
-
-        /**
-         * 赋予持有ProcessModel的对象修改的能力
-         * @param vertex
-         * @param vSize
-         */
-        virtual void UpdateVertex(const std::vector<Float2> &vertex) = 0;
-    };
+    virtual ~PolygonModelUpdater() = default;
 
     /**
-     * 可绘制几何图形
-     * 用于绘制多边形
+     * 赋予修改顶点的能力
+     * @param vertex
+     * @param vSize
      */
-    class PolygonModel : public IComFunc<>,
-                         public PolygonModelUpdater {
-    public:
-        PolygonModel();
+    virtual void UpdateVertex(const std::vector<Float2> &vertex) = 0;
+  };
 
-        virtual ~PolygonModel() = default;
+  /**
+   * 可绘制几何图形
+   * 用于绘制多边形
+   */
+  class PolygonModel : public IComFunc<>,
+                       public PolygonModelUpdater {
+  public:
+    PolygonModel();
 
-        bool Init() override;
+    virtual ~PolygonModel() = default;
 
-        void DeInit() override;
+    bool Init() override;
 
-        void Bind(GLint posLoc) const;
+    void DeInit() override;
 
-        void UpdateVertex(const std::vector<Float2> &vertex) override;
+    void Bind(GLint posLoc) const;
 
-        void Use(GLTask &&task) const;
+    void UpdateVertex(const std::vector<Float2> &vertex) override;
 
-    private:
-        GLuint m_vertexVbo;
-        std::shared_ptr<GLfloat> m_vertexs;
+    void Use(GLTask &&task) const;
 
-    public:
-        // 最多支持的定点数
-        static const int s_vertexMax = 300;
-        // x y
-        static const int s_vertexCoordsPer = 2;
-    };
+  private:
+    GLuint m_vertexVbo;
+    std::shared_ptr<GLfloat> m_vertexs;
+
+  public:
+    // 最多支持的定点数
+    static const int s_vertexMax = 300;
+    // x y
+    static const int s_vertexCoordsPer = 2;
+  };
 
 }

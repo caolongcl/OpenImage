@@ -6,23 +6,23 @@
 
 namespace clt {
 
-    class LuminanceTexture final : public Texture {
-    public:
-        LuminanceTexture() = default;
+  class LuminanceTexture final : public Texture {
+  public:
+    LuminanceTexture() = default;
 
-        LuminanceTexture(GLenum index) : Texture(index) {}
+    LuminanceTexture(GLenum index) : Texture(index) {}
 
-        ~LuminanceTexture() = default;
+    ~LuminanceTexture() = default;
 
-        bool Init() override;
+    bool Init() override;
 
-        void DeInit() override;
+    void DeInit() override;
 
-        void Bind(GLuint uniformSamplerLoc) const override;
+    void Bind(GLuint uniformSamplerLoc) const override;
 
-        void UnBind() const override;
+    void UnBind() const override;
 
-        void upload(BufferPtr buffer) override;
-    };
+    void upload(BufferPtr buffer) override;
+  };
 }
 

@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Map;
 
 public class CharsAdapter extends BaseAdapter {
-    private List<String> mTitles;
-    private Map<String, List<Model.Item>> mData;
+  private List<String> mTitles;
+  private Map<String, List<Model.Item>> mData;
 
 //  public void setData(@NonNull Map<String, List<Item>> data) {
 //    mData = data;
@@ -26,48 +26,48 @@ public class CharsAdapter extends BaseAdapter {
 //    mData.put(title, data);
 //  }
 
-    @Override
-    public int getCount() {
-        return mData != null ? mData.size() : 0;
-    }
+  @Override
+  public int getCount() {
+    return mData != null ? mData.size() : 0;
+  }
 
-    @Override
-    public Object getItem(int position) {
-        return mData != null ? mData.get(mTitles.get(position)) : null;
-    }
+  @Override
+  public Object getItem(int position) {
+    return mData != null ? mData.get(mTitles.get(position)) : null;
+  }
 
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
+  @Override
+  public long getItemId(int position) {
+    return position;
+  }
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
-        if (convertView != null) {
-            holder = (ViewHolder) convertView.getTag();
-        } else {
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_chars_layout, null);
-            holder = new ViewHolder(convertView);
-            convertView.setTag(holder);
+  @Override
+  public View getView(int position, View convertView, ViewGroup parent) {
+    ViewHolder holder;
+    if (convertView != null) {
+      holder = (ViewHolder) convertView.getTag();
+    } else {
+      convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_chars_layout, null);
+      holder = new ViewHolder(convertView);
+      convertView.setTag(holder);
 //      holder.update(mTitles.get(position), mData.get(mTitles.get(position)));
-        }
-
-        return convertView;
     }
 
-    public static final class ViewHolder {
-        public TextView title;
-        public CSpinner cSpinner;
+    return convertView;
+  }
 
-        public ViewHolder(View view) {
-            title = view.findViewById(R.id.cspinner_title);
-            cSpinner = view.findViewById(R.id.cspinner_item);
-        }
+  public static final class ViewHolder {
+    public TextView title;
+    public CSpinner cSpinner;
+
+    public ViewHolder(View view) {
+      title = view.findViewById(R.id.cspinner_title);
+      cSpinner = view.findViewById(R.id.cspinner_item);
+    }
 
 //    public void update(String titleStr, List<Item> items) {
 //      title.setText(titleStr);
 //      cSpinner.setData(items);
 //    }
-    }
+  }
 }

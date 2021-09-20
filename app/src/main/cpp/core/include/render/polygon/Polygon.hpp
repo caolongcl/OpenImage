@@ -13,44 +13,47 @@
 
 namespace clt {
 
-    class Polygon final : public PolygonDrawer {
-    ClassDeclare(Polygon)
-    VarDeclare(color)
-    VarDeclare(fill)
+  /**
+   * 绘制多边形，如人脸检测框，AR Marker 框等
+   */
+  class Polygon final : public PolygonDrawer {
+  ClassDeclare(Polygon)
+  VarDeclare(color)
+  VarDeclare(fill)
 
-    public:
-        Polygon();
+  public:
+    Polygon();
 
-        ~Polygon() = default;
+    ~Polygon() = default;
 
-        bool Init() override;
+    bool Init() override;
 
-        void DeInit() override;
+    void DeInit() override;
 
-        void UpdatePolygon(const PolygonObject &object, const Viewport &viewport);
+    void UpdatePolygon(const PolygonObject &object, const Viewport &viewport);
 
-        void Render();
-    private:
+    void Render();
+  private:
 
-        void loadShader() override;
+    void loadShader() override;
 
-        void updateValue() override;
+    void updateValue() override;
 
-        void registerVar() override;
+    void registerVar() override;
 
-        void draw() override;
+    void draw() override;
 
-    private:
-        PolygonModel m_model;
-        TextInfo m_tag;
-        glm::mat4 m_projection;
-        Float4 m_color;
-        int m_lineWidth;
-        int m_vertexCount;
-        bool m_fill;
+  private:
+    PolygonModel m_model;
+    TextInfo m_tag;
+    glm::mat4 m_projection;
+    Float4 m_color;
+    int m_lineWidth;
+    int m_vertexCount;
+    bool m_fill;
 
-        GLint m_uniformLocProjection{-1};
-        GLint m_uniformLocModel{-1};
-        GLint m_uniformLocColor{-1};
-    };
+    GLint m_uniformLocProjection{-1};
+    GLint m_uniformLocModel{-1};
+    GLint m_uniformLocColor{-1};
+  };
 }

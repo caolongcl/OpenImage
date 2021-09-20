@@ -12,18 +12,18 @@ using namespace clt;
 std::mutex Printer::s_mutex;
 
 bool Printer::Init() {
-    Log::v(Log::RES_TAG, "Printer::Init");
-    return true;
+  Log::v(Log::RES_TAG, "Printer::Init");
+  return true;
 }
 
 void Printer::DeInit() {
-    Log::v(Log::RES_TAG, "Printer::DeInit");
+  Log::v(Log::RES_TAG, "Printer::DeInit");
 }
 
 void Printer::Print(const TextInfo &info) {
-    assert(Flow::Self()->InvokeInRender()); // 只能在渲染线程绘制
+  assert(Flow::Self()->InvokeInRender()); // 只能在渲染线程绘制
 
-    if (ResManager::Self()->GetGUIFont() != nullptr) {
-        ResManager::Self()->GetGUIFont()->RenderText(info);
-    }
+  if (ResManager::Self()->GetGUIFont() != nullptr) {
+    ResManager::Self()->GetGUIFont()->RenderText(info);
+  }
 }

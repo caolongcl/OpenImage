@@ -27,21 +27,21 @@ if (type == filter::target) {\
 return std::make_shared<filter>();}
 
 std::shared_ptr<FilterWithShader> FilterFactory::Create(const std::string &type) {
-    CreateFilter(type, ExposureFilter)
-    CreateFilter(type, BaseFilter)
-    CreateFilter(type, ColorInvertFilter)
-    CreateFilter(type, OpacityFilter)
-    CreateFilter(type, BlurFilter)
-    CreateFilter(type, WhiteBalanceFilter)
-    CreateFilter(type, GrayscaleFilter)
-    CreateFilter(type, GammaFilter)
-    CreateFilter(type, HueFilter)
-    CreateFilter(type, MonochromeFilter)
-    CreateFilter(type, RGBFilter)
-    CreateFilter(type, SharpenFilter)
-    CreateFilter(type, MosaicFilter)
-    CreateFilter(type, WhirlpoolFilter)
-    CreateFilter(type, TimeColorFilter)
-    CreateFilter(type, FireFilter)
-    return nullptr;
+  CreateFilter(type, ExposureFilter)
+  CreateFilter(type, BaseFilter)
+  CreateFilter(type, ColorInvertFilter)
+  CreateFilter(type, OpacityFilter)
+  CreateFilter(type, BlurFilter)
+  CreateFilter(type, WhiteBalanceFilter)
+  CreateFilter(type, GrayscaleFilter)
+  CreateFilter(type, GammaFilter)
+  CreateFilter(type, HueFilter)
+  CreateFilter(type, MonochromeFilter)
+  CreateFilter(type, RGBFilter)
+  CreateFilter(type, SharpenFilter)
+  CreateFilter(type, MosaicFilter)
+  CreateFilter(type, WhirlpoolFilter)
+  CreateFilter(type, TimeColorFilter)
+  CreateFilter(type, FireFilter)
+  return nullptr;
 }

@@ -8,7 +8,7 @@
 
 namespace clt {
 
-    using Task = std::function<void()>;
+  using Task = std::function<void()>;
 
-    using GLTask = std::function<void()>;
+  using GLTask = std::function<void()>;
 }

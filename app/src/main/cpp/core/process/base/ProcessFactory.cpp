@@ -17,8 +17,8 @@ if (type == process::target) {\
 return std::make_shared<process::Wrapper>(process::target, std::make_shared<process>());}
 
 std::shared_ptr<IProcessTask> ProcessFactory::Create(const std::string &type) {
-    CreateProcess(type, FaceDetector)
-    CreateProcess(type, CalibrateCamera)
-    CreateProcess(type, MarkerAR)
-    return nullptr;
+  CreateProcess(type, FaceDetector)
+  CreateProcess(type, CalibrateCamera)
+  CreateProcess(type, MarkerAR)
+  return nullptr;
 }

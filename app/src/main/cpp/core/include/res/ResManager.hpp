@@ -11,227 +11,227 @@
 
 namespace clt {
 
-    class Font;
+  class Font;
 
-    class Shader;
+  class Shader;
 
-    struct ResParams {
-        ResParams() {
-            boardSize.w = 6; // 棋盘每行内点数
-            boardSize.h = 8; // 棋盘每列内点数
-            boardSquareSize.w = 17.8; // 棋盘每格宽度 mm
-            boardSquareSize.h = 16.8; // 棋盘每格高度 mm
+  struct ResParams {
+    ResParams() {
+      boardSize.w = 6; // 棋盘每行内点数
+      boardSize.h = 8; // 棋盘每列内点数
+      boardSquareSize.w = 17.8; // 棋盘每格宽度 mm
+      boardSquareSize.h = 16.8; // 棋盘每格高度 mm
 
-            markerSize.w = 63.5; // marker 实际宽度 mm
-            markerSize.h = 67.5; // marker 实际高度 mm
+      markerSize.w = 63.5; // marker 实际宽度 mm
+      markerSize.h = 67.5; // marker 实际高度 mm
 
-            bufRatio = 1.0;
-        }
+      bufRatio = 1.0;
+    }
 
-        // chessboard
-        Integer2 boardSize;
-        Float2 boardSquareSize;
+    // chessboard
+    Integer2 boardSize;
+    Float2 boardSquareSize;
 
-        // marker
-        Float2 markerSize;
+    // marker
+    Float2 markerSize;
 
-        // process standard buf ratio (buf.w / preview.h)
-        float bufRatio;
-    };
+    // process standard buf ratio (buf.w / preview.h)
+    float bufRatio;
+  };
+
+  /**
+   * 校正工具参数
+   */
+  struct CalibrateData {
+    CalibrateData() = default;
+
+    CalibrateData(
+        const Integer2 &_boardSize,
+        const Float2 &_boardSquareSize,
+        const Float2 &_markerSize) :
+        boardSize(_boardSize),
+        boardSquareSize(_boardSquareSize),
+        markerSize(_markerSize) {}
+
+    static YAML::Node Encode(const CalibrateData &rhs) {
+      YAML::Node node;
+      YAML::Node infoNode;
+      infoNode["board_width"] = rhs.boardSize.w;
+      infoNode["board_height"] = rhs.boardSize.h;
+      infoNode["board_square_width"] = rhs.boardSquareSize.w;
+      infoNode["board_square_height"] = rhs.boardSquareSize.h;
+      infoNode["marker_width"] = rhs.markerSize.w;
+      infoNode["marker_height"] = rhs.markerSize.h;
+      node["info"] = infoNode;
+      return node;
+    }
+
+    static bool Decode(const YAML::Node &node, CalibrateData &rhs) {
+      if (!node.IsDefined()
+          || !node["info"].IsDefined()) {
+        return false;
+      }
+      rhs.boardSize = {node["info"]["board_width"].as<int>(),
+                       node["info"]["board_height"].as<int>()};
+      rhs.boardSquareSize = {node["info"]["board_square_width"].as<float>(),
+                             node["info"]["board_square_height"].as<float>()};
+      rhs.markerSize = {node["info"]["marker_width"].as<float>(),
+                        node["info"]["marker_height"].as<float>()};
+      return true;
+    }
+
+    const Integer2 GetBoardSize() const {
+      return boardSize;
+    }
+
+    const Float2 GetBoardSquareSize() const {
+      return boardSquareSize;
+    }
+
+    const Float2 GetMarkerSize() const {
+      return markerSize;
+    }
+
+    std::string GetJsonString() const {
+      std::stringstream ss;
+      ss << "{" << "\"board_width\":" << boardSize.w << ","
+         << "\"board_height\":" << boardSize.h << ","
+         << "\"board_square_width\":" << boardSquareSize.w << ","
+         << "\"board_square_height\":" << boardSquareSize.h << ","
+         << "\"marker_width\":" << markerSize.w << ","
+         << "\"marker_height\":" << markerSize.h << "}";
+      return ss.str();
+    }
+
+  private:
+    Integer2 boardSize;
+    Float2 boardSquareSize;
+    Float2 markerSize;
+  };
+
+  class ResManager final
+      : public IComFunc<> {
+  public:
+    bool Init() override;
+
+    void DeInit() override;
 
     /**
-     * 校正工具参数
+     * 扫描path下的文件并加载
+     * @param path
      */
-    struct CalibrateData {
-        CalibrateData() = default;
+    void ScanAndLoad(const std::string &path);
 
-        CalibrateData(
-                const Integer2 &_boardSize,
-                const Float2 &_boardSquareSize,
-                const Float2 &_markerSize) :
-                boardSize(_boardSize),
-                boardSquareSize(_boardSquareSize),
-                markerSize(_markerSize) {}
+    std::string GetResAbsolutePath(const std::string &file) const;
 
-        static YAML::Node Encode(const CalibrateData &rhs) {
-            YAML::Node node;
-            YAML::Node infoNode;
-            infoNode["board_width"] = rhs.boardSize.w;
-            infoNode["board_height"] = rhs.boardSize.h;
-            infoNode["board_square_width"] = rhs.boardSquareSize.w;
-            infoNode["board_square_height"] = rhs.boardSquareSize.h;
-            infoNode["marker_width"] = rhs.markerSize.w;
-            infoNode["marker_height"] = rhs.markerSize.h;
-            node["info"] = infoNode;
-            return node;
-        }
+    void RegisterBaseDir(const std::string &path);
 
-        static bool Decode(const YAML::Node &node, CalibrateData &rhs) {
-            if (!node.IsDefined()
-                || !node["info"].IsDefined()) {
-                return false;
-            }
-            rhs.boardSize = {node["info"]["board_width"].as<int>(),
-                             node["info"]["board_height"].as<int>()};
-            rhs.boardSquareSize = {node["info"]["board_square_width"].as<float>(),
-                                   node["info"]["board_square_height"].as<float>()};
-            rhs.markerSize = {node["info"]["marker_width"].as<float>(),
-                             node["info"]["marker_height"].as<float>()};
-            return true;
-        }
+    void RegisterFunctionDir(const std::string &path);
 
-        const Integer2 GetBoardSize() const {
-            return boardSize;
-        }
+    const std::string &GetBaseAbsolutePath() const;
 
-        const Float2 GetBoardSquareSize() const {
-            return boardSquareSize;
-        }
+    const std::string &GetFunctionAbsolutePath() const;
 
-        const Float2 GetMarkerSize() const {
-            return markerSize;
-        }
+    /**
+     * 加载shader
+     * @param name
+     * @return
+     */
+    std::shared_ptr<Shader> LoadShader(const std::string &name);
 
-        std::string GetJsonString() const {
-            std::stringstream ss;
-            ss << "{" << "\"board_width\":" << boardSize.w << ","
-               << "\"board_height\":" << boardSize.h << ","
-               << "\"board_square_width\":" << boardSquareSize.w << ","
-               << "\"board_square_height\":" << boardSquareSize.h << ","
-               << "\"marker_width\":" << markerSize.w << ","
-               << "\"marker_height\":" << markerSize.h << "}";
-            return ss.str();
-        }
+    /**
+     * 获取字体
+     * @return
+     */
+    std::shared_ptr<Font> GetGUIFont();
 
-    private:
-        Integer2 boardSize;
-        Float2 boardSquareSize;
-        Float2 markerSize;
-    };
+    static void SaveMatImage(const std::string &fileName, const cv::Mat &image);
 
-    class ResManager final
-            : public IComFunc<> {
-    public:
-        bool Init() override;
+    static void SaveMatImageImmediate(const std::string &fileName, const cv::Mat &image);
 
-        void DeInit() override;
+    std::string GetCameraParamsFile() const;
 
-        /**
-         * 扫描path下的文件并加载
-         * @param path
-         */
-        void ScanAndLoad(const std::string &path);
+    void UpdateResParamsBufRatio(float ratio);
 
-        std::string GetResAbsolutePath(const std::string &file) const;
+    const CalibrateData &LoadCalibrateParams();
 
-        void RegisterBaseDir(const std::string &path);
+    const float GetBufferRatio() const {
+      return m_realWorldParam.bufRatio;
+    }
 
-        void RegisterFunctionDir(const std::string &path);
+    void SaveCalibrateParams(Integer2 boardSize, Float2 boardSquareSize, Float2 markerSize);
 
-        const std::string &GetBaseAbsolutePath() const;
+  private:
+    static std::string getShaderName(const YamlParse &yaml);
 
-        const std::string &GetFunctionAbsolutePath() const;
+    static std::string getShaderSrc(const YamlParse &yaml, const std::string &type);
 
-        /**
-         * 加载shader
-         * @param name
-         * @return
-         */
-        std::shared_ptr<Shader> LoadShader(const std::string &name);
+    static std::string getVertexShaderSrc(const YamlParse &yaml);
 
-        /**
-         * 获取字体
-         * @return
-         */
-        std::shared_ptr<Font> GetGUIFont();
+    static std::string getComputeShaderSrc(const YamlParse &yaml);
 
-        static void SaveMatImage(const std::string &fileName, const cv::Mat &image);
+    static std::string getFragmentShaderSrc(const YamlParse &yaml);
 
-        static void SaveMatImageImmediate(const std::string &fileName, const cv::Mat &image);
+    static std::shared_ptr<Shader> makeShader(const YamlParse &yaml);
 
-        std::string GetCameraParamsFile() const;
+    static std::shared_ptr<Shader> makeShader(const std::string &vertexSrc,
+                                              const std::string &fragmentSrc,
+                                              const std::string &computeSrc);
 
-        void UpdateResParamsBufRatio(float ratio);
+    void registerFonts(const std::string &name, std::shared_ptr<Font> font);
 
-        const CalibrateData &LoadCalibrateParams();
+    bool scanResFiles(const std::string &rootPath);
 
-        const float GetBufferRatio() const {
-            return m_realWorldParam.bufRatio;
-        }
+    void loadFonts();
 
-        void SaveCalibrateParams(Integer2 boardSize, Float2 boardSquareSize, Float2 markerSize);
+    void clearOldCalibrateImages();
 
-    private:
-        static std::string getShaderName(const YamlParse &yaml);
+  private:
+    ResHub<Shader> m_shaders;
+    ResHub<Font> m_fonts;
+    std::list<std::string> m_baseShaderFiles;
+    std::list<std::string> m_otherShaderFiles;
+    std::list<std::string> m_resFiles;
+    std::string m_resPath;  // 读取资源的地方
+    std::string m_basePath; // 保存文件地方
+    std::string m_functionPath; // 保存功能文件文件地方
+    ResParams m_realWorldParam; // 原始默认参数
+    CalibrateData m_calibrateData; // 相机校正参数
 
-        static std::string getShaderSrc(const YamlParse &yaml, const std::string &type);
+  private:
+    // 预定义的最小化运行资源
+    // oes/default shader
+    static const char *s_oes;
+    static const char *s_copier;
+    static const char *s_oesVertex;
+    static const char *s_oesFragment;
+    static const char *s_copierVertex;
+    static const char *s_copierFragment;
 
-        static std::string getVertexShaderSrc(const YamlParse &yaml);
+    /**
+     * singleton
+     */
+  public:
+    ResManager(const ResManager &) = delete;
 
-        static std::string getComputeShaderSrc(const YamlParse &yaml);
+    ResManager &operator=(const ResManager &) = delete;
 
-        static std::string getFragmentShaderSrc(const YamlParse &yaml);
+    ResManager(ResManager &&) = delete;
 
-        static std::shared_ptr<Shader> makeShader(const YamlParse &yaml);
+    ResManager &operator=(ResManager &&) = delete;
 
-        static std::shared_ptr<Shader> makeShader(const std::string &vertexSrc,
-                                                  const std::string &fragmentSrc,
-                                                  const std::string &computeSrc);
+    ~ResManager() = default;
 
-        void registerFonts(const std::string &name, std::shared_ptr<Font> font);
+    static std::shared_ptr<ResManager> Self() {
+      std::lock_guard<std::mutex> locker(s_mutex);
+      static std::shared_ptr<ResManager> instance(new ResManager());
+      return instance;
+    }
 
-        bool scanResFiles(const std::string &rootPath);
+  private:
+    ResManager() = default;
 
-        void loadFonts();
-
-        void clearOldCalibrateImages();
-
-    private:
-        ResHub<Shader> m_shaders;
-        ResHub<Font> m_fonts;
-        std::list<std::string> m_baseShaderFiles;
-        std::list<std::string> m_otherShaderFiles;
-        std::list<std::string> m_resFiles;
-        std::string m_resPath;  // 读取资源的地方
-        std::string m_basePath; // 保存文件地方
-        std::string m_functionPath; // 保存功能文件文件地方
-        ResParams m_realWorldParam; // 原始默认参数
-        CalibrateData m_calibrateData; // 相机校正参数
-
-    private:
-        // 预定义的最小化运行资源
-        // oes/default shader
-        static const char *s_oes;
-        static const char *s_copier;
-        static const char *s_oesVertex;
-        static const char *s_oesFragment;
-        static const char *s_copierVertex;
-        static const char *s_copierFragment;
-
-        /**
-         * singleton
-         */
-    public:
-        ResManager(const ResManager &) = delete;
-
-        ResManager &operator=(const ResManager &) = delete;
-
-        ResManager(ResManager &&) = delete;
-
-        ResManager &operator=(ResManager &&) = delete;
-
-        ~ResManager() = default;
-
-        static std::shared_ptr<ResManager> Self() {
-            std::lock_guard<std::mutex> locker(s_mutex);
-            static std::shared_ptr<ResManager> instance(new ResManager());
-            return instance;
-        }
-
-    private:
-        ResManager() = default;
-
-        static std::mutex s_mutex;
-    };
+    static std::mutex s_mutex;
+  };
 
 }

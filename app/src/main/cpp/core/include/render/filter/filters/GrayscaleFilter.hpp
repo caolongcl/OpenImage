@@ -7,23 +7,23 @@
 #include <render/filter/FilterCom.hpp>
 
 namespace clt {
-/**
- * 灰度
- */
-    class GrayscaleFilter : public FilterWithShader {
-    ClassDeclare(GrayscaleFilter)
+  /**
+   * 灰度
+   */
+  class GrayscaleFilter : public FilterWithShader {
+  ClassDeclare(GrayscaleFilter)
 
-    public:
-        GrayscaleFilter();
+  public:
+    GrayscaleFilter();
 
-        ~GrayscaleFilter() = default;
+    ~GrayscaleFilter() = default;
 
-    private:
-        void loadShader() override;
+  private:
+    void loadShader() override;
 
-        void updateValue() override {}
+    void updateValue() override {}
 
-        void registerVar() override {}
-    };
+    void registerVar() override {}
+  };
 
 }

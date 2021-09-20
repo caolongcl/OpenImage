@@ -11,26 +11,26 @@
 
 namespace clt {
 
-    class FaceDetector final : public IBufferProcessTask {
-    ClassDeclare(FaceDetector)
-    ClassWrapper(BufferProcessTask)
-    public:
-        FaceDetector();
+  class FaceDetector final : public IBufferProcessTask {
+  ClassDeclare(FaceDetector)
+  ClassWrapper(BufferProcessTask)
+  public:
+    FaceDetector();
 
-        ~FaceDetector() = default;
+    ~FaceDetector() = default;
 
-        bool Init() override;
+    bool Init() override;
 
-        void DeInit() override;
+    void DeInit() override;
 
-        void Process(std::shared_ptr<Buffer> buf) override;
+    void Process(std::shared_ptr<Buffer> buf) override;
 
-    private:
-        void process(const Buffer &buf);
+  private:
+    void process(const Buffer &buf);
 
-    private:
-        std::shared_ptr<CascadeClassifierFaceDetector> m_faceCascade;
-        TimeStatics m_timeStatics;
-    };
+  private:
+    std::shared_ptr<CascadeClassifierFaceDetector> m_faceCascade;
+    TimeStatics m_timeStatics;
+  };
 
 }

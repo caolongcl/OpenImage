@@ -8,35 +8,35 @@
 #include <softarch/std.hpp>
 
 namespace clt {
-    using TimeTask = std::function<void(long period)>;
+  using TimeTask = std::function<void(long period)>;
 
-    struct TimeStatics : public IComFunc<>,
-                         public IComUpdate<long, TimeTask &&> {
-        TimeStatics() = default;
+  struct TimeStatics : public IComFunc<>,
+                       public IComUpdate<long, TimeTask &&> {
+    TimeStatics() = default;
 
-        bool Init() override {
-            avgProcessTime = 0;
-            processCount = 0;
-            return true;
-        }
-        void DeInit() override {}
+    bool Init() override {
+      avgProcessTime = 0;
+      processCount = 0;
+      return true;
+    }
+    void DeInit() override {}
 
-        void Update(long lastTime, TimeTask &&task) override {
-            float avg = (static_cast<float>(processCount) * avgProcessTime +
-                         static_cast<float>( Utils::CurTimeMilli() - lastTime)) /
-                        static_cast<float>(processCount + 1);
-            avgProcessTime = avg;
-            processCount += 1;
+    void Update(long lastTime, TimeTask &&task) override {
+      float avg = (static_cast<float>(processCount) * avgProcessTime +
+                   static_cast<float>( Utils::CurTimeMilli() - lastTime)) /
+                  static_cast<float>(processCount + 1);
+      avgProcessTime = avg;
+      processCount += 1;
 
-            task(avgProcessTime);
+      task(avgProcessTime);
 
-            if (processCount >= 10000) {
-                processCount = 0;
-                avgProcessTime = 0;
-            }
-        }
+      if (processCount >= 10000) {
+        processCount = 0;
+        avgProcessTime = 0;
+      }
+    }
 
-        float avgProcessTime;
-        int processCount;
-    };
+    float avgProcessTime;
+    int processCount;
+  };
 }

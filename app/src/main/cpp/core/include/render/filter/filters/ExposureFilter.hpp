@@ -8,28 +8,28 @@
 
 namespace clt {
 
-/**
- * 曝光: -10.0 ~ 10.0, 默认为 0.0
- */
-    class ExposureFilter : public FilterWithShader {
-    ClassDeclare(ExposureFilter)
-    VarDeclare(exposure)
-    public:
-        ExposureFilter();
+  /**
+   * 曝光: -10.0 ~ 10.0, 默认为 0.0
+   */
+  class ExposureFilter : public FilterWithShader {
+  ClassDeclare(ExposureFilter)
+  VarDeclare(exposure)
+  public:
+    ExposureFilter();
 
-        ~ExposureFilter() = default;
+    ~ExposureFilter() = default;
 
-    private:
-        void loadShader() override;
+  private:
+    void loadShader() override;
 
-        void updateValue() override;
+    void updateValue() override;
 
-        void registerVar() override;
+    void registerVar() override;
 
-        ExposureFilter &setExposure(const Float &exposure);
+    ExposureFilter &setExposure(const Float &exposure);
 
-    private:
-        Float1 m_exposure;
-        GLint m_uniformLocExposure{};
-    };
+  private:
+    Float1 m_exposure;
+    GLint m_uniformLocExposure{};
+  };
 }

@@ -7,15 +7,15 @@
 using namespace clt;
 
 SingleThreadPool::SingleThreadPool(const std::string &name)
-        : ThreadPool(name, 1) {
+    : ThreadPool(name, 1) {
 
 }
 
 SingleThreadPool::SingleThreadPool(const std::string &name, bool syncStop)
-        : ThreadPool(name, syncStop, 1) {
+    : ThreadPool(name, syncStop, 1) {
 
 }
 
 std::thread::id SingleThreadPool::Id() {
-    return ThreadPool::Id();
+  return ThreadPool::Id();
 }

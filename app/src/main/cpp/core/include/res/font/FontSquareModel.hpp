@@ -9,28 +9,28 @@
 
 namespace clt {
 
-    /**
-     * 承载字体显示
-     */
-    class FontSquareModel : public IComFunc<> {
-    public:
-        FontSquareModel();
+  /**
+   * 字体绘制
+   */
+  class FontSquareModel : public IComFunc<> {
+  public:
+    FontSquareModel();
 
-        ~FontSquareModel() = default;
+    ~FontSquareModel() = default;
 
-        bool Init() override;
+    bool Init() override;
 
-        void DeInit() override;
+    void DeInit() override;
 
-        void Bind(GLint posLoc, GLint texLoc) const;
+    void Bind(GLint posLoc, GLint texLoc) const;
 
-        void UpdateVertex(const GLfloat *vertex, int vSize) const;
+    void UpdateVertex(const GLfloat *vertex, int vSize) const;
 
-        void Draw() const;
+    void Draw() const;
 
-    private:
-        GLuint m_vertexVbo;
-        GLuint m_ebo;
-    };
+  private:
+    GLuint m_vertexVbo;
+    GLuint m_ebo;
+  };
 
 }

@@ -8,20 +8,23 @@
 
 namespace clt {
 
-    class OESTexture final : virtual public Texture {
-    public:
-        OESTexture();
+  /**
+   * 相机输出的预览纹理格式
+   */
+  class OESTexture final : virtual public Texture {
+  public:
+    OESTexture();
 
-        ~OESTexture() = default;
+    ~OESTexture() = default;
 
-        bool Init() override;
+    bool Init() override;
 
-        void DeInit() override;
+    void DeInit() override;
 
-        void Bind(GLuint uniformSamplerLoc) const override;
+    void Bind(GLuint uniformSamplerLoc) const override;
 
-        void UnBind() const override;
+    void UnBind() const override;
 
-        void upload(BufferPtr buffer) override {}
-    };
+    void upload(BufferPtr buffer) override {}
+  };
 }

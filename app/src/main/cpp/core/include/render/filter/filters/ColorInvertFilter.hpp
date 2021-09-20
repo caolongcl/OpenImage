@@ -8,22 +8,22 @@
 
 namespace clt {
 
-/**
- * 反色
- */
-    class ColorInvertFilter : public FilterWithShader {
-    ClassDeclare(ColorInvertFilter)
+  /**
+   * 反色
+   */
+  class ColorInvertFilter : public FilterWithShader {
+  ClassDeclare(ColorInvertFilter)
 
-    public:
-        ColorInvertFilter();
+  public:
+    ColorInvertFilter();
 
-        ~ColorInvertFilter() = default;
+    ~ColorInvertFilter() = default;
 
-    private:
-        void loadShader() override;
+  private:
+    void loadShader() override;
 
-        void updateValue() override {}
+    void updateValue() override {}
 
-        void registerVar() override {}
-    };
+    void registerVar() override {}
+  };
 }

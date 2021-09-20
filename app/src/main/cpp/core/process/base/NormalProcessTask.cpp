@@ -8,12 +8,12 @@
 using namespace clt;
 
 NormalProcessTask::NormalProcessTask(std::string name, std::shared_ptr<IProcessTask> task)
-        : m_name(std::move(name)), m_task(std::move(task)) {
-    m_task->Init();
+    : m_name(std::move(name)), m_task(std::move(task)) {
+  m_task->Init();
 }
 
 NormalProcessTask::~NormalProcessTask() {
-    m_task->DeInit();
+  m_task->DeInit();
 }
 
 bool NormalProcessTask::Init() { return true; }
@@ -21,5 +21,5 @@ bool NormalProcessTask::Init() { return true; }
 void NormalProcessTask::DeInit() {}
 
 void NormalProcessTask::Process() {
-    m_task->Process();
+  m_task->Process();
 }

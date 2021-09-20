@@ -8,11 +8,11 @@
 using namespace clt;
 
 GrayscaleFilter::GrayscaleFilter()
-        : FilterWithShader(target) {
+    : FilterWithShader(target) {
 
 }
 
 void GrayscaleFilter::loadShader() {
-    m_shader = ResManager::Self()->LoadShader("grayscale");
-    assert(m_shader != nullptr);
+  m_shader = ResManager::Self()->LoadShader("grayscale");
+  assert(m_shader != nullptr);
 }

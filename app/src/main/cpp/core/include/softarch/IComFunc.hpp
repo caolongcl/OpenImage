@@ -6,54 +6,54 @@
 
 namespace clt {
 
-    /**
-     * 关键组件的超基类，利用统一接口，规范设计
-     * @tparam Args
-     */
-    template<typename ...Args>
-    class IComFunc {
-    public:
-        IComFunc() = default;
+  /**
+   * 关键组件的超基类，利用统一接口，规范设计
+   * @tparam Args
+   */
+  template<typename ...Args>
+  class IComFunc {
+  public:
+    IComFunc() = default;
 
-        virtual ~IComFunc() = default;
+    virtual ~IComFunc() = default;
 
-        virtual bool Init(Args ...args) = 0;
+    virtual bool Init(Args ...args) = 0;
 
-        virtual void DeInit() = 0;
-    };
+    virtual void DeInit() = 0;
+  };
 
-    template<>
-    class IComFunc<> {
-    public:
-        IComFunc() = default;
+  template<>
+  class IComFunc<> {
+  public:
+    IComFunc() = default;
 
-        virtual ~IComFunc() = default;
+    virtual ~IComFunc() = default;
 
-        virtual bool Init() = 0;
+    virtual bool Init() = 0;
 
-        virtual void DeInit() = 0;
-    };
+    virtual void DeInit() = 0;
+  };
 
-    /**
-     * 提供更新
-     * @tparam Args
-     */
-    template<typename ...Args>
-    struct IComUpdate {
-        IComUpdate() = default;
+  /**
+   * 提供更新
+   * @tparam Args
+   */
+  template<typename ...Args>
+  struct IComUpdate {
+    IComUpdate() = default;
 
-        virtual ~IComUpdate() = default;
+    virtual ~IComUpdate() = default;
 
-        virtual void Update(Args ...) = 0;
-    };
+    virtual void Update(Args ...) = 0;
+  };
 
-    template<>
-    struct IComUpdate<> {
-        IComUpdate() = default;
+  template<>
+  struct IComUpdate<> {
+    IComUpdate() = default;
 
-        virtual ~IComUpdate() = default;
+    virtual ~IComUpdate() = default;
 
-        virtual void Update() = 0;
-    };
+    virtual void Update() = 0;
+  };
 
 }

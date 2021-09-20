@@ -7,18 +7,18 @@ import java.util.List;
 
 public interface ICamera {
 
-    void Create(Context context);
+  void Create(Context context);
 
-    void Destroy();
+  void Destroy();
 
-    void Open(String id, List<Surface> surfaces);
+  void Open(String id, List<Surface> surfaces);
 
-    void Close();
+  void Close();
 
-    void SetErrorHandler(onError handler);
+  void SetErrorHandler(onError handler);
 
-    interface onError {
-        void handleError(int error);
-    }
+  interface onError {
+    void handleError(int error);
+  }
 
 }

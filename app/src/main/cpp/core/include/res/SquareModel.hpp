@@ -9,33 +9,33 @@
 
 namespace clt {
 
-/**
- * 可绘制长方形
- */
-    class SquareModel : public IComFunc<> {
-    public:
-        SquareModel();
+  /**
+   * 可绘制长方形
+   */
+  class SquareModel : public IComFunc<> {
+  public:
+    SquareModel();
 
-        ~SquareModel() = default;
+    ~SquareModel() = default;
 
-        bool Init() override;
+    bool Init() override;
 
-        void DeInit() override;
+    void DeInit() override;
 
-        void Bind(GLint posLoc, GLint texLoc);
+    void Bind(GLint posLoc, GLint texLoc);
 
-        void UpdatePositionCoordinates(const GLfloat *vertex, int vSize) const;
+    void UpdatePositionCoordinates(const GLfloat *vertex, int vSize) const;
 
-        void UpdateTextureCoordinates(const GLfloat *tex, int tSize) const;
+    void UpdateTextureCoordinates(const GLfloat *tex, int tSize) const;
 
-        void Draw();
+    void Draw();
 
-    private:
-        GLuint m_vao;
-        GLuint m_vertexVbo;
-        GLuint m_texVbo;
-        GLuint m_ebo;
-    };
+  private:
+    GLuint m_vao;
+    GLuint m_vertexVbo;
+    GLuint m_texVbo;
+    GLuint m_ebo;
+  };
 
 }
 

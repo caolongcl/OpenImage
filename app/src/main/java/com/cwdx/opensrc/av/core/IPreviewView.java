@@ -1,7 +1,7 @@
 package com.cwdx.opensrc.av.core;
 
 public interface IPreviewView {
-    IPreviewController GetController();
+  IPreviewController GetController();
 
-    void SetController(IPreviewController controller);
+  void SetController(IPreviewController controller);
 }

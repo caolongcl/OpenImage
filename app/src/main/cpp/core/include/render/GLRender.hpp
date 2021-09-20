@@ -12,135 +12,141 @@
 
 namespace clt {
 
-    class FilterPipe;
+  class FilterPipe;
 
-    class EGLCore;
+  class EGLCore;
 
-    class OESCopier;
+  class OESCopier;
 
-    class Copier;
+  class Copier;
 
-    class Drawer;
+  class Drawer;
 
-    class Capturer;
+  class Capturer;
 
-    class Recorder;
+  class Recorder;
 
-    class PreviewControllerCallback;
+  class PreviewControllerCallback;
 
-    class RenderObserver;
+  class RenderObserver;
 
-    class Flow;
+  class Flow;
 
-    class ProcessPipe;
+  class ProcessPipe;
+
+  /**
+   * 控制整个渲染流程
+   */
+  class GLRender final
+      : public IComFunc<std::shared_ptr<PreviewControllerCallback>>,
+        public MsgHandler {
+  ClassDeclare(GLRender)
+  MsgDefine(post_info)
+
+  private:
+    using InitParamType = std::shared_ptr<PreviewControllerCallback>;
+
+  public:
+    GLRender();
+
+    ~GLRender() = default;
 
     /**
-     * 控制整个渲染流程
+     * 初始化，包含PreviewControllerCallback，将内部消息回调给PreviewController
+     * @return
      */
-    class GLRender final
-            : public IComFunc<std::shared_ptr<PreviewControllerCallback>>,
-              public MsgHandler {
-    ClassDeclare(GLRender)
-    MsgDefine(post_info)
+    bool Init(InitParamType) override;
 
-    private:
-        using InitParamType = std::shared_ptr<PreviewControllerCallback>;
+    void DeInit() override;
 
-    public:
-        GLRender();
+    void SetPreviewMode(int rotate, int ratio,
+                        bool vFlip, bool hFlip,
+                        int width, int height);
 
-        ~GLRender() = default;
+    /**
+     * 渲染一帧
+     */
+    void Render();
 
-        /**
-         * 初始化，包含PreviewControllerCallback，将内部消息回调给PreviewController
-         * @return
-         */
-        bool Init(InitParamType) override;
+    /**
+     * 相机预览纹理ID
+     * @return
+     */
+    GLuint GetPreviewTexId() const;
 
-        void DeInit() override;
+    void SetSurface(int type, ANativeWindow *windows);
 
-        void SetPreviewMode(int rotate, int ratio,
-                            bool vFlip, bool hFlip,
-                            int width, int height);
+    void SetSurfaceSize(int width, int height);
 
-        /**
-         * 渲染一帧
-         */
-        void Render();
+    void Capture();
 
-        /**
-         * 相机预览纹理ID
-         * @return
-         */
-        GLuint GetPreviewTexId() const;
+    void Record(bool start, int fps, int bitrate);
 
-        void SetSurface(int type, ANativeWindow *windows);
+    bool GetRecordState(int &fps, int &bitrate);
 
-        void SetSurfaceSize(int width, int height);
+    void GetCaptureSize(int &width, int &height);
 
-        void Capture();
+    void SetVar(const std::string &name, const Var &var);
 
-        void Record(bool start, int fps, int bitrate);
+    void EnableFilter(const std::string &name, bool enable);
 
-        bool GetRecordState(int &fps, int &bitrate);
+    void EnableProcess(const std::string &name, bool enable);
 
-        void GetCaptureSize(int &width, int &height);
+    void ClearFilters();
 
-        void SetVar(const std::string &name, const Var &var);
+    void ClearProcessTasks();
 
-        void EnableFilter(const std::string &name, bool enable);
+    void UpdateTargetPosition(int x, int y);
 
-        void EnableProcess(const std::string &name, bool enable);
+    void OnMsgHandle(const Msg &msg) override;
 
-        void ClearFilters();
+    const std::string &GetInfoToJava() const;
 
-        void ClearProcessTasks();
+  private:
+    /**
+     * 将采集到的OES纹理转为RGBA的纹理便于后续处理
+     */
+    std::shared_ptr<OESCopier> m_oesCopier;
 
-        void UpdateTargetPosition(int x, int y);
+    /**
+     * 将处理过的纹理绘制到的各个目标上
+     */
+    std::shared_ptr<Copier> m_copier;
 
-        void OnMsgHandle(const Msg &msg) override;
+    /**
+     * 滤镜处理管道
+     */
+    std::shared_ptr<FilterPipe> m_filterPipe;
 
-        const std::string &GetInfoToJava() const;
+    /**
+     * 将Copier输出绘制到屏幕上
+     */
+    std::shared_ptr<Drawer> m_drawer;
 
-    private:
-        /**
-         * 将采集到的OES纹理转为RGBA的纹理便于后续处理
-         */
-        std::shared_ptr<OESCopier> m_oesCopier;
+    /**
+     * 拍照，将Copier输出绘制到拍照的surface上
+     */
+    std::shared_ptr<Capturer> m_capture;
 
-        /**
-         * 将处理过的纹理绘制到的各个目标上
-         */
-        std::shared_ptr<Copier> m_copier;
+    /**
+     * 录制, 将Copier输出绘制到录制的surface上
+     */
+    std::shared_ptr<Recorder> m_recorder;
 
-        /**
-         * 滤镜处理管道
-         */
-        std::shared_ptr<FilterPipe> m_filterPipe;
+    /**
+     * 代理PreviewControllerCallback入口
+     */
+    std::shared_ptr<RenderObserver> m_renderObserver;
 
-        /**
-         * 将Copier输出绘制到屏幕上
-         */
-        std::shared_ptr<Drawer> m_drawer;
+    /**
+     * 实时图像处理管道
+     */
+    std::shared_ptr<ProcessPipe> m_processPipe;
 
-        /**
-         * 拍照，将Copier输出绘制到拍照的surface上
-         */
-        std::shared_ptr<Capturer> m_capture;
-
-        /**
-         * 录制,将Copier输出绘制到录制的surface上
-         */
-        std::shared_ptr<Recorder> m_recorder;
-
-        /**
-         * 代理PreviewControllerCallback入口
-         */
-        std::shared_ptr<RenderObserver> m_renderObserver;
-
-        std::shared_ptr<ProcessPipe> m_processPipe;
-
-        std::string m_infoToJava;
-    };
+    /**
+     * 缓存需要回调给 Java 层的信息，用于 UI 显示
+     */
+    std::string m_infoToJava;
+  };
 
 }

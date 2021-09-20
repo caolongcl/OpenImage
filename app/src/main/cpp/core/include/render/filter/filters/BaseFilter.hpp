@@ -7,39 +7,39 @@
 #include <render/filter/FilterCom.hpp>
 
 namespace clt {
-/**
- * brightness : -1.0f ~ 1.0f, default 0.0f
- * contrast : 0.0f ~ 4.0f, default 1.0f
- * saturation : 0.0f ~ 2.0f, default 1.0f
- */
-    class BaseFilter : public FilterWithShader {
-    ClassDeclare(BaseFilter)
-    VarDeclare(brightness)
-    VarDeclare(contrast)
-    VarDeclare(saturation)
-    public:
-        BaseFilter();
+  /**
+   * brightness : -1.0f ~ 1.0f, default 0.0f
+   * contrast : 0.0f ~ 4.0f, default 1.0f
+   * saturation : 0.0f ~ 2.0f, default 1.0f
+   */
+  class BaseFilter : public FilterWithShader {
+  ClassDeclare(BaseFilter)
+  VarDeclare(brightness)
+  VarDeclare(contrast)
+  VarDeclare(saturation)
+  public:
+    BaseFilter();
 
-        ~BaseFilter() = default;
+    ~BaseFilter() = default;
 
-    private:
-        void loadShader() override;
+  private:
+    void loadShader() override;
 
-        void updateValue() override;
+    void updateValue() override;
 
-        void registerVar() override;
+    void registerVar() override;
 
-        BaseFilter &setBrightness(const Float &brightness);
+    BaseFilter &setBrightness(const Float &brightness);
 
-        BaseFilter &setContrast(const Float &contrast);
+    BaseFilter &setContrast(const Float &contrast);
 
-        BaseFilter &setSaturation(const Float &saturation);
+    BaseFilter &setSaturation(const Float &saturation);
 
-    private:
-        Float1 m_brightness;
-        Float1 m_contrast;
-        Float1 m_saturation;
+  private:
+    Float1 m_brightness;
+    Float1 m_contrast;
+    Float1 m_saturation;
 
-        GLint m_uniformLocBase{-1};
-    };
+    GLint m_uniformLocBase{-1};
+  };
 }

@@ -8,30 +8,30 @@
 
 namespace clt {
 
-/**
- * 火焰
- */
-    class FireFilter : public FilterWithShader {
-    ClassDeclare(FireFilter)
+  /**
+   * 火焰
+   */
+  class FireFilter : public FilterWithShader {
+  ClassDeclare(FireFilter)
 
-    public:
-        FireFilter();
+  public:
+    FireFilter();
 
-        ~FireFilter() = default;
+    ~FireFilter() = default;
 
-    private:
-        void loadShader() override;
+  private:
+    void loadShader() override;
 
-        void updateValue() override;
+    void updateValue() override;
 
-        void registerVar() override;
+    void registerVar() override;
 
-    private:
-        long m_startTime;
+  private:
+    long m_startTime;
 
-        GLint m_uniformTime{};
-        GLint m_uniformLocInputSize{};
-    };
+    GLint m_uniformTime{};
+    GLint m_uniformLocInputSize{};
+  };
 
 }
 

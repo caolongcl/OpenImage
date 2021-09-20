@@ -11,29 +11,32 @@
 
 namespace clt {
 
-    class Copier;
+  class Copier;
 
-    class Surface;
+  class Surface;
 
-    class Drawer final
-            : public IComFunc<std::shared_ptr<Copier>>,
-              public ICopierSurface<std::shared_ptr<Surface>> {
-    public:
-        Drawer();
+  /**
+   * 将最终的输出绘制到屏幕上
+   */
+  class Drawer final
+      : public IComFunc<std::shared_ptr<Copier>>,
+        public ICopierSurface<std::shared_ptr<Surface>> {
+  public:
+    Drawer();
 
-        ~Drawer() = default;
+    ~Drawer() = default;
 
-        bool Init(std::shared_ptr<Copier>) override;
+    bool Init(std::shared_ptr<Copier>) override;
 
-        void DeInit() override;
+    void DeInit() override;
 
-        void RegisterSurface(std::shared_ptr<Surface> args) override;
+    void RegisterSurface(std::shared_ptr<Surface> args) override;
 
-        void Render() override;
+    void Render() override;
 
-    private:
-        std::shared_ptr<Surface> m_surface;
-        std::shared_ptr<Copier> m_copier;
-    };
+  private:
+    std::shared_ptr<Surface> m_surface;
+    std::shared_ptr<Copier> m_copier;
+  };
 
 }

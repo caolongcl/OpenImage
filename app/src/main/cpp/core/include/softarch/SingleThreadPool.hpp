@@ -8,18 +8,18 @@
 
 namespace clt {
 
-    /**
-     * 单线程循环处理任务
-     */
-    class SingleThreadPool final : public ThreadPool {
-    public:
-        explicit SingleThreadPool(const std::string &name);
+  /**
+   * 单线程循环处理任务
+   */
+  class SingleThreadPool final : public ThreadPool {
+  public:
+    explicit SingleThreadPool(const std::string &name);
 
-        explicit SingleThreadPool(const std::string &name, bool syncStop);
+    explicit SingleThreadPool(const std::string &name, bool syncStop);
 
-        ~SingleThreadPool() = default;
+    ~SingleThreadPool() = default;
 
-        std::thread::id Id() override;
-    };
+    std::thread::id Id() override;
+  };
 
 }
