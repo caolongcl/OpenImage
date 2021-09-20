@@ -50,17 +50,22 @@
   - 将棋盘格图片打印出来，或者在电脑屏幕上显示，然后测量棋盘格每个格子的宽高，以 mm 为单位；
   - 将 Marker 图片打印出来，或者在电脑屏幕上显示，然后测量 Marker 的宽高，以 mm 为单位
 - 切换到校正模式
-- 长按校正按钮，在弹出框依次填入如下，并点击确认按钮保存设置
+- 长按校正按钮，在弹出框依次填入如下，并点击确认按钮保存设置（会在 /sdcard/Android/media/com.cwdx.opensrc/media/function 生成 `calibrate_params.yml`，可参考 doc/calibrate_params.yml）
   - 棋盘格行内点数
   - 棋盘格列内点数
   - 棋盘格格子实际测量的宽度（mm）
   - 棋盘格格子实际测量的高度（mm）
   - Marker 实际测量的宽度（mm）
   - Marker 实际测量的高度（mm）
-- 从各个角度拍摄棋盘格 5 张图片，然后短按校正按钮，开始标定（标定结束时会弹出 Toast，根据机器性能时间可能稍长）
+- 从各个角度拍摄棋盘格 5 张图片，然后短按校正按钮，开始标定（标定结束时会弹出 Toast，根据机器性能时间可能稍长，会在 /sdcard/Android/media/com.cwdx.opensrc/media/function 保存图片，并生成标定文件 `camera_params.yml`，可参考 doc/camera_params.yml）
   - 查看日志，搜索日志 "calibrate average err"，假如在 10.0 上下，说明标定准确率尚可
   - 如果最后 Marker AR 的效果不正常，可查看标定时否找到了角点（可查看 /sdcard/Android/media/com.cwdx.opensrc/media/function 目录下对应图片）
+
+  ![](./doc/calibrate_images.png)
+
 - 切换到拍照模式，可以从弹出菜单中开启 “opencv AR”。将摄像头对准 Marker 图片，正常情况下会有一个彩色金字塔位于 Marker 图片上
+
+![](./doc/marker_ar.png)
 
 ## 测试 UI
 
