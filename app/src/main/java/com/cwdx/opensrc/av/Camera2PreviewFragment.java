@@ -1,8 +1,5 @@
 package com.cwdx.opensrc.av;
 
-import static com.cwdx.opensrc.av.core.PreviewController.MSG_ADD_PICTURE;
-import static com.cwdx.opensrc.av.core.PreviewController.MSG_ADD_VIDEO;
-
 import android.content.Context;
 import android.media.MediaScannerConnection;
 import android.os.Bundle;
@@ -18,17 +15,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.cwdx.core.platform.GPUVideo;
+import com.cwdx.core.preview.AspectRatio;
+import com.cwdx.core.preview.CameraSelector;
+import com.cwdx.core.preview.IPreviewController;
+import com.cwdx.core.preview.PreviewController;
+import com.cwdx.core.preview.PreviewView;
 import com.cwdx.opensrc.MainActivity;
 import com.cwdx.opensrc.R;
-import com.cwdx.opensrc.av.core.AspectRatio;
-import com.cwdx.opensrc.av.core.CameraSelector;
-import com.cwdx.opensrc.av.core.IPreviewController;
-import com.cwdx.opensrc.av.core.PreviewController;
-import com.cwdx.opensrc.av.core.PreviewView;
 import com.cwdx.opensrc.av.view.CalibrateParamsDialog;
 import com.cwdx.opensrc.av.view.CameraModeSelectView;
 import com.cwdx.opensrc.av.view.CameraParamSelectView;
-import com.cwdx.opensrc.common.Utils;
+import com.cwdx.utils.CLog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,7 +68,7 @@ public class Camera2PreviewFragment extends Fragment {
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    Utils.d(TAG, "onCreate");
+    CLog.d(TAG, "onCreate");
 
     GPUVideo gpuVideo = new GPUVideo(getContext());
   }
@@ -83,7 +81,7 @@ public class Camera2PreviewFragment extends Fragment {
 
   @Override
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-    Utils.d(TAG, "onViewCreated");
+    CLog.d(TAG, "onViewCreated");
 
     mPreviewView = view.findViewById(R.id.camera2_preview);
 
@@ -122,13 +120,13 @@ public class Camera2PreviewFragment extends Fragment {
 
   @Override
   public void onStart() {
-    Utils.d(TAG, "onStart");
+    CLog.d(TAG, "onStart");
     super.onStart();
   }
 
   @Override
   public void onResume() {
-    Utils.d(TAG, "onResume");
+    CLog.d(TAG, "onResume");
     super.onResume();
 
     mCameraModeSelectV.SetSwitchCameraFunc(() -> {
@@ -150,11 +148,11 @@ public class Camera2PreviewFragment extends Fragment {
       if (!mCalibrateParamsDialog.isVisible()) {
         String params = mPreviewView.GetParamsFromNative("calibrate_params");
         if (params == null || params.equals("")) {
-          Utils.e(TAG, "get calibrate_params failed");
+          CLog.e(TAG, "get calibrate_params failed");
           return;
         }
 
-        Utils.d(TAG, "get calibrate_params: " + params);
+        CLog.d(TAG, "get calibrate_params: " + params);
 
         try {
           JSONObject paramsJson = new JSONObject(params);
@@ -172,7 +170,7 @@ public class Camera2PreviewFragment extends Fragment {
 
           mCalibrateParamsDialog.show(getFragmentManager(), "CalibrateParams");
         } catch (JSONException e) {
-          Utils.e(TAG, "json parse failed :" + params);
+          CLog.e(TAG, "json parse failed :" + params);
         }
       }
     });
@@ -183,19 +181,19 @@ public class Camera2PreviewFragment extends Fragment {
 
   @Override
   public void onPause() {
-    Utils.d(TAG, "onPause");
+    CLog.d(TAG, "onPause");
     super.onPause();
   }
 
   @Override
   public void onStop() {
-    Utils.d(TAG, "onStop");
+    CLog.d(TAG, "onStop");
     super.onStop();
   }
 
   @Override
   public void onDestroyView() {
-    Utils.d(TAG, "onDestroyView");
+    CLog.d(TAG, "onDestroyView");
     mCameraParamSelectView.HideDetailContainerVG();
     mCalibrateParamsDialog.SetCallback(null);
     super.onDestroyView();
@@ -203,7 +201,7 @@ public class Camera2PreviewFragment extends Fragment {
 
   @Override
   public void onDestroy() {
-    Utils.d(TAG, "onDestroy");
+    CLog.d(TAG, "onDestroy");
     mPreviewView.Destroy();
     super.onDestroy();
   }
@@ -213,69 +211,69 @@ public class Camera2PreviewFragment extends Fragment {
     if (settingsView != null) {
       // 分辨率切换
       settingsView.findViewById(R.id.aspect_ratio_3_4).setOnClickListener(v -> {
-        Utils.v(TAG, "set aspect to 3:4");
+        CLog.v(TAG, "set aspect to 3:4");
         if (mPreviewView.Recording()) return;
         mPreviewView.GetCameraSelector().SetRatio(AspectRatio.RATIO_4_3);
         mPreviewView.SwitchCamera(mPreviewController.GetCameraSelector());
       });
       settingsView.findViewById(R.id.aspect_ratio_9_16).setOnClickListener(v -> {
-        Utils.v(TAG, "set aspect to 9:16");
+        CLog.v(TAG, "set aspect to 9:16");
         if (mPreviewView.Recording()) return;
         mPreviewView.GetCameraSelector().SetRatio(AspectRatio.RATIO_16_9);
         mPreviewView.SwitchCamera(mPreviewController.GetCameraSelector());
       });
       settingsView.findViewById(R.id.aspect_ratio_normal).setOnClickListener(v -> {
-        Utils.v(TAG, "set aspect to normal");
+        CLog.v(TAG, "set aspect to normal");
         if (mPreviewView.Recording()) return;
         mPreviewView.GetCameraSelector().SetRatio(AspectRatio.RATIO_OTHER);
         mPreviewView.SwitchCamera(mPreviewController.GetCameraSelector());
       });
 
       settingsView.findViewById(R.id.hflip).setOnClickListener(v -> {
-        Utils.v(TAG, "hflip");
+        CLog.v(TAG, "hflip");
         mPreviewView.GetCameraSelector().SetHFlip(!mPreviewView.GetCameraSelector().hFlip);
         mPreviewView.SetBoolVar("hflip", mPreviewView.GetCameraSelector().hFlip);
       });
       settingsView.findViewById(R.id.vflip).setOnClickListener(v -> {
-        Utils.v(TAG, "vflip");
+        CLog.v(TAG, "vflip");
         mPreviewView.GetCameraSelector().SetVFlip(!mPreviewView.GetCameraSelector().vFlip);
         mPreviewView.SetBoolVar("vflip", mPreviewView.GetCameraSelector().vFlip);
       });
 
       // 滤镜
       settingsView.findViewById(R.id.color_invert).setOnClickListener(v -> {
-        Utils.v(TAG, "color invert");
+        CLog.v(TAG, "color invert");
         mPreviewView.GetCameraSelector().filterState.color_invert = !mPreviewView.GetCameraSelector().filterState.color_invert;
         mPreviewView.EnableFilter("ColorInvertFilter", mPreviewView.GetCameraSelector().filterState.color_invert);
       });
 
       settingsView.findViewById(R.id.grayscale).setOnClickListener(v -> {
-        Utils.v(TAG, "grayscale");
+        CLog.v(TAG, "grayscale");
         mPreviewView.GetCameraSelector().filterState.grayscale = !mPreviewView.GetCameraSelector().filterState.grayscale;
         mPreviewView.EnableFilter("GrayscaleFilter", mPreviewView.GetCameraSelector().filterState.grayscale);
       });
       settingsView.findViewById(R.id.time_color).setOnClickListener(v -> {
-        Utils.v(TAG, "time color");
+        CLog.v(TAG, "time color");
         mPreviewView.GetCameraSelector().filterState.time_color = !mPreviewView.GetCameraSelector().filterState.time_color;
         mPreviewView.EnableFilter("TimeColorFilter", mPreviewView.GetCameraSelector().filterState.time_color);
       });
       settingsView.findViewById(R.id.blur).setOnClickListener(v -> {
-        Utils.v(TAG, "blur");
+        CLog.v(TAG, "blur");
         mPreviewView.GetCameraSelector().filterState.blur = !mPreviewView.GetCameraSelector().filterState.blur;
         mPreviewView.EnableFilter("BlurFilter", mPreviewView.GetCameraSelector().filterState.blur);
       });
       settingsView.findViewById(R.id.mosaic).setOnClickListener(v -> {
-        Utils.v(TAG, "mosaic");
+        CLog.v(TAG, "mosaic");
         mPreviewView.GetCameraSelector().filterState.mosaic = !mPreviewView.GetCameraSelector().filterState.mosaic;
         mPreviewView.EnableFilter("MosaicFilter", mPreviewView.GetCameraSelector().filterState.mosaic);
       });
       settingsView.findViewById(R.id.whirlpool).setOnClickListener(v -> {
-        Utils.v(TAG, "whirlpool");
+        CLog.v(TAG, "whirlpool");
         mPreviewView.GetCameraSelector().filterState.whirlpool = !mPreviewView.GetCameraSelector().filterState.whirlpool;
         mPreviewView.EnableFilter("WhirlpoolFilter", mPreviewView.GetCameraSelector().filterState.whirlpool);
       });
       settingsView.findViewById(R.id.exposure).setOnLongClickListener(v -> {
-        Utils.v(TAG, "exposure");
+        CLog.v(TAG, "exposure");
         mPreviewView.GetCameraSelector().filterState.exposure = !mPreviewView.GetCameraSelector().filterState.exposure;
         mPreviewView.EnableFilter("ExposureFilter", mPreviewView.GetCameraSelector().filterState.exposure);
         if (!mPreviewView.GetCameraSelector().filterState.exposure) {
@@ -284,7 +282,7 @@ public class Camera2PreviewFragment extends Fragment {
         return true;
       });
       settingsView.findViewById(R.id.exposure).setOnClickListener(v -> {
-        Utils.v(TAG, "exposure");
+        CLog.v(TAG, "exposure");
         if (mPreviewView.GetCameraSelector().filterState.exposure) {
           mPreviewView.GetCameraSelector().filterState.exposure_value += 1.0f;
           if (mPreviewView.GetCameraSelector().filterState.exposure_value > 3.f) {
@@ -295,7 +293,7 @@ public class Camera2PreviewFragment extends Fragment {
         }
       });
       View.OnLongClickListener baseSwitch = v -> {
-        Utils.v(TAG, "base");
+        CLog.v(TAG, "base");
         mPreviewView.GetCameraSelector().filterState.base = !mPreviewView.GetCameraSelector().filterState.base;
         mPreviewView.EnableFilter("BaseFilter", mPreviewView.GetCameraSelector().filterState.base);
         if (!mPreviewView.GetCameraSelector().filterState.base) {
@@ -309,7 +307,7 @@ public class Camera2PreviewFragment extends Fragment {
       settingsView.findViewById(R.id.constrast).setOnLongClickListener(baseSwitch);
       settingsView.findViewById(R.id.saturation).setOnLongClickListener(baseSwitch);
       settingsView.findViewById(R.id.brightness).setOnClickListener(v -> {
-        Utils.v(TAG, "brightness");
+        CLog.v(TAG, "brightness");
         if (mPreviewView.GetCameraSelector().filterState.base) {
           mPreviewView.GetCameraSelector().filterState.brightness_value += 0.25f;
           if (mPreviewView.GetCameraSelector().filterState.brightness_value > 1.f) {
@@ -320,7 +318,7 @@ public class Camera2PreviewFragment extends Fragment {
         }
       });
       settingsView.findViewById(R.id.constrast).setOnClickListener(v -> {
-        Utils.v(TAG, "contrast");
+        CLog.v(TAG, "contrast");
         if (mPreviewView.GetCameraSelector().filterState.base) {
           mPreviewView.GetCameraSelector().filterState.contrast_value += 1.0f;
           if (mPreviewView.GetCameraSelector().filterState.contrast_value > 4.f) {
@@ -331,7 +329,7 @@ public class Camera2PreviewFragment extends Fragment {
         }
       });
       settingsView.findViewById(R.id.saturation).setOnClickListener(v -> {
-        Utils.v(TAG, "saturation");
+        CLog.v(TAG, "saturation");
         if (mPreviewView.GetCameraSelector().filterState.base) {
           mPreviewView.GetCameraSelector().filterState.saturation_value += 0.5f;
           if (mPreviewView.GetCameraSelector().filterState.saturation_value > 2.f) {
@@ -343,7 +341,7 @@ public class Camera2PreviewFragment extends Fragment {
       });
 
       settingsView.findViewById(R.id.hue).setOnLongClickListener(v -> {
-        Utils.v(TAG, "hue");
+        CLog.v(TAG, "hue");
         mPreviewView.GetCameraSelector().filterState.hue = !mPreviewView.GetCameraSelector().filterState.hue;
         mPreviewView.EnableFilter("HueFilter", mPreviewView.GetCameraSelector().filterState.hue);
         if (!mPreviewView.GetCameraSelector().filterState.hue) {
@@ -352,7 +350,7 @@ public class Camera2PreviewFragment extends Fragment {
         return true;
       });
       settingsView.findViewById(R.id.hue).setOnClickListener(v -> {
-        Utils.v(TAG, "hue");
+        CLog.v(TAG, "hue");
         if (mPreviewView.GetCameraSelector().filterState.hue) {
           mPreviewView.GetCameraSelector().filterState.hue_value += 30.0f;
           if (mPreviewView.GetCameraSelector().filterState.hue_value > 360.f) {
@@ -363,12 +361,13 @@ public class Camera2PreviewFragment extends Fragment {
         }
       });
       settingsView.findViewById(R.id.face_detector).setOnClickListener(v -> {
-        Utils.v(TAG, "face_detector");
+        CLog.v(TAG, "face_detector");
         mPreviewView.GetCameraSelector().filterState.face_detect = !mPreviewView.GetCameraSelector().filterState.face_detect;
-        mPreviewView.EnableProcess("FaceDetector", mPreviewView.GetCameraSelector().filterState.face_detect);
+//        mPreviewView.EnableProcess("FaceDetector", mPreviewView.GetCameraSelector().filterState.face_detect);
+        mPreviewView.EnableProcess("ObjectDetector", mPreviewView.GetCameraSelector().filterState.face_detect);
       });
       settingsView.findViewById(R.id.opencvar).setOnClickListener(v -> {
-        Utils.v(TAG, "opencvar");
+        CLog.v(TAG, "opencvar");
         mPreviewView.GetCameraSelector().filterState.opencv_ar = !mPreviewView.GetCameraSelector().filterState.opencv_ar;
         mPreviewView.EnableProcess("MarkerAR", mPreviewView.GetCameraSelector().filterState.opencv_ar);
       });
@@ -386,10 +385,10 @@ public class Camera2PreviewFragment extends Fragment {
     @Override
     public void handleMessage(@NonNull Message msg) {
       switch (msg.what) {
-        case MSG_ADD_PICTURE:
+        case PreviewController.MSG_ADD_PICTURE:
           File picture = (File) msg.obj;
           if (picture != null && mContext != null && mContext.get() != null) {
-            Utils.d(TAG, "save picture " + picture.getAbsolutePath());
+            CLog.d(TAG, "save picture " + picture.getAbsolutePath());
             Toast.makeText(mContext.get(), picture.getAbsolutePath(), Toast.LENGTH_LONG).show();
             String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
             MediaScannerConnection.scanFile(mContext.get(),
@@ -397,10 +396,10 @@ public class Camera2PreviewFragment extends Fragment {
                 new String[]{mimeType}, null);
           }
           break;
-        case MSG_ADD_VIDEO:
+        case PreviewController.MSG_ADD_VIDEO:
           File video = (File) msg.obj;
           if (video != null && mContext != null && mContext.get() != null) {
-            Utils.d(TAG, "save video " + video.getAbsolutePath());
+            CLog.d(TAG, "save video " + video.getAbsolutePath());
             Toast.makeText(mContext.get(), video.getAbsolutePath(), Toast.LENGTH_LONG).show();
             String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("mp4");
             MediaScannerConnection.scanFile(mContext.get(),

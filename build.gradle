@@ -1,11 +1,12 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+apply from: "buildvar.gradle"
 
 buildscript {
     
     repositories {
+        maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
         google()
-        jcenter()
-
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.1'
@@ -18,8 +19,9 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
         google()
-        jcenter()
         maven { url 'https://jitpack.io' }
     }
 }

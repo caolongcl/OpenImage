@@ -1,0 +1,61 @@
+plugins {
+  id 'com.android.library'
+}
+
+android {
+  compileSdkVersion 30
+
+  defaultConfig {
+    minSdkVersion 28
+    targetSdkVersion 30
+    versionCode 1
+    versionName "1.0"
+
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    consumerProguardFiles "consumer-rules.pro"
+
+    ndk {
+      abiFilters "arm64-v8a"
+    }
+
+    externalNativeBuild {
+      cmake {
+//        arguments "-DANDROID_STL=c++_shared"
+        cppFlags "-std=c++17", "-frtti", "-fexceptions"
+      }
+    }
+  }
+
+  buildTypes {
+    release {
+      packagingOptions {
+        doNotStrip '**/*.so'  // controlled by OpenCV CMake scripts
+      }
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+    }
+  }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+
+  externalNativeBuild {
+    cmake {
+      path file('src/main/cpp/CMakeLists.txt')
+      version '3.10.2'
+    }
+  }
+}
+
+dependencies {
+  api project(path: ':utils')
+  api project(path: ':opencv')
+  api 'com.google.code.gson:gson:2.8.6'
+
+  implementation 'androidx.appcompat:appcompat:1.2.0'
+  implementation 'com.google.android.material:material:1.3.0'
+  testImplementation 'junit:junit:4.+'
+  androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+  androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+}

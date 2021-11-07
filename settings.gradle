@@ -1,2 +1,5 @@
 rootProject.name='OpenSrc'
 include ':app'
+include ':core'
+include ':utils'
+include ':opencv'

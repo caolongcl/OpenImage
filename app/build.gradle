@@ -1,99 +1,84 @@
 apply plugin: 'com.android.application'
 
 android {
-    signingConfigs {
-        avcore {
-            storeFile file('androiddev')
-            storePassword 'caolong'
-            keyAlias 'androiddev'
-            keyPassword 'caolong'
-        }
+  signingConfigs {
+    avcore {
+      storeFile file('androiddev')
+      storePassword 'caolong'
+      keyAlias 'androiddev'
+      keyPassword 'caolong'
     }
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+  }
+  compileSdkVersion 29
+  buildToolsVersion "30.0.2"
 
-    defaultConfig {
-        applicationId "com.cwdx.opensrc"
-        minSdkVersion 29
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+  defaultConfig {
+    applicationId "com.cwdx.opensrc"
+    minSdkVersion 29
+    targetSdkVersion 29
+    versionCode 1
+    versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    signingConfig signingConfigs.avcore
+  }
 
-        ndk {
-            abiFilters "arm64-v8a"
-        }
-
-        externalNativeBuild {
-            cmake {
-                cppFlags "-std=c++17", "-frtti", "-fexceptions"
-            }
-        }
-        signingConfig signingConfigs.avcore
+  sourceSets {
+    main {
+      jni.srcDirs = []
+      jniLibs.srcDirs = []
     }
+  }
 
-    externalNativeBuild {
-        cmake {
-            path "CMakeLists.txt"
-            version "3.10.2"
-        }
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+      debuggable true
     }
-
-    sourceSets {
-        main {
-            jni.srcDirs = []
-            jniLibs.srcDirs = []
-        }
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            debuggable true
-        }
-    }
-    compileOptions {
-        sourceCompatibility = 1.8
-        targetCompatibility = 1.8
-    }
+  }
+  compileOptions {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+  }
 
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+  implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
-    implementation('io.reactivex.rxjava2:rxjava:2.2.10')
-    implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
-    implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+  api project(path: ':core')
 
-    def lifecycle_version = "2.2.0"
-    def arch_version = "2.1.0"
-    // ViewModel
-    implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
-    // LiveData
-    implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
-    // Lifecycles only (without ViewModel or LiveData)
-    implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"
+  implementation 'androidx.appcompat:appcompat:1.2.0'
+  implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+  implementation('io.reactivex.rxjava2:rxjava:2.2.10')
+  implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
+  implementation 'com.google.code.gson:gson:2.8.6'
+  implementation 'androidx.recyclerview:recyclerview:1.2.0'
 
-    // Saved state module for ViewModel
-    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
-    // alternately - if using Java8, use the following instead of lifecycle-compiler
-    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
-    // optional - helpers for implementing LifecycleOwner in a Service
-    implementation "androidx.lifecycle:lifecycle-service:$lifecycle_version"
-    // optional - ProcessLifecycleOwner provides a lifecycle for the whole application process
-    implementation "androidx.lifecycle:lifecycle-process:$lifecycle_version"
-    // optional - ReactiveStreams support for LiveData
-    implementation "androidx.lifecycle:lifecycle-reactivestreams:$lifecycle_version"
+  def lifecycle_version = "2.3.1"
+  def arch_version = "2.1.0"
+  // ViewModel
+  implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
+  // LiveData
+  implementation "androidx.lifecycle:lifecycle-livedata:$lifecycle_version"
+  // Lifecycles only (without ViewModel or LiveData)
+  implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"
 
-    // optional - Test helpers for LiveData
-    testImplementation "androidx.arch.core:core-testing:$arch_version"
-    testImplementation 'junit:junit:4.13'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+  // Saved state module for ViewModel
+  implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
+  // alternately - if using Java8, use the following instead of lifecycle-compiler
+  implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
+  // optional - helpers for implementing LifecycleOwner in a Service
+  implementation "androidx.lifecycle:lifecycle-service:$lifecycle_version"
+  // optional - ProcessLifecycleOwner provides a lifecycle for the whole application process
+  implementation "androidx.lifecycle:lifecycle-process:$lifecycle_version"
+  // optional - ReactiveStreams support for LiveData
+  implementation "androidx.lifecycle:lifecycle-reactivestreams:$lifecycle_version"
+
+  // optional - Test helpers for LiveData
+  testImplementation "androidx.arch.core:core-testing:$arch_version"
+  testImplementation 'junit:junit:4.13'
+  androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+  androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }

@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.cwdx.opensrc.av.Camera2PreviewFragment;
 import com.cwdx.opensrc.av.model.Model;
 import com.cwdx.opensrc.av.view.BtnAdapter;
-import com.cwdx.opensrc.common.Utils;
+import com.cwdx.utils.CLog;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.io.File;
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
     rxPermissions.requestEach(normalPermissions)
         .subscribe(permission -> {
           if (permission.granted) {
-            Utils.d("GLRender", "permission.name" + permission.name);
+            CLog.d("GLRender", "permission.name" + permission.name);
             if (permission.name.equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
               mMediaDir = createDirs();
             } else {
@@ -123,12 +123,12 @@ public class MainActivity extends AppCompatActivity {
     File appDir = new File(mediaDir, dirs);
 
     if (appDir.exists()) {
-      Utils.d("GLRender", appDir.getAbsolutePath());
+      CLog.d("GLRender", appDir.getAbsolutePath());
       return mediaDir;
     } else if (!appDir.mkdirs()) {
-      Utils.d("GLRender", "Create dir failed " + appDir.getAbsolutePath());
+      CLog.d("GLRender", "Create dir failed " + appDir.getAbsolutePath());
     } else {
-      Utils.d("GLRender", "Create dir " + appDir.getAbsolutePath());
+      CLog.d("GLRender", "Create dir " + appDir.getAbsolutePath());
       return mediaDir;
     }
 

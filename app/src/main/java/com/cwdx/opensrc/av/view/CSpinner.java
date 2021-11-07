@@ -9,7 +9,7 @@ import android.widget.AdapterView;
 import androidx.appcompat.widget.AppCompatSpinner;
 
 import com.cwdx.opensrc.av.model.Model;
-import com.cwdx.opensrc.common.Utils;
+import com.cwdx.utils.CLog;
 
 import java.util.List;
 
@@ -64,7 +64,7 @@ public class CSpinner extends AppCompatSpinner implements AdapterView.OnItemSele
   public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
     Model.Item.Value value = (Model.Item.Value) parent.getItemAtPosition(position);
     if (!mFirst && value.runnable != null) {
-      Utils.d(TAG, value.value);
+      CLog.d(TAG, value.value);
       value.runnable.run();
     }
     mFirst = false;

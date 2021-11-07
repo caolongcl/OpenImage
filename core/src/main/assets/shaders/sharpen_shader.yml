@@ -1,0 +1,64 @@
+name: sharpen
+
+vertex:
+  _#1_version 300 es
+
+  layout(location = 0) in vec4 aPosition;
+  layout(location = 1) in vec2 aTexCoords;
+  out vec2 vTexCoords;
+  out vec2 vLeftTexCoords;
+  out vec2 vRightTexCoords;
+  out vec2 vTopTexCoords;
+  out vec2 vBottomTexCoords;
+  out float vCenterMultiplier;
+  out float vEdgeMultiplier;
+
+  uniform float uWidthFactor;
+  uniform float uHeightFactor;
+  uniform float uSharpen;
+
+  void main() {
+  mediump vec2 widthStep = vec2(uWidthFactor, 0.0);
+  mediump vec2 heightStep = vec2(0.0, uHeightFactor);
+
+  vTexCoords = aTexCoords.xy;
+  vLeftTexCoords = aTexCoords.xy - widthStep;
+  vRightTexCoords = aTexCoords.xy + widthStep;
+  vTopTexCoords = aTexCoords.xy + heightStep;
+  vBottomTexCoords = aTexCoords.xy - heightStep;
+  vCenterMultiplier = 1.0 + 4.0 * uSharpen;
+  vEdgeMultiplier = uSharpen;
+  gl_Position = aPosition;
+  }
+
+
+#compute:
+
+
+fragment:
+  _#1_version 300 es
+
+  precision highp float;
+  uniform sampler2D uTexSampler;
+
+  in highp vec2 vTexCoords;
+  out vec4 oFragColor;
+  out highp vec2 vLeftTexCoords;
+  out highp vec2 vRightTexCoords;
+  out highp vec2 vTopTexCoords;
+  out highp vec2 vBottomTexCoords;
+  out highp float vCenterMultiplier;
+  out highp float vEdgeMultiplier;
+
+  void main() {
+  mediump vec3 textureColor = texture(uTexSampler, vTexCoords).rgb;
+  mediump vec3 leftTextureColor = texture(uTexSampler, vLeftTexCoords).rgb;
+  mediump vec3 rightTextureColor = texture(uTexSampler, vRightTexCoords).rgb;
+  mediump vec3 topTextureColor = texture(uTexSampler, vTopTexCoords).rgb;
+  mediump vec3 bottomTextureColor = texture(uTexSampler, vBottomTexCoords).rgb;
+  oFragColor = vec4((textureColor * vCenterMultiplier -
+    (leftTextureColor * vEdgeMultiplier +
+      rightTextureColor * vEdgeMultiplier +
+      topTextureColor * vEdgeMultiplier +
+    bottomTextureColor * vEdgeMultiplier)), texture(uTexSampler, vBottomTexCoords).a);
+  }

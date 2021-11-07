@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.cwdx.opensrc.R;
-import com.cwdx.opensrc.common.Utils;
+import com.cwdx.utils.CLog;
 
 public class CalibrateParamsDialog extends DialogFragment {
   private static final String TAG = "CalibrateParamsDialog";
@@ -54,7 +54,7 @@ public class CalibrateParamsDialog extends DialogFragment {
         float markerSizeWidth = Float.parseFloat(markerSizeWidthV.getText().toString());
         float markerSizeHeight = Float.parseFloat(markerSizeHeightV.getText().toString());
 
-        Utils.d(TAG, "board size:" + boardSizeWidth + "," + boardSizeHeight + ";"
+        CLog.d(TAG, "board size:" + boardSizeWidth + "," + boardSizeHeight + ";"
             + "board square size:" + boardSquareSizeWidth + "," + boardSquareSizeHeight + ";"
             + "marker size:" + markerSizeWidth + "," + markerSizeHeight);
 
@@ -68,7 +68,7 @@ public class CalibrateParamsDialog extends DialogFragment {
           }
         }
       } catch (Exception e) {
-        Utils.e(TAG, e.getMessage());
+        CLog.e(TAG, e.getMessage());
       }
 
       dismiss();

@@ -1,0 +1,31 @@
+name: exposure
+
+vertex:
+  _#1_version 300 es
+
+  layout(location = 0) in vec4 aPosition;
+  layout(location = 1) in vec2 aTexCoords;
+  out vec2 vTexCoords;
+
+  void main() {
+  vTexCoords = aTexCoords;
+  gl_Position = aPosition;
+  }
+
+#compute:
+
+
+fragment:
+  _#1_version 300 es
+
+  precision mediump float;
+  uniform sampler2D uTexSampler;
+  uniform highp float uExposure;
+
+  in highp vec2 vTexCoords;
+  out vec4 oFragColor;
+
+  void main() {
+    highp vec4 color=texture(uTexSampler, vTexCoords);
+    oFragColor = vec4(color.rgb * pow(2.0, uExposure), color.a);
+  }
