@@ -13,6 +13,7 @@ namespace clt {
   class SquareModel;
 
   class RGBAToGray : public FilterCom {
+  ClassDeclare(RGBAToGray)
   public:
     RGBAToGray();
 

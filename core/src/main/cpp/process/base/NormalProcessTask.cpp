@@ -8,7 +8,7 @@
 using namespace clt;
 
 NormalProcessTask::NormalProcessTask(std::string name, std::shared_ptr<IProcessTask> task)
-    : m_name(std::move(name)), m_task(std::move(task)) {
+  : m_name(std::move(name)), m_task(std::move(task)) {
   m_task->Init();
 }
 

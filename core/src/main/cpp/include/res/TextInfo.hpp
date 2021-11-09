@@ -17,23 +17,23 @@ namespace clt {
     TextInfo(const std::string &_text,
              const Viewport &_displayViewport,
              const Viewport &_realViewport)
-        : text(_text),
-          displayViewport(_displayViewport),
-          previewViewport(_realViewport),
-          position{0.0f, 0.0f},
-          color(WhiteColor),
-          bgColor(TransColor),
-          scale(1.0f),
-          shadowColor(BlackColor),
-          shadowDelta{1.5f, -1.5f},
-          shadow(true),
-          baseAdjust(true),
-          fillBg(false),
-          rotate(0.0f) {
+      : text(_text),
+        displayViewport(_displayViewport),
+        previewViewport(_realViewport),
+        position{0.0f, 0.0f},
+        color(WhiteColor),
+        bgColor(TransColor),
+        scale(1.0f),
+        shadowColor(BlackColor),
+        shadowDelta{1.5f, -1.5f},
+        shadow(true),
+        baseAdjust(true),
+        fillBg(false),
+        rotate(0.0f) {
     }
 
     TextInfo(const std::string &_text)
-        : TextInfo(_text, {}, {}) {}
+      : TextInfo(_text, {}, {}) {}
 
     bool Empty() {
       return text.empty();

@@ -29,18 +29,18 @@ public class GPUVideo {
    */
   private boolean supportsOpenGLES2(final Context context) {
     final ActivityManager activityManager = (ActivityManager)
-        context.getSystemService(Context.ACTIVITY_SERVICE);
+      context.getSystemService(Context.ACTIVITY_SERVICE);
     final ConfigurationInfo configurationInfo =
-        activityManager.getDeviceConfigurationInfo();
+      activityManager.getDeviceConfigurationInfo();
 
     return configurationInfo.reqGlEsVersion >= 0x20000;
   }
 
   private boolean supportsOpenGLES3(final Context context) {
     final ActivityManager activityManager = (ActivityManager)
-        context.getSystemService(Context.ACTIVITY_SERVICE);
+      context.getSystemService(Context.ACTIVITY_SERVICE);
     final ConfigurationInfo configurationInfo =
-        activityManager.getDeviceConfigurationInfo();
+      activityManager.getDeviceConfigurationInfo();
     return configurationInfo.reqGlEsVersion >= 0x30001;
   }
 }

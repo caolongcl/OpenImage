@@ -10,12 +10,12 @@
 using namespace clt;
 
 PixelReaderPbo::PixelReaderPbo()
-    : m_fbo(0),
-      m_pbo{0, 0},
-      m_curPboIndex(0),
-      m_width(0),
-      m_height(0),
-      m_pboBytes(0) {
+  : m_fbo(0),
+    m_pbo{0, 0},
+    m_curPboIndex(0),
+    m_width(0),
+    m_height(0),
+    m_pboBytes(0) {
 
 }
 
@@ -63,7 +63,7 @@ void PixelReaderPbo::Read(std::shared_ptr<Texture> tex, std::shared_ptr<Buffer> 
 
   readFromPbos(tex, buf);
 
-  Log::n(Log::PROCESSOR_TAG,
+  Log::n(target,
          "pixel data produce %d ms",
          (Utils::CurTimeMilli() - lastTime));
 }

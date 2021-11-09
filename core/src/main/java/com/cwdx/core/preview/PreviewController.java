@@ -176,8 +176,8 @@ public class PreviewController implements IPreviewController {
 
     if (mHasInit) {
       NativeSetPreviewMode(mSelector.rotation, mSelector.ratio,
-          mSelector.vFlip, mSelector.hFlip,
-          mSelector.previewSize.getWidth(), mSelector.previewSize.getHeight());
+        mSelector.vFlip, mSelector.hFlip,
+        mSelector.previewSize.getWidth(), mSelector.previewSize.getHeight());
     }
   }
 
@@ -357,8 +357,8 @@ public class PreviewController implements IPreviewController {
                                  float markerSizeWidth, float markerSizeHeight) {
     if (mHasInit) {
       NativeSetCalibrateParams(boardSizeWidth, boardSizeHeight,
-          boardSquareSizeWidth, boardSquareSizeHeight,
-          markerSizeWidth, markerSizeHeight);
+        boardSquareSizeWidth, boardSquareSizeHeight,
+        markerSizeWidth, markerSizeHeight);
     }
   }
 
@@ -421,7 +421,7 @@ public class PreviewController implements IPreviewController {
     // 设置预览目标及大小
     mSurfaceTexture = new SurfaceTexture(texId);
     mSurfaceTexture.setDefaultBufferSize(mSelector.previewSize.getWidth(),
-        mSelector.previewSize.getHeight());
+      mSelector.previewSize.getHeight());
 
     // 当Camera采集到一帧数据时，通知native渲染
     mSurfaceTexture.setOnFrameAvailableListener(surfaceTexture -> {
@@ -469,7 +469,7 @@ public class PreviewController implements IPreviewController {
     mData = new byte[width * height * 4];
 
     mImageReader = ImageReader.newInstance(width, height,
-        PixelFormat.RGBA_8888, 2);
+      PixelFormat.RGBA_8888, 2);
     mImageReader.setOnImageAvailableListener(reader -> {
       Image image = reader.acquireNextImage();
       // 处理像素及保存图片
@@ -536,9 +536,9 @@ public class PreviewController implements IPreviewController {
 
   private boolean validState() {
     return mState == State.STATE_INIT
-        || mState == State.STATE_START
-        || mState == State.STATE_RESUME
-        || mState == State.STATE_PAUSE;
+      || mState == State.STATE_START
+      || mState == State.STATE_RESUME
+      || mState == State.STATE_PAUSE;
   }
 
   private native void NativeCreate();

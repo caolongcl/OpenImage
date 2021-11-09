@@ -15,10 +15,10 @@
 using namespace clt;
 
 CalibrateCamera::CalibrateCamera()
-    : m_images() {}
+  : m_images() {}
 
 bool CalibrateCamera::Init() {
-  Log::v(Log::PROCESSOR_TAG, "CalibrateCamera::Init");
+  Log::v(target, "CalibrateCamera::Init");
 
   std::string functionDir = ResManager::Self()->GetFunctionAbsolutePath();
 
@@ -31,7 +31,7 @@ bool CalibrateCamera::Init() {
 
 void CalibrateCamera::DeInit() {
   m_images.clear();
-  Log::v(Log::PROCESSOR_TAG, "CalibrateCamera::DeInit");
+  Log::v(target, "CalibrateCamera::DeInit");
 }
 
 void CalibrateCamera::Process() {
@@ -39,10 +39,10 @@ void CalibrateCamera::Process() {
 }
 
 void CalibrateCamera::process() {
-  Log::v(Log::PROCESSOR_TAG, "CalibrateCamera::process");
+  Log::v(target, "CalibrateCamera::process");
 
   if (m_images.empty()) {
-    Log::w(Log::PROCESSOR_TAG, "no calibrate images.");
+    Log::w(target, "no calibrate images.");
     Flow::Self()->SendMsg(PosInfoMsg(GLRender::target, "no calibrate images!"));
     return;
   }
@@ -83,10 +83,10 @@ void CalibrateCamera::process() {
     Flow::Self()->SendMsg(PosInfoMsg(GLRender::target, "calibrate successfully"));
 
   } catch (std::exception &e) {
-    Log::e(Log::PROCESSOR_TAG, "calibrate exception occur %s", e.what());
+    Log::e(target, "calibrate exception occur %s", e.what());
 
     Flow::Self()->SendMsg(
-        PosInfoMsg(GLRender::target, "calibrate failed, " + std::string(e.what())));
+      PosInfoMsg(GLRender::target, "calibrate failed, " + std::string(e.what())));
   }
 }
 
@@ -108,7 +108,7 @@ void CalibrateCamera::calibrate(const std::vector<std::vector<cv::Point3f> > &re
                                           cameraMatrix, distCoeffs, rvecs, tvecs,
                                           perViewErrors);
 
-  Log::d(Log::PROCESSOR_TAG, "calibrate average err : %f", avgErr);
+  Log::d(target, "calibrate average err : %f", avgErr);
 
   std::stringstream ss;
   // 内参矩阵 https://blog.csdn.net/qq_33446100/article/details/96845829
@@ -119,7 +119,7 @@ void CalibrateCamera::calibrate(const std::vector<std::vector<cv::Point3f> > &re
   // 透镜畸变系数 k1,k2,p1,p2,k3
   ss << "distCoeffs : " << distCoeffs << std::endl;
 
-  Log::d(Log::PROCESSOR_TAG, "calibrate params :\n %s", ss.str().c_str());
+  Log::d(target, "calibrate params :\n %s", ss.str().c_str());
 
   saveCalibrateParams(cameraMatrix, distCoeffs, imageSize, boardSize, boardSquareSize, avgErr);
 }
@@ -148,7 +148,7 @@ void CalibrateCamera::saveCalibrateParams(const cv::Mat &cameraMatrix,
 
   YamlCreator creator(ResManager::Self()->GetCameraParamsFile());
   creator.Emit()
-      << CameraData::Encode({matrix, dist, _imageSize, boardSize, boardSquareSize, avgErr});
+    << CameraData::Encode({matrix, dist, _imageSize, boardSize, boardSquareSize, avgErr});
   creator.Save();
 }
 
@@ -162,7 +162,7 @@ bool CalibrateCamera::findCorners(const std::string &file,
   imageSize.height = image.rows;
 
   if (!cv::findChessboardCorners(image, cv::Size(boardSize.width, boardSize.height), corners)) {
-    Log::w(Log::PROCESSOR_TAG, "calibrate images %s find no corners", file.c_str());
+    Log::w(target, "calibrate images %s find no corners", file.c_str());
     return false;
   }
 
@@ -217,7 +217,7 @@ void CalibrateCamera::scanImages(const std::string &functionDir) {
           && dirName.find("ChessboardCorners") == std::string::npos
           && dirName.find("undistort") == std::string::npos) {
         m_images.emplace_back(dirName);
-        Log::v(Log::PROCESSOR_TAG, "function file : %s", dirName.c_str());
+        Log::v(target, "function file : %s", dirName.c_str());
       }
     }
 
@@ -261,7 +261,7 @@ void CameraData::GetCameraMatrix(cv::Mat &_matrix) {
   _matrix.at<double>(1, 2) = matrix[3];
   _matrix.at<double>(2, 2) = 1.0;
 
-  Log::n(Log::PROCESSOR_TAG, "GetCameraMatrix %f %f %f %f", _matrix.at<double>(0, 0),
+  Log::n(target, "GetCameraMatrix %f %f %f %f", _matrix.at<double>(0, 0),
          _matrix.at<double>(0, 2), _matrix.at<double>(1, 1), _matrix.at<double>(1, 2));
 }
 
@@ -271,7 +271,7 @@ void CameraData::GetCameraDistCoeffs(cv::Mat &_dist) {
     _dist.at<double>(0, i) = dist[i];
   }
 
-  Log::n(Log::PROCESSOR_TAG, "GetCameraDistCoeffs %f %f %f %f %f", _dist.at<double>(0, 0),
+  Log::n(target, "GetCameraDistCoeffs %f %f %f %f %f", _dist.at<double>(0, 0),
          _dist.at<double>(0, 1), _dist.at<double>(0, 2), _dist.at<double>(0, 3),
          _dist.at<double>(0, 4));
 }

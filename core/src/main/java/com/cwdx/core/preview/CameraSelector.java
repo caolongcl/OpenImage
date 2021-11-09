@@ -23,8 +23,8 @@ public class CameraSelector {
   public static final Size SMALLEST_PREVIEW_SIZE_16_9 = new Size(1920, 1080);
   public static final Size SMALLEST_PREVIEW_SIZE_4_3 = new Size(1440, 1080);
   private static final Comparator<Size> comparator = (left, right) ->
-      Long.signum((long) left.getWidth() * left.getHeight() -
-          (long) right.getWidth() * right.getHeight());
+    Long.signum((long) left.getWidth() * left.getHeight() -
+      (long) right.getWidth() * right.getHeight());
 
   static {
     FrontCamera.param = Camera.Param.FRONT;
@@ -33,7 +33,7 @@ public class CameraSelector {
     FrontCamera.vFlip = false;
     FrontCamera.hFlip = true;
     FrontCamera.previewSize = new Size(SMALLEST_PREVIEW_SIZE_4_3.getWidth(),
-        SMALLEST_PREVIEW_SIZE_4_3.getHeight());
+      SMALLEST_PREVIEW_SIZE_4_3.getHeight());
 
     BackCamera.param = Camera.Param.BACK;
     BackCamera.ratio = AspectRatio.RATIO_4_3;
@@ -41,7 +41,7 @@ public class CameraSelector {
     BackCamera.vFlip = false;
     BackCamera.hFlip = false;
     BackCamera.previewSize = new Size(SMALLEST_PREVIEW_SIZE_4_3.getWidth(),
-        SMALLEST_PREVIEW_SIZE_4_3.getHeight());
+      SMALLEST_PREVIEW_SIZE_4_3.getHeight());
   }
 
   // 相机固有属性
@@ -78,7 +78,7 @@ public class CameraSelector {
 
     for (Size option : choices) {
       if (option.getWidth() >= targetWidth && option.getHeight() >= targetHeight
-          && option.getWidth() >= smallSize.getWidth() && option.getHeight() >= smallSize.getHeight()) {
+        && option.getWidth() >= smallSize.getWidth() && option.getHeight() >= smallSize.getHeight()) {
         return option;
       }
     }
@@ -121,7 +121,7 @@ public class CameraSelector {
     List<Size> aspectLists = new ArrayList<>();
     for (Size s : choices) {
       if (AspectRatio.aspectRatio(ratio).equals(
-          AspectRatio.aspectRatio(s.getWidth(), s.getHeight()))) {
+        AspectRatio.aspectRatio(s.getWidth(), s.getHeight()))) {
         aspectLists.add(s);
       }
     }
@@ -131,7 +131,7 @@ public class CameraSelector {
     Size target = null;
     for (Size t : aspectLists) {
       if (t.getWidth() >= targetWidth && t.getHeight() >= targetHeight
-          && t.getWidth() <= maxWidth && t.getHeight() <= maxHeight) {
+        && t.getWidth() <= maxWidth && t.getHeight() <= maxHeight) {
         target = t;
       }
     }
@@ -148,7 +148,7 @@ public class CameraSelector {
 
     for (Size option : choices) {
       if (option.getWidth() <= maxWidth && option.getHeight() <= maxHeight &&
-          option.getHeight() == option.getWidth() * targetHeight / targetWidth) {
+        option.getHeight() == option.getWidth() * targetHeight / targetWidth) {
         if (option.getWidth() >= targetWidth && option.getHeight() >= targetHeight) {
           bigEnough.add(option);
         } else {
@@ -171,7 +171,7 @@ public class CameraSelector {
 
   public void Select() {
     this.rotation = computePreviewRotation(param.id,
-        Camera.Param.surfaceOrientation, param.sensorOrientation);
+      Camera.Param.surfaceOrientation, param.sensorOrientation);
 
     if (targetSize != null)
       previewSize = chooseBigPreviewSizeWithTarget(param, ratio, targetSize.getWidth(), targetSize.getHeight());
@@ -345,14 +345,14 @@ public class CameraSelector {
   @Override
   public String toString() {
     return "CameraSelector{" +
-        "param=" + param +
-        ", ratio=" + ratio +
-        ", rotation=" + rotation +
-        ", vFlip=" + vFlip +
-        ", hFlip=" + hFlip +
-        ", targetSize=" + targetSize +
-        ", previewSize=" + previewSize +
-        '}';
+      "param=" + param +
+      ", ratio=" + ratio +
+      ", rotation=" + rotation +
+      ", vFlip=" + vFlip +
+      ", hFlip=" + hFlip +
+      ", targetSize=" + targetSize +
+      ", previewSize=" + previewSize +
+      '}';
   }
 
   public static class FilterState {

@@ -11,7 +11,7 @@
 using namespace clt;
 
 RGBAToGray::RGBAToGray()
-    : FilterCom("rgba2gray", PriorityNormal) {
+  : FilterCom("rgba2gray", PriorityNormal) {
 
 }
 

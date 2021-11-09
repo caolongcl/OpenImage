@@ -4,15 +4,17 @@
 #pragma once
 
 #include <softarch/std.hpp>
+#include <softarch/IComFunc.hpp>
 
 namespace clt {
 
 #define CheckMethodIDExit(id, name) \
     if ((id)==nullptr) {\
-        Log::e(Log::JNI_TAG, "CheckMethodIDExit, method:%s", #name);\
+        Log::e(target, "CheckMethodIDExit, method:%s", #name);\
         exit(EXIT_FAILURE);}
 
   class JniUtils final {
+  ClassDeclare(JniUtils)
   public:
     /**
      * 在其他线程执行jvm方法
@@ -25,24 +27,24 @@ namespace clt {
                             const std::function<void(JNIEnv *)> &task,
                             const char *info = "") {
       if (vm == nullptr) {
-        Log::e(Log::JNI_TAG, "vm==null %s", info);
+        Log::e(target, "vm==null %s", info);
         return false;
       }
 
       JNIEnv *env;
       if (vm->AttachCurrentThread(&env, nullptr) != JNI_OK) {
-        Log::e(Log::JNI_TAG, "AttachCurrentThread failed  %s", info);
+        Log::e(target, "AttachCurrentThread failed  %s", info);
         return false;
       }
       if (env == nullptr) {
-        Log::e(Log::JNI_TAG, "env==null %s", info);
+        Log::e(target, "env==null %s", info);
         return false;
       }
 
       task(env);
 
       if (vm->DetachCurrentThread() != JNI_OK) {
-        Log::e(Log::JNI_TAG, "DetachCurrentThread failed %s", info);
+        Log::e(target, "DetachCurrentThread failed %s", info);
         return false;
       }
 
@@ -59,7 +61,7 @@ namespace clt {
                            const std::function<void(JNIEnv *)> &task,
                            const char *info = "") {
       if (vm == nullptr) {
-        Log::e(Log::JNI_TAG, "vm==null %s", info);
+        Log::e(target, "vm==null %s", info);
         return;
       }
 

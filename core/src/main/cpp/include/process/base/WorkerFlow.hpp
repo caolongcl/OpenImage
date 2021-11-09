@@ -10,6 +10,7 @@
 namespace clt {
 
   class WorkerFlow final : public IComFunc<> {
+  ClassDeclare(WorkerFlow)
   public:
     bool Init() override;
 

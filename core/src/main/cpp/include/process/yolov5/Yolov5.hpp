@@ -10,7 +10,8 @@
 
 namespace clt {
   class Yolov5 : public IComFunc<const std::string &,
-      const std::string &, bool> {
+    const std::string &, bool> {
+  ClassDeclare(Yolov5)
   public:
     using BoxInfo = struct {
       float x1;
@@ -22,6 +23,7 @@ namespace clt {
     };
 
     Yolov5();
+
     ~Yolov5() = default;
 
     bool Init(const std::string &paramPath, const std::string &modelPath, bool useGPU) override;
@@ -30,7 +32,7 @@ namespace clt {
 
     std::vector<BoxInfo> Detect(const cv::Mat &image, float threshold, float nmsThreshold);
 
-    const std::string & LabelStr(int label) const;
+    const std::string &LabelStr(int label) const;
 
   private:
     using Size = struct {

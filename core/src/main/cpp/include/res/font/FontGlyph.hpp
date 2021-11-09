@@ -33,6 +33,7 @@ namespace clt {
    * 将所有字符拼接成一个纹理
    */
   class CharsGroupGlyph {
+  ClassDeclare(CharsGroupGlyph)
   public:
     CharsGroupGlyph() = default;
 

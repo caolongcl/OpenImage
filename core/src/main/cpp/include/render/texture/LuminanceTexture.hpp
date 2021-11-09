@@ -7,6 +7,7 @@
 namespace clt {
 
   class LuminanceTexture final : public Texture {
+  ClassDeclare(LuminanceTexture)
   public:
     LuminanceTexture() = default;
 

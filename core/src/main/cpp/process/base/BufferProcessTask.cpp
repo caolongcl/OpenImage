@@ -9,9 +9,9 @@
 using namespace clt;
 
 BufferProcessTask::BufferProcessTask(std::string name, std::shared_ptr<IProcessTask> task)
-    : m_name(std::move(name)), m_task(std::move(task)) {
+  : m_name(std::move(name)), m_task(std::move(task)) {
 
-  Log::v(Log::PROCESSOR_TAG, "BufferProcessTask %s", m_name.c_str());
+  Log::v(target, "BufferProcessTask %s", m_name.c_str());
 
   m_task->Init();
 }
@@ -19,7 +19,7 @@ BufferProcessTask::BufferProcessTask(std::string name, std::shared_ptr<IProcessT
 BufferProcessTask::~BufferProcessTask() {
   m_task->DeInit();
 
-  Log::v(Log::PROCESSOR_TAG, "~BufferProcessTask %s", m_name.c_str());
+  Log::v(target, "~BufferProcessTask %s", m_name.c_str());
 }
 
 bool BufferProcessTask::Init() { return true; }

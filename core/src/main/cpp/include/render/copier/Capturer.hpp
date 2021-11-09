@@ -18,8 +18,9 @@ namespace clt {
   class Copier;
 
   class Capturer final
-      : public IComFunc<std::shared_ptr<Copier>>,
-        public ICopierSurface<std::shared_ptr<Surface>> {
+    : public IComFunc<std::shared_ptr<Copier>>,
+      public ICopierSurface<std::shared_ptr<Surface>> {
+  ClassDeclare(Capturer)
   public:
     Capturer();
 

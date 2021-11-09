@@ -17,12 +17,12 @@ using namespace clt;
 ncnn::Mutex ObjectDetector::mutex;
 
 ObjectDetector::ObjectDetector()
-    : m_yolov5(new Yolov5()),
-      m_timeStatics() {
+  : m_yolov5(new Yolov5()),
+    m_timeStatics() {
 }
 
 bool ObjectDetector::Init() {
-  Log::v(Log::PROCESSOR_TAG, "ObjectDetector::Init");
+  Log::v(target, "ObjectDetector::Init");
 
   const std::string modelPath = ResManager::Self()->GetResAbsolutePath("/yolov5/yolov5.bin");
   const std::string paramPath = ResManager::Self()->GetResAbsolutePath("/yolov5/yolov5.param");
@@ -42,7 +42,7 @@ void ObjectDetector::DeInit() {
   m_yolov5->DeInit();
   m_timeStatics.DeInit();
 
-  Log::v(Log::PROCESSOR_TAG, "ObjectDetector::DeInit");
+  Log::v(target, "ObjectDetector::DeInit");
 }
 
 void ObjectDetector::Process(std::shared_ptr<Buffer> buf) {
@@ -50,15 +50,15 @@ void ObjectDetector::Process(std::shared_ptr<Buffer> buf) {
 
   process(*buf);
 
-  Log::n(Log::PROCESSOR_TAG, "object detect period %d ms", (Utils::CurTimeMilli() - lastTime));
+  Log::n(target, "object detect period %d ms", (Utils::CurTimeMilli() - lastTime));
 
   Log::debug([this, lastTime]() {
     m_timeStatics.Update(lastTime, [](long period) {
       TextInfo textInfo("object_detect:" + std::to_string(period) + "ms");
       textInfo.position = {100.0f, 200.0f};
       Flow::Self()->SendMsg(
-          TextMsg(Copier::target, Copier::msg_detect_face_info,
-                  std::make_shared<TextMsgData>(std::move(textInfo))));
+        TextMsg(Copier::target, Copier::msg_detect_face_info,
+                std::make_shared<TextMsgData>(std::move(textInfo))));
     });
   });
 }
@@ -75,7 +75,7 @@ void ObjectDetector::process(const Buffer &buf) {
     boxInfo = m_yolov5->Detect(frame, 0.5, 0.5);
 
   } catch (std::exception &e) {
-    Log::e(Log::PROCESSOR_TAG, "object detect exception occur %s", e.what());
+    Log::e(target, "object detect exception occur %s", e.what());
   }
 
   if (boxInfo.empty()) {
@@ -87,7 +87,7 @@ void ObjectDetector::process(const Buffer &buf) {
   objects.reserve(boxInfo.size());
 
   for (auto &box : boxInfo) {
-    Log::d(Log::PROCESSOR_TAG, "object %s region (%f %f %f %f)", m_yolov5->LabelStr(box.label).c_str(),
+    Log::d(target, "object %s region (%f %f %f %f)", m_yolov5->LabelStr(box.label).c_str(),
            box.x1, box.y1, (box.y1 - box.x1 + 1),
            (box.y2 - box.x2 + 1));
 
@@ -98,5 +98,6 @@ void ObjectDetector::process(const Buffer &buf) {
   }
 
   Flow::Self()->SendMsg(
-      PolygonMsg(Copier::target, Copier::msg_detect_face, std::make_shared<PolygonMsgData>(std::move(objects))));
+    PolygonMsg(Copier::target, Copier::msg_detect_face,
+               std::make_shared<PolygonMsgData>(std::move(objects))));
 }

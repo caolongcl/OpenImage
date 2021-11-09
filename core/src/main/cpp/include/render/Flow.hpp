@@ -17,9 +17,10 @@ namespace clt {
    * 基本线程 render 是渲染主线程，shared 是用来加载纹理，字体等资源的线程
    */
   class Flow final
-      : public IComFunc<>,
-        public IThreadPoster,
-        public IMsg {
+    : public IComFunc<>,
+      public IThreadPoster,
+      public IMsg {
+  ClassDeclare(Flow)
   public:
     bool Init() override;
 

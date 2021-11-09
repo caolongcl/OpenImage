@@ -13,7 +13,7 @@ OESTexture::OESTexture() = default;
 bool OESTexture::Init() {
   Texture::Init();
 
-  Log::v(Log::RENDER_TAG, "OESTexture::Init id %d", m_id);
+  Log::v(target, "OESTexture::Init id %d", m_id);
 
   bool hasError = false;
 

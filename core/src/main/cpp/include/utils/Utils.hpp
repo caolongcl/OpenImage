@@ -6,18 +6,15 @@
 
 #include <utils/Log.hpp>
 #include <softarch/Buffer.hpp>
+#include <softarch/IComFunc.hpp>
 
 namespace clt {
-
-#define ClassWrapper(Type) public:using Wrapper = Type;
-#define ClassDeclare(type) public:constexpr static const char *target = #type;
-
-#define VarDeclare(var) public:constexpr static const char *var_##var = #var;
-
   /**
    * 工具类
    */
   struct Utils {
+  ClassDeclare(Utils)
+
     /**
      * 归整到最近的偶数
      * @param n
@@ -92,13 +89,13 @@ namespace clt {
 
     static void PrintPixel(Buffer::DataPtrType data, std::size_t size) {
       std::string tmp = Utils::ToHexString(data, size / 20);
-      Log::d(Log::PROCESSOR_TAG, "printPixel %s", tmp.c_str());
+      Log::d(target, "printPixel %s", tmp.c_str());
 
       std::string tmp1 = Utils::ToHexString(data + size / 20, size / 20);
-      Log::d(Log::PROCESSOR_TAG, "printPixel1 %s", tmp1.c_str());
+      Log::d(target, "printPixel1 %s", tmp1.c_str());
 
       std::string tmp2 = Utils::ToHexString(data + size / 10, size / 20);
-      Log::d(Log::PROCESSOR_TAG, "printPixel2 %s", tmp2.c_str());
+      Log::d(target, "printPixel2 %s", tmp2.c_str());
     }
 
     static std::string GetBoolStr(bool b) {

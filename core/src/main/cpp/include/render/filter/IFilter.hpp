@@ -23,8 +23,8 @@ namespace clt {
    * 滤镜基类
    */
   class IFilter
-      : virtual public IComFunc<>,
-        public IVarSet {
+    : virtual public IComFunc<>,
+      public IVarSet {
   public:
     IFilter() = default;
 

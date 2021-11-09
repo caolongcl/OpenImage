@@ -9,10 +9,10 @@
 using namespace clt;
 
 GLThread::GLThread(const std::string &name)
-    : m_thread(new SingleThreadPool(name)),
-      m_egl(nullptr),
-      m_name(name),
-      m_needEgl(true) {
+  : m_thread(new SingleThreadPool(name)),
+    m_egl(nullptr),
+    m_name(name),
+    m_needEgl(true) {
 
 }
 
@@ -29,7 +29,7 @@ bool GLThread::Init(std::shared_ptr<EGLCore> egl, bool needEgl) {
         m_egl = std::make_shared<EGLCore>();
       }
 
-      Log::v(Log::GLTHREAD_TAG, "%s's EGL create", m_name.c_str());
+      Log::v(target, "%s's EGL create", m_name.c_str());
       m_egl->Init();
       m_egl->ActiveContext("");
 
@@ -47,7 +47,7 @@ void GLThread::DeInit() {
 
   if (m_needEgl) {
     m_thread->AddTask([this]() {
-      Log::v(Log::GLTHREAD_TAG, "%s's EGL destroy", m_name.c_str());
+      Log::v(target, "%s's EGL destroy", m_name.c_str());
       m_egl->DeInit();
     });
   }
@@ -115,7 +115,7 @@ void GLThread::AddMsgHandler(const std::shared_ptr<IMsgHandler> &handler) {
     return;
   }
 
-  Log::d(Log::GLTHREAD_TAG, "add msg handler : %s", handler->Target().c_str());
+  Log::d(target, "add msg handler : %s", handler->Target().c_str());
 
   if (m_msgHandlers.find(handler->Target()) == m_msgHandlers.end()) {
     m_msgHandlers[handler->Target()] = handler;
@@ -127,7 +127,7 @@ void GLThread::RemoveMsgHandler(const std::shared_ptr<IMsgHandler> &handler) {
     return;
   }
 
-  Log::d(Log::GLTHREAD_TAG, "remove msg handler : %s", handler->Target().c_str());
+  Log::d(target, "remove msg handler : %s", handler->Target().c_str());
 
   if (m_msgHandlers.find(handler->Target()) == m_msgHandlers.end()) {
     m_msgHandlers.erase(handler->Target());

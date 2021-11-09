@@ -12,6 +12,7 @@ namespace clt {
    * 相机输出的预览纹理格式
    */
   class OESTexture final : virtual public Texture {
+  ClassDeclare(OESTexture)
   public:
     OESTexture();
 

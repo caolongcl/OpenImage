@@ -30,9 +30,10 @@ namespace clt {
    * 滤镜渲染管道,管理所有滤镜
    */
   class FilterPipe final
-      : public IComFunc<std::shared_ptr<OESCopier>, std::shared_ptr<Copier>, std::shared_ptr<IProcessTextureReader>>,
-        public Observer<OPreviewSize>,
-        public std::enable_shared_from_this<FilterPipe> {
+    : public IComFunc<std::shared_ptr<OESCopier>, std::shared_ptr<Copier>, std::shared_ptr<IProcessTextureReader>>,
+      public Observer<OPreviewSize>,
+      public std::enable_shared_from_this<FilterPipe> {
+  ClassDeclare(FilterPipe)
   VarDeclare(target_position)
   VarDeclare(position_ratio)
   public:

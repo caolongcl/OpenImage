@@ -12,6 +12,7 @@
 namespace clt {
 
   class Shader : public IComFunc<> {
+  ClassDeclare(Shader)
   public:
     Shader() = default;
 

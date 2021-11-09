@@ -31,12 +31,13 @@ namespace clt {
       MSG_OTHER, // 其他，待添加实现
     };
 
-    Msg(const std::string &_target, const std::string &_what, const std::shared_ptr<MsgData> &_data = nullptr) :
-        type(Type::MSG_OTHER), target(_target), what(_what), data(_data) {}
+    Msg(const std::string &_target, const std::string &_what,
+        const std::shared_ptr<MsgData> &_data = nullptr) :
+      type(Type::MSG_OTHER), target(_target), what(_what), data(_data) {}
 
     Msg(Type _type, const std::string &_target, const std::string &_what,
         const std::shared_ptr<MsgData> &_data = nullptr) :
-        type(_type), target(_target), what(_what), data(_data) {}
+      type(_type), target(_target), what(_what), data(_data) {}
 
     virtual ~Msg() = default;
 

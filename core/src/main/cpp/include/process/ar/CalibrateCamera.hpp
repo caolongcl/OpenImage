@@ -92,11 +92,12 @@ namespace clt {
      * @param perViewErrors
      * @return
      */
-    static double computeProjectionErrors(const std::vector<std::vector<cv::Point3f> > &objectPoints,
-                                          const std::vector<std::vector<cv::Point2f> > &imagePoints,
-                                          const cv::Mat &cameraMatrix, const cv::Mat &distCoeffs,
-                                          const std::vector<cv::Mat> &rvecs, const std::vector<cv::Mat> &tvecs,
-                                          std::vector<float> &perViewErrors);
+    static double
+    computeProjectionErrors(const std::vector<std::vector<cv::Point3f> > &objectPoints,
+                            const std::vector<std::vector<cv::Point2f> > &imagePoints,
+                            const cv::Mat &cameraMatrix, const cv::Mat &distCoeffs,
+                            const std::vector<cv::Mat> &rvecs, const std::vector<cv::Mat> &tvecs,
+                            std::vector<float> &perViewErrors);
 
     /**
      * 保存校正参数
@@ -126,21 +127,23 @@ namespace clt {
    * 内参矩阵等参数
    */
   struct CameraData {
+  ClassDeclare(CameraData)
   VarDeclare(camera_matrix);
   VarDeclare(dist_coeffs);
 
     CameraData() = default;
+
     CameraData(const std::vector<double> &m,
                const std::vector<double> &d,
                const Integer2 &_imageSize,
                const Integer2 &_boardSize,
                const Float2 &_boardSquareSize,
                const double _avgErr) :
-        matrix(m),
-        dist(d),
-        imageSize(_imageSize),
-        boardSize(_boardSize), boardSquareSize(_boardSquareSize),
-        avgErr(_avgErr) {}
+      matrix(m),
+      dist(d),
+      imageSize(_imageSize),
+      boardSize(_boardSize), boardSquareSize(_boardSquareSize),
+      avgErr(_avgErr) {}
 
     static YAML::Node Encode(const CameraData &rhs) {
       YAML::Node node;
@@ -166,8 +169,10 @@ namespace clt {
           || !node["avgErr"].IsDefined()) {
         return false;
       }
-      rhs.imageSize = {node["info"]["image_width"].as<int>(), node["info"]["image_height"].as<int>()};
-      rhs.boardSize = {node["info"]["board_width"].as<int>(), node["info"]["board_height"].as<int>()};
+      rhs.imageSize = {node["info"]["image_width"].as<int>(),
+                       node["info"]["image_height"].as<int>()};
+      rhs.boardSize = {node["info"]["board_width"].as<int>(),
+                       node["info"]["board_height"].as<int>()};
       rhs.boardSquareSize = {node["info"]["board_square_width"].as<float>(),
                              node["info"]["board_square_height"].as<float>()};
       rhs.matrix = node[CameraData::var_camera_matrix].as<std::vector<double>>();

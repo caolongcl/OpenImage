@@ -24,7 +24,7 @@ PreviewController::PreviewController()
 }
 
 void PreviewController::Create(JavaVM *jvm, jobject thiz) {
-  Log::v(Log::PREVIEW_CTRL_TAG, "PreviewController::Create");
+  Log::v(target, "PreviewController::Create");
 
   // 初始化渲染线程和共享线程
   Flow::Self()->Init();
@@ -43,7 +43,7 @@ void PreviewController::Create(JavaVM *jvm, jobject thiz) {
 
       // 在共享渲染线程加载资源
 //                Flow::Self()->PostToShared([this, path]() {
-      Log::v(Log::PREVIEW_CTRL_TAG, "LoadResource %s", path.c_str());
+      Log::v(target, "LoadResource %s", path.c_str());
 
       ResManager::Self()->Init();
       ResManager::Self()->ScanAndLoad(path);
@@ -56,7 +56,7 @@ void PreviewController::Create(JavaVM *jvm, jobject thiz) {
 }
 
 void PreviewController::Destroy() {
-  Log::v(Log::PREVIEW_CTRL_TAG, "PreviewController::Destroy");
+  Log::v(target, "PreviewController::Destroy");
 
   // 等待所有耗时任务停止
   WorkerFlow::Self()->DeInit();
@@ -81,7 +81,7 @@ void PreviewController::Destroy() {
 bool PreviewController::Init() {
   Flow::Self()->PostToRender(
     [this]() {
-      Log::v(Log::PREVIEW_CTRL_TAG, "PreviewController::Init");
+      Log::v(target, "PreviewController::Init");
 
       // 初始化渲染器
       m_render->Init(shared_from_this());
@@ -93,7 +93,7 @@ bool PreviewController::Init() {
 void PreviewController::DeInit() {
   Flow::Self()->PostToRender(
     [this]() {
-      Log::v(Log::PREVIEW_CTRL_TAG, "DeInit");
+      Log::v(target, "DeInit");
 
       m_render->DeInit();
     });
@@ -104,7 +104,7 @@ void PreviewController::SetPreviewMode(int rotate, int ratio,
                                        int width, int height) {
   Flow::Self()->PostToRender(
     [this, rotate, ratio, vFlip, hFlip, width, height]() {
-      Log::d(Log::PREVIEW_CTRL_TAG,
+      Log::d(target,
              "SetPreviewMode rotate %d ratio %d vFlip %d hFlip %d previewW %d previewH %d",
              rotate, ratio, vFlip, hFlip, width, height);
 
@@ -113,7 +113,7 @@ void PreviewController::SetPreviewMode(int rotate, int ratio,
 
       // 将预览纹理设置给 Java 层相机预览 SurfaceTexture
       JniUtils::DoOutCurJvm(m_JavaVM, [this](JNIEnv *env) {
-        Log::d(Log::PREVIEW_CTRL_TAG, "CreatePreviewTex :%d", m_render->GetPreviewTexId());
+        Log::d(target, "CreatePreviewTex :%d", m_render->GetPreviewTexId());
 
         env->CallVoidMethod(m_Thiz, m_SetPreviewTextureMethod, m_render->GetPreviewTexId());
       }, "PreviewController::SetPreviewMode");
@@ -123,7 +123,7 @@ void PreviewController::SetPreviewMode(int rotate, int ratio,
 void PreviewController::Start() {
   Flow::Self()->PostToRender(
     [this]() {
-      Log::d(Log::PREVIEW_CTRL_TAG, "Start");
+      Log::d(target, "Start");
 
       m_previewing = true;
 
@@ -137,7 +137,7 @@ void PreviewController::Start() {
 void PreviewController::Resume() {
   Flow::Self()->PostToRender(
     [this]() {
-      Log::d(Log::PREVIEW_CTRL_TAG, "Resume");
+      Log::d(target, "Resume");
 
       m_rendering = true;
     });
@@ -146,7 +146,7 @@ void PreviewController::Resume() {
 void PreviewController::Pause() {
   Flow::Self()->PostToRender(
     [this]() {
-      Log::d(Log::PREVIEW_CTRL_TAG, "Pause");
+      Log::d(target, "Pause");
 
       m_rendering = false;
 
@@ -178,7 +178,7 @@ void PreviewController::NotifyFrameAvailable() {
 void PreviewController::Stop() {
   Flow::Self()->PostToRender(
     [this]() {
-      Log::d(Log::PREVIEW_CTRL_TAG, "Stop");
+      Log::d(target, "Stop");
 
       m_renderDelayCount = 0;
       m_previewing = false;
@@ -192,7 +192,7 @@ void PreviewController::Stop() {
       int fps, bitrate;
       bool recording = m_render->GetRecordState(fps, bitrate);
       if (recording) {
-        Log::d(Log::PREVIEW_CTRL_TAG, "PreviewController::Stop stop record");
+        Log::d(target, "PreviewController::Stop stop record");
 
         m_render->Record(false, 0, 0);
 
@@ -207,7 +207,7 @@ void PreviewController::Stop() {
 void PreviewController::SetSurface(int type, ANativeWindow *window) {
   Flow::Self()->PostToRender(
     [this, type, window]() {
-      Log::d(Log::PREVIEW_CTRL_TAG, "SetSurface %s's surface %s",
+      Log::d(target, "SetSurface %s's surface %s",
              Constants::SurfaceTypeName(type).c_str(),
              Utils::GetBoolStr(window != nullptr).c_str());
 
@@ -218,7 +218,7 @@ void PreviewController::SetSurface(int type, ANativeWindow *window) {
 void PreviewController::SetSurfaceSize(int width, int height) {
   Flow::Self()->PostToRender(
     [this, width, height]() {
-      Log::d(Log::PREVIEW_CTRL_TAG, "SetSurfaceSize %d %d",
+      Log::d(target, "SetSurfaceSize %d %d",
              width, height);
 
       m_render->SetSurfaceSize(width, height);
@@ -228,7 +228,7 @@ void PreviewController::SetSurfaceSize(int width, int height) {
 void PreviewController::Capture() {
   Flow::Self()->PostToRender(
     [this]() {
-      Log::d(Log::PREVIEW_CTRL_TAG, "Capture");
+      Log::d(target, "Capture");
 
       if (m_previewing && m_rendering) {
         m_render->Capture();
@@ -244,7 +244,7 @@ void PreviewController::Record(bool start, int fps, float factor) {
       m_render->GetCaptureSize(width, height);
       bitrate = static_cast<int>(static_cast<float >(width * height * fps) * factor);
 
-      Log::d(Log::PREVIEW_CTRL_TAG,
+      Log::d(target,
              "Record %s fps %d factor %f bitrate %d",
              (start ? "start" : "stop"), fps, factor, bitrate);
 
@@ -253,14 +253,14 @@ void PreviewController::Record(bool start, int fps, float factor) {
       // 创建或销毁 Mediacodec 录制编码器
       JniUtils::DoOutCurJvm(m_JavaVM, [&, this](JNIEnv *env) {
         if (start) {
-          Log::d(Log::PREVIEW_CTRL_TAG,
+          Log::d(target,
                  "start config encoder wh(%d %d) fps %d bitrate %d",
                  width, height, fps, bitrate);
 
           env->CallVoidMethod(m_Thiz, m_ConfigEncoderMethod, true, width, height, fps,
                               bitrate);
         } else {
-          Log::d(Log::PREVIEW_CTRL_TAG, "stop config encoder");
+          Log::d(target, "stop config encoder");
 
           env->CallVoidMethod(m_Thiz, m_ConfigEncoderMethod, false, 0, 0, 0, 0);
         }
@@ -271,7 +271,7 @@ void PreviewController::Record(bool start, int fps, float factor) {
 void PreviewController::SetVar(const std::string &name, const Var &var) {
   Flow::Self()->PostToRender(
     [this, name, var]() {
-      Log::d(Log::PREVIEW_CTRL_TAG, "SetVar %s %s", name.c_str(), var.Dump().c_str());
+      Log::d(target, "SetVar %s %s", name.c_str(), var.Dump().c_str());
 
       if (m_previewing) {
         m_render->SetVar(name, var);
@@ -282,7 +282,7 @@ void PreviewController::SetVar(const std::string &name, const Var &var) {
 void PreviewController::SetString(const std::string &name, const std::string &str) {
   Flow::Self()->PostToRender(
     [this, name, str]() {
-      Log::v(Log::PREVIEW_CTRL_TAG, "SetString %s %s", name.c_str(), str.c_str());
+      Log::v(target, "SetString %s %s", name.c_str(), str.c_str());
       if (name == "basedir") {
 //                    Flow::Self()->PostToShared([str]() {
         ResManager::Self()->RegisterBaseDir(str);
@@ -298,7 +298,7 @@ void PreviewController::SetString(const std::string &name, const std::string &st
 void PreviewController::EnableFilter(const std::string &name, bool enable) {
   Flow::Self()->PostToRender(
     [this, name, enable]() {
-      Log::d(Log::PREVIEW_CTRL_TAG, "EnableFilter %s %s", name.c_str(),
+      Log::d(target, "EnableFilter %s %s", name.c_str(),
              Utils::GetBoolStr(enable).c_str());
 
       if (m_previewing) {
@@ -310,7 +310,7 @@ void PreviewController::EnableFilter(const std::string &name, bool enable) {
 void PreviewController::EnableProcess(const std::string &name, bool enable) {
   Flow::Self()->PostToRender(
     [this, name, enable]() {
-      Log::d(Log::PREVIEW_CTRL_TAG, "EnableProcess %s %s", name.c_str(),
+      Log::d(target, "EnableProcess %s %s", name.c_str(),
              Utils::GetBoolStr(enable).c_str());
 
       if (m_previewing) {
@@ -323,7 +323,7 @@ void PreviewController::UpdateTargetPos(int x, int y) {
   Flow::Self()->PostToRender(
     [this, x, y]() {
       if (m_previewing) {
-        // Log::d(Log::PREVIEW_CTRL_TAG, "UpdateTargetPosition x %d y %d", x, y);
+        // Log::d(target, "UpdateTargetPosition x %d y %d", x, y);
         m_render->UpdateTargetPosition(x, y);
       }
     });
@@ -340,7 +340,7 @@ void PreviewController::OnCallback(CallbackType type) {
       m_render->GetCaptureSize(width, height);
 
       JniUtils::DoOutCurJvm(m_JavaVM, [this, width, height](JNIEnv *env) {
-        Log::d(Log::PREVIEW_CTRL_TAG, "CaptureSizeChanged Update ImageReader (%d %d)",
+        Log::d(target, "CaptureSizeChanged Update ImageReader (%d %d)",
                width, height);
 
         env->CallVoidMethod(m_Thiz, m_CreateImageReaderMethod, width, height);
@@ -350,7 +350,7 @@ void PreviewController::OnCallback(CallbackType type) {
       bool recording = m_render->GetRecordState(fps, bitrate);
 
       if (recording) {
-        Log::d(Log::PREVIEW_CTRL_TAG, "CaptureSizeChanged Reconfig Encoder (%d %d)", width,
+        Log::d(target, "CaptureSizeChanged Reconfig Encoder (%d %d)", width,
                height);
 
         m_render->Record(false, 0, 0);

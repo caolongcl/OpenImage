@@ -19,7 +19,7 @@ namespace clt {
                   const Float4 &_color,
                   const std::string &_tag,
                   bool _fill = false)
-        : canvasSize(_canvasSize), region(_region), color(_color), tag(_tag), fill(_fill) {
+      : canvasSize(_canvasSize), region(_region), color(_color), tag(_tag), fill(_fill) {
       for (auto &point : region) {
         point.y = canvasSize.h - point.y;
       }
@@ -30,7 +30,7 @@ namespace clt {
                   const Float4 &_color,
                   const std::string &_tag,
                   bool _fill = false)
-        : canvasSize(_canvasSize), color(_color), tag(_tag), fill(_fill) {
+      : canvasSize(_canvasSize), color(_color), tag(_tag), fill(_fill) {
       float x = _region.x;
       float y = canvasSize.h - _region.y;
       float w = _region.z; // width
@@ -57,11 +57,11 @@ namespace clt {
     BaseModelObject(Type _type,
                     const glm::mat4 &_projection, const glm::mat4 &_view, const glm::mat4 &_model,
                     const Color &_color)
-        : type(_type),
-          projection(_projection),
-          view(_view),
-          model(_model),
-          color(_color) {}
+      : type(_type),
+        projection(_projection),
+        view(_view),
+        model(_model),
+        color(_color) {}
 
     Type type;
     glm::mat4 projection;

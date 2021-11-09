@@ -25,6 +25,7 @@ namespace clt {
                             public IComUpdate<const std::size_t, const std::size_t>,
                             public IProcessTextureReader,
                             public Observer<OPreviewSize> {
+  ClassDeclare(ProcessPipe)
   public:
     ProcessPipe();
 

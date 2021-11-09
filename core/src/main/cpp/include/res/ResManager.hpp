@@ -46,12 +46,12 @@ namespace clt {
     CalibrateData() = default;
 
     CalibrateData(
-        const Integer2 &_boardSize,
-        const Float2 &_boardSquareSize,
-        const Float2 &_markerSize) :
-        boardSize(_boardSize),
-        boardSquareSize(_boardSquareSize),
-        markerSize(_markerSize) {}
+      const Integer2 &_boardSize,
+      const Float2 &_boardSquareSize,
+      const Float2 &_markerSize) :
+      boardSize(_boardSize),
+      boardSquareSize(_boardSquareSize),
+      markerSize(_markerSize) {}
 
     static YAML::Node Encode(const CalibrateData &rhs) {
       YAML::Node node;
@@ -110,7 +110,8 @@ namespace clt {
   };
 
   class ResManager final
-      : public IComFunc<> {
+    : public IComFunc<> {
+  ClassDeclare(ResManager)
   public:
     bool Init() override;
 

@@ -14,6 +14,7 @@ namespace clt {
    * 检测、标记、解码
    */
   class Marker final : public IComFunc<> {
+  ClassDeclare(Marker);
   public:
     struct Item {
       Item() : code(""), id(-1) {}
@@ -46,7 +47,8 @@ namespace clt {
      * @param minContoursNum 最少点数
      * @param minSideLength 每边最小长度
      */
-    static void detect(cv::Mat &imgGray, std::vector<Item> &possibleMarkers, int minContoursNum, int minSideLength);
+    static void detect(cv::Mat &imgGray, std::vector<Item> &possibleMarkers, int minContoursNum,
+                       int minSideLength);
 
     /**
      * 解析候选 marker 区域中的汉明码
@@ -55,8 +57,9 @@ namespace clt {
      * @param codes
      * @param finalMarkers
      */
-    static void recognize(cv::Mat &imgGray, std::vector<Item> &possibleMarkers, const std::vector<Code> &codes,
-                          std::vector<Item> &finalMarkers);
+    static void
+    recognize(cv::Mat &imgGray, std::vector<Item> &possibleMarkers, const std::vector<Code> &codes,
+              std::vector<Item> &finalMarkers);
 
     /**
      * 对 marker 轮廓坐标坐标精细化采样

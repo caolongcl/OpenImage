@@ -10,29 +10,37 @@
 using namespace clt;
 
 Yolov5::Yolov5() :
-    m_useGPU(true),
-    m_layers({
-                 {"394",    32, {{116, 90}, {156, 198}, {373, 326}}},
-                 {"375",    16, {{30,  61}, {62,  45},  {59,  119}}},
-                 {"output", 8,  {{10,  13}, {16,  30},  {33,  23}}},
-             }),
-    m_labels({"person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat", "traffic light",
-              "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse", "sheep", "cow",
-              "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee",
-              "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove", "skateboard", "surfboard",
-              "tennis racket", "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple",
-              "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake", "chair", "couch",
-              "potted plant", "bed", "dining table", "toilet", "tv", "laptop", "mouse", "remote", "keyboard",
-              "cell phone",
-              "microwave", "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase", "scissors", "teddy bear",
-              "hair drier", "toothbrush"}) {
+  m_useGPU(true),
+  m_layers({
+             {"394",    32, {{116, 90}, {156, 198}, {373, 326}}},
+             {"375",    16, {{30,  61}, {62,  45},  {59,  119}}},
+             {"output", 8,  {{10,  13}, {16,  30},  {33,  23}}},
+           }),
+  m_labels({"person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat",
+            "traffic light",
+            "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat", "dog", "horse",
+            "sheep", "cow",
+            "elephant", "bear", "zebra", "giraffe", "backpack", "umbrella", "handbag", "tie",
+            "suitcase", "frisbee",
+            "skis", "snowboard", "sports ball", "kite", "baseball bat", "baseball glove",
+            "skateboard", "surfboard",
+            "tennis racket", "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl",
+            "banana", "apple",
+            "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake",
+            "chair", "couch",
+            "potted plant", "bed", "dining table", "toilet", "tv", "laptop", "mouse", "remote",
+            "keyboard",
+            "cell phone",
+            "microwave", "oven", "toaster", "sink", "refrigerator", "book", "clock", "vase",
+            "scissors", "teddy bear",
+            "hair drier", "toothbrush"}) {
 }
 
 bool Yolov5::Init(const std::string &paramPath, const std::string &modelPath, bool useGPU) {
   bool hasGPU = ncnn::get_gpu_count() > 0;
   m_useGPU = useGPU && hasGPU;
 
-  Log::d(Log::PROCESSOR_TAG, "has gpu %d, use gpu %d", hasGPU, m_useGPU);
+  Log::d(target, "has gpu %d, use gpu %d", hasGPU, m_useGPU);
 
   ncnn::set_cpu_powersave(0);
   ncnn::set_omp_num_threads(ncnn::get_big_cpu_count());
@@ -54,13 +62,15 @@ void Yolov5::DeInit() {
   m_workspacePoolAlloc.clear();
 }
 
-std::vector<Yolov5::BoxInfo> Yolov5::Detect(const cv::Mat &image, float threshold, float nmsThreshold) {
+std::vector<Yolov5::BoxInfo>
+Yolov5::Detect(const cv::Mat &image, float threshold, float nmsThreshold) {
   int inWidth = image.cols;
   int inHeight = image.rows;
   int targetWidth = s_inputSize / 2;
   int targetHeight = s_inputSize / 2;
 
-  ncnn::Mat in_net = ncnn::Mat::from_pixels_resize(image.data, ncnn::Mat::PIXEL_RGB, inWidth, inHeight,
+  ncnn::Mat in_net = ncnn::Mat::from_pixels_resize(image.data, ncnn::Mat::PIXEL_RGB, inWidth,
+                                                   inHeight,
                                                    targetWidth, targetHeight);
 
   const float norm[3] = {1 / 255.f, 1 / 255.f, 1 / 255.f};
@@ -117,13 +127,17 @@ Yolov5::decodeInfer(ncnn::Mat &data, int stride, const Size &frameSize, int netS
             //printf("[grid size=%d, stride = %d]x y w h %f %f %f %f\n",grid_size,stride,record[0],record[1],record[2],record[3]);
             BoxInfo box;
             box.x1 = std::max(0, std::min(frameSize.width,
-                                          int((cx - w / 2.f) * (float) frameSize.width / (float) netSize)));
+                                          int((cx - w / 2.f) * (float) frameSize.width /
+                                              (float) netSize)));
             box.y1 = std::max(0, std::min(frameSize.height,
-                                          int((cy - h / 2.f) * (float) frameSize.height / (float) netSize)));
+                                          int((cy - h / 2.f) * (float) frameSize.height /
+                                              (float) netSize)));
             box.x2 = std::max(0, std::min(frameSize.width,
-                                          int((cx + w / 2.f) * (float) frameSize.width / (float) netSize)));
+                                          int((cx + w / 2.f) * (float) frameSize.width /
+                                              (float) netSize)));
             box.y2 = std::max(0, std::min(frameSize.height,
-                                          int((cy + h / 2.f) * (float) frameSize.height / (float) netSize)));
+                                          int((cy + h / 2.f) * (float) frameSize.height /
+                                              (float) netSize)));
             box.score = score;
             box.label = cls;
             result.push_back(box);

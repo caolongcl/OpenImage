@@ -17,7 +17,7 @@ namespace clt {
   class FilterCom : public IFilter {
   public:
     FilterCom(const std::string &type, const int priority)
-        : m_type(type), m_priority(priority), m_needUpdate(true) {}
+      : m_type(type), m_priority(priority), m_needUpdate(true) {}
 
     virtual ~FilterCom() = default;
 
@@ -58,7 +58,7 @@ namespace clt {
                            virtual public IComFunc<std::shared_ptr<SquareModel>> {
   public:
     FilterWithShader(const std::string &type, const int priority = PriorityNormal)
-        : FilterCom(type, priority) {};
+      : FilterCom(type, priority) {};
 
     virtual ~FilterWithShader() = default;
 

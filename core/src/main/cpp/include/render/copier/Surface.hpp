@@ -10,7 +10,8 @@
 namespace clt {
 
   class Surface final
-      : public IComFunc<ANativeWindow *> {
+    : public IComFunc<ANativeWindow *> {
+  ClassDeclare(Surface)
   public:
     Surface(std::string name);
 

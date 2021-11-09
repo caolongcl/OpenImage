@@ -262,8 +262,8 @@ public class PreviewView extends SurfaceView implements IPreviewView, IPreviewCo
                                  float boardSquareSizeWidth, float boardSquareSizeHeight,
                                  float markerSizeWidth, float markerSizeHeight) {
     mController.SetCalibrateParams(boardSizeWidth, boardSizeHeight,
-        boardSquareSizeWidth, boardSquareSizeHeight,
-        markerSizeWidth, markerSizeHeight);
+      boardSquareSizeWidth, boardSquareSizeHeight,
+      markerSizeWidth, markerSizeHeight);
   }
 
   @Override

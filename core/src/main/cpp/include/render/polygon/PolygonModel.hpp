@@ -29,6 +29,7 @@ namespace clt {
    */
   class PolygonModel : public IComFunc<>,
                        public PolygonModelUpdater {
+  ClassDeclare(PolygonModel)
   public:
     PolygonModel();
 

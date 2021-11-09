@@ -27,6 +27,7 @@ namespace clt {
     VariableSetter(const Setter &s) : setter(s) {}
 
     void operator()(const T &var) { setter(var); }
+
   private:
     Setter setter;
   };

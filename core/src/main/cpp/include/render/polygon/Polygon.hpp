@@ -33,6 +33,7 @@ namespace clt {
     void UpdatePolygon(const PolygonObject &object, const Viewport &viewport);
 
     void Render();
+
   private:
 
     void loadShader() override;

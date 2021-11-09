@@ -26,7 +26,7 @@ bool FilterPipe::Init(std::shared_ptr<OESCopier> oesCopier,
   assert(copier != nullptr);
   assert(processTextureReader != nullptr);
 
-  Log::v(Log::RENDER_TAG, "FilterPipe::Init");
+  Log::v(target, "FilterPipe::Init");
 
   m_squareModel = std::make_shared<SquareModel>();
   m_squareModel->Init();
@@ -102,11 +102,11 @@ void FilterPipe::DeInit() {
 
   gles::DeleteFbo(m_fbo);
 
-  Log::v(Log::RENDER_TAG, "FilterPipe::DeInit");
+  Log::v(target, "FilterPipe::DeInit");
 };
 
 void FilterPipe::OnUpdate(OPreviewSize &&t) {
-  Log::d(Log::RENDER_TAG, "FilterPipe::OnUpdate preview size (%d %d)", t.width, t.height);
+  Log::d(target, "FilterPipe::OnUpdate preview size (%d %d)", t.width, t.height);
   updateFilterSize();
 }
 
@@ -232,13 +232,13 @@ void FilterPipe::push(const std::string &type) {
   auto f = m_filtersMap.find(type);
 
   if (f != m_filtersMap.cend()) {
-    Log::w(Log::RENDER_TAG, "FilterPipe::push filter %s already pushed", type.c_str());
+    Log::w(target, "FilterPipe::push filter %s already pushed", type.c_str());
     return;
   }
 
   auto filter = FilterFactory::Create(type);
   if (filter == nullptr) {
-    Log::w(Log::RENDER_TAG, "FilterPipe::push filter %s invalid", type.c_str());
+    Log::w(target, "FilterPipe::push filter %s invalid", type.c_str());
     return;
   }
 
@@ -252,14 +252,14 @@ void FilterPipe::push(const std::string &type) {
   // 由于 m_filters 变化了，需要更新各个 filter 的输入输出纹理
   updateFiltersTexture();
 
-  Log::d(Log::RENDER_TAG, "FilterPipe::push filter %s successfully", type.c_str());
+  Log::d(target, "FilterPipe::push filter %s successfully", type.c_str());
 }
 
 void FilterPipe::pop(const std::string &type) {
   auto f = m_filtersMap.find(type);
 
   if (f == m_filtersMap.cend()) {
-    Log::w(Log::RENDER_TAG, "FilterPipe::pop filter %s already popped", type.c_str());
+    Log::w(target, "FilterPipe::pop filter %s already popped", type.c_str());
     return;
   }
 
@@ -275,5 +275,5 @@ void FilterPipe::pop(const std::string &type) {
 
   filter->DeInit();
 
-  Log::d(Log::RENDER_TAG, "FilterPipe::pop filter %s successfully", type.c_str());
+  Log::d(target, "FilterPipe::pop filter %s successfully", type.c_str());
 }

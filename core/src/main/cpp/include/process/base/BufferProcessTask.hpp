@@ -12,6 +12,7 @@ namespace clt {
   class GLThread;
 
   class BufferProcessTask final : public IBufferProcessTask {
+  ClassDeclare(BufferProcessTask);
   public:
     BufferProcessTask(std::string name, std::shared_ptr<IProcessTask> task);
 

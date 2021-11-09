@@ -85,6 +85,7 @@ namespace clt {
      */
     static void getMarkerCoordinates(const std::vector<cv::Point2f> &bufCoords,
                                      std::vector<cv::Point2f> &coords, float bufRatio);
+
   private:
     std::shared_ptr<Marker> m_marker;
     CameraData m_params;

@@ -11,7 +11,7 @@ using namespace clt;
 ProcessBuffers::ProcessBuffers() = default;
 
 bool ProcessBuffers::Init() {
-  Log::v(Log::PROCESSOR_TAG, "ProcessPipe::Init");
+  Log::v(target, "ProcessPipe::Init");
 
 //  resetBufferQueue();
 
@@ -35,7 +35,7 @@ void ProcessBuffers::Update(const std::size_t width, const std::size_t height) {
     }
   }
 
-  Log::v(Log::PROCESSOR_TAG,
+  Log::v(target,
          "ProcessBuffers::Update width %d height %d buf bytes %d",
          width, height, m_buffers[0]->bytes);
 }
@@ -47,7 +47,7 @@ void ProcessBuffers::DeInit() {
 
   m_buffers.clear();
 
-  Log::v(Log::PROCESSOR_TAG, "ProcessBuffers::DeInit");
+  Log::v(target, "ProcessBuffers::DeInit");
 }
 
 std::shared_ptr<Buffer> ProcessBuffers::PopWriteBuffer() {

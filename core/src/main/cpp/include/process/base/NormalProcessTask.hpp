@@ -10,6 +10,7 @@
 namespace clt {
 
   class NormalProcessTask final : public INormalProcessTask {
+  ClassDeclare(NormalProcessTask)
   public:
     NormalProcessTask(std::string name, std::shared_ptr<IProcessTask> task);
 

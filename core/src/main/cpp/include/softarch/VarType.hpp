@@ -27,7 +27,7 @@ namespace clt {
     Float2() : x(0.0f), y(0.0f) {}
 
     Float2(const float _x, const float _y)
-        : x(_x), y(_y) {}
+      : x(_x), y(_y) {}
 
     union {
       struct {
@@ -49,7 +49,7 @@ namespace clt {
     Float3() : x(0.0f), y(0.0f), z(0.0f) {}
 
     Float3(const float _x, const float _y, const float _z)
-        : x(_x), y(_y), z(_z) {}
+      : x(_x), y(_y), z(_z) {}
 
     union {
       struct {
@@ -68,7 +68,7 @@ namespace clt {
     Float4() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}
 
     Float4(const float _x, const float _y, const float _z, const float _w)
-        : x(_x), y(_y), z(_z), w(_w) {}
+      : x(_x), y(_y), z(_z), w(_w) {}
 
     union {
       struct {
@@ -99,7 +99,7 @@ namespace clt {
     Integer2() : x(0), y(0) {}
 
     Integer2(const int _x, const int _y)
-        : x(_x), y(_y) {}
+      : x(_x), y(_y) {}
 
     union {
       struct {
@@ -121,7 +121,7 @@ namespace clt {
     Integer3() : x(0), y(0), z(0) {}
 
     Integer3(const int _x, const int _y, const int _z)
-        : x(_x), y(_y), z(_z) {}
+      : x(_x), y(_y), z(_z) {}
 
     union {
       struct {
@@ -140,7 +140,7 @@ namespace clt {
     Integer4() : x(0), y(0), z(0), w(0) {}
 
     Integer4(const int _x, const int _y, const int _z, const int _w)
-        : x(_x), y(_y), z(_z), w(_w) {}
+      : x(_x), y(_y), z(_z), w(_w) {}
 
     union {
       struct {
@@ -248,7 +248,7 @@ namespace clt {
     Numerical(T _x, T _y, T _z, T _w) : x(_x), y(_y), z(_z), w(_w), tag(ID_BASE + 3) {}
 
     Numerical(const T *elems, int count)
-        : tag(ID_BASE + count - 1) {
+      : tag(ID_BASE + count - 1) {
       assert(count > 0 && count <= 4);
       for (int i = 0; i < count; ++i) {
         ta[i] = elems[i];
@@ -466,7 +466,7 @@ namespace clt {
     using VarSetter = std::function<void(const Var &)>;
 
     Setter(const VarSetter &s, const VarType &t)
-        : setter(s), type(t) {
+      : setter(s), type(t) {
     }
 
     bool operator()(const Var &var) {

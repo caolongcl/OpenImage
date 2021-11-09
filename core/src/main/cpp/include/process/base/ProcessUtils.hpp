@@ -12,6 +12,8 @@ namespace clt {
 
   struct TimeStatics : public IComFunc<>,
                        public IComUpdate<long, TimeTask &&> {
+  ClassDeclare(TimeStatics)
+
     TimeStatics() = default;
 
     bool Init() override {
@@ -19,6 +21,7 @@ namespace clt {
       processCount = 0;
       return true;
     }
+
     void DeInit() override {}
 
     void Update(long lastTime, TimeTask &&task) override {

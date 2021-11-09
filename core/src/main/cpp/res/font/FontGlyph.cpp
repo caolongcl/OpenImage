@@ -33,13 +33,13 @@ bool CharsGroupGlyph::Merge(const std::shared_ptr<Texture> &texture) {
   m_charGroupSize.w = static_cast<float>(pitch);
   m_charGroupSize.h = static_cast<float>(maxHeight);
 
-  Log::d(Log::RES_TAG, "Glyph count %d max(%d %d) bytes %d; merge wh(%d %d)",
+  Log::d(target, "Glyph count %d max(%d %d) bytes %d; merge wh(%d %d)",
          count, maxWidth, maxHeight, bytes, pitch, maxHeight);
 
   //
   Texture::BufferPtr
-      buffer(new Texture::Buffer[bytes]{0},
-             [](const Texture::Buffer *const b) { delete[] b; });
+    buffer(new Texture::Buffer[bytes]{0},
+           [](const Texture::Buffer *const b) { delete[] b; });
 
   // 将count个小Bitmap拼成一个宽pitch高maxHeight的长条bitmap
   for (auto &g : m_charsGlyph) {
@@ -50,7 +50,7 @@ bool CharsGroupGlyph::Merge(const std::shared_ptr<Texture> &texture) {
       for (int j = 0; j < glyph.size.h; ++j) { // glyph的高
         for (int i = 0; i < glyph.pitch; ++i) {// glyph的宽
           buffer.get()[j * pitch + index * maxWidth + i] = glyph.buffer.get()[
-              j * glyph.pitch + i];
+            j * glyph.pitch + i];
         }
       }
       glyph.buffer = nullptr;
@@ -58,7 +58,7 @@ bool CharsGroupGlyph::Merge(const std::shared_ptr<Texture> &texture) {
   }
 
   // 上传到texture中
-  Log::v(Log::RES_TAG, "font texture upload");
+  Log::v(target, "font texture upload");
   texture->Upload(pitch, maxHeight, buffer);
 
   return true;

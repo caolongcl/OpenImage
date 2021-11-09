@@ -7,16 +7,16 @@
 using namespace clt;
 
 CascadeClassifierWrap::CascadeClassifierWrap(std::string file)
-    : m_detector(nullptr),
-      m_file(std::move(file)) {
+  : m_detector(nullptr),
+    m_file(std::move(file)) {
 
 }
 
 bool CascadeClassifierWrap::Init() {
   auto mainDetector =
-      cv::makePtr<CascadeDetectorAdapter>(cv::makePtr<cv::CascadeClassifier>(m_file));
+    cv::makePtr<CascadeDetectorAdapter>(cv::makePtr<cv::CascadeClassifier>(m_file));
   auto trackingDetector =
-      cv::makePtr<CascadeDetectorAdapter>(cv::makePtr<cv::CascadeClassifier>(m_file));
+    cv::makePtr<CascadeDetectorAdapter>(cv::makePtr<cv::CascadeClassifier>(m_file));
 
   m_detector = std::make_shared<DetectorAggregator>(mainDetector, trackingDetector);
 

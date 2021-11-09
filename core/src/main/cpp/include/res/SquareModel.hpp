@@ -13,6 +13,7 @@ namespace clt {
    * 可绘制长方形
    */
   class SquareModel : public IComFunc<> {
+  ClassDeclare(SquareModel)
   public:
     SquareModel();
 

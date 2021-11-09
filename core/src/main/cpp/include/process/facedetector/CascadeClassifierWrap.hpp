@@ -12,17 +12,18 @@
 namespace clt {
 
   class CascadeDetectorAdapter : public cv::DetectionBasedTracker::IDetector {
+  ClassDeclare(CascadeDetectorAdapter)
   public:
     CascadeDetectorAdapter(cv::Ptr<cv::CascadeClassifier> detector) :
-        IDetector(),
-        Detector(detector) {
-      Log::v(Log::PROCESSOR_TAG, "CascadeDetectorAdapter::Detect::Detect");
+      IDetector(),
+      Detector(detector) {
+      Log::v(target, "CascadeDetectorAdapter::Detect::Detect");
       CV_Assert(detector);
     }
 
     void detect(const cv::Mat &Image, std::vector<cv::Rect> &objects) {
-//    Log::v(Log::PROCESSOR_TAG, "CascadeDetectorAdapter::Detect: begin");
-//    Log::v(Log::PROCESSOR_TAG,
+//    Log::v(target, "CascadeDetectorAdapter::Detect: begin");
+//    Log::v(target,
 //           "CascadeDetectorAdapter::Detect: scaleFactor=%.2f, "
 //           "minNeighbours=%d, minObjSize=(%dx%d), maxObjSize=(%dx%d)",
 //           scaleFactor,
@@ -38,11 +39,11 @@ namespace clt {
                                  2,
                                  minObjSize,
                                  maxObjSize);
-//    Log::v(Log::PROCESSOR_TAG, "CascadeDetectorAdapter::Detect: end");
+//    Log::v(target, "CascadeDetectorAdapter::Detect: end");
     }
 
     virtual ~CascadeDetectorAdapter() {
-      Log::v(Log::PROCESSOR_TAG, "CascadeDetectorAdapter::Detect::~Detect");
+      Log::v(target, "CascadeDetectorAdapter::Detect::~Detect");
     }
 
   private:
@@ -59,15 +60,15 @@ namespace clt {
 
     DetectorAggregator(cv::Ptr<CascadeDetectorAdapter> &_mainDetector,
                        cv::Ptr<CascadeDetectorAdapter> &_trackingDetector) :
-        mainDetector(_mainDetector),
-        trackingDetector(_trackingDetector) {
+      mainDetector(_mainDetector),
+      trackingDetector(_trackingDetector) {
       CV_Assert(_mainDetector);
       CV_Assert(_trackingDetector);
 
       cv::DetectionBasedTracker::Parameters DetectorParams;
       tracker =
-          cv::makePtr<cv::DetectionBasedTracker>(mainDetector, trackingDetector,
-                                                 DetectorParams);
+        cv::makePtr<cv::DetectionBasedTracker>(mainDetector, trackingDetector,
+                                               DetectorParams);
     }
   };
 
@@ -101,6 +102,7 @@ namespace clt {
 
   // 简单人脸检测
   class CascadeClassifierFaceDetector final : public IComFunc<const std::string &> {
+  ClassDeclare(CascadeClassifierFaceDetector)
   public:
     CascadeClassifierFaceDetector() {
 
@@ -108,7 +110,7 @@ namespace clt {
 
     bool Init(const std::string &file) override {
       if (!m_classifier.load(file)) {
-        Log::e(Log::PROCESSOR_TAG, "CascadeClassifierFaceDetector load error %s",
+        Log::e(target, "CascadeClassifierFaceDetector load error %s",
                file.c_str());
         return false;
       }

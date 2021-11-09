@@ -29,7 +29,8 @@ namespace clt {
 
     virtual void Update(const std::string &name) = 0;
 
-    virtual void SetPresentationTime(const std::string &name, khronos_stime_nanoseconds_t nsecs) = 0;
+    virtual void
+    SetPresentationTime(const std::string &name, khronos_stime_nanoseconds_t nsecs) = 0;
   };
 
 }

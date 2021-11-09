@@ -6,6 +6,11 @@
 
 namespace clt {
 
+#define ClassWrapper(Type) public:using Wrapper = Type;
+#define ClassDeclare(type) public:constexpr static const char *target = #type;
+
+#define VarDeclare(var) public:constexpr static const char *var_##var = #var;
+
   /**
    * 关键组件的超基类，利用统一接口，规范设计
    * @tparam Args

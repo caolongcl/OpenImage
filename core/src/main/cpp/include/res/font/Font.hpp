@@ -23,6 +23,7 @@ namespace clt {
 
   class Font : public IComFunc<>,
                public IRenderText {
+  ClassDeclare(Font)
     using Face = FT_Face;
 
   public:

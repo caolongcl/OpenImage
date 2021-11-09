@@ -15,6 +15,7 @@ namespace clt {
 
   class ProcessTextures final : public IComFunc<>,
                                 public IComUpdate<const std::size_t, const std::size_t> {
+  ClassDeclare(ProcessTextures)
   public:
     using TextureQueue = std::queue<std::shared_ptr<Texture>>;
   public:

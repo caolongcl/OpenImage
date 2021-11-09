@@ -13,6 +13,7 @@ namespace clt {
 
   class ProcessBuffers final : public IComFunc<>,
                                public IComUpdate<const std::size_t, const std::size_t> {
+  ClassDeclare(ProcessBuffers)
   public:
     using BufferQueue = std::queue<std::shared_ptr<Buffer>>;
   public:

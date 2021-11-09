@@ -7,19 +7,19 @@
 using namespace clt;
 
 SquareModel::SquareModel()
-    : m_vao(0),
-      m_vertexVbo(0),
-      m_texVbo(0),
-      m_ebo(0) {
+  : m_vao(0),
+    m_vertexVbo(0),
+    m_texVbo(0),
+    m_ebo(0) {
 }
 
 bool SquareModel::Init() {
   // 顶点
   GLfloat vertex[] = {
-      -1.0f, 1.0f, 0.0f, // 0 左上角
-      -1.0f, -1.0f, 0.0f, // 1 左下角
-      1.0f, -1.0f, 0.0f, // 2 右下角
-      1.0f, 1.0f, 0.0f, // 3 右上角
+    -1.0f, 1.0f, 0.0f, // 0 左上角
+    -1.0f, -1.0f, 0.0f, // 1 左下角
+    1.0f, -1.0f, 0.0f, // 2 右下角
+    1.0f, 1.0f, 0.0f, // 3 右上角
   };
 
   gles::CreateXbo(GL_ARRAY_BUFFER, GL_STATIC_DRAW,
@@ -27,8 +27,8 @@ bool SquareModel::Init() {
 
   // 绘制索引
   short index[] = {
-      0, 1, 2, // 左下三角形
-      0, 2, 3  // 右上三角形
+    0, 1, 2, // 左下三角形
+    0, 2, 3  // 右上三角形
   };
 
   gles::CreateXbo(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW,
@@ -36,10 +36,10 @@ bool SquareModel::Init() {
 
   // 纹理
   GLfloat tex[] = {
-      0.0f, 1.0f,  // 0 左上角
-      0.0f, 0.0f,  // 1 左下角
-      1.0f, 0.0f, // 2 右下角
-      1.0f, 1.0f // 3 右上角
+    0.0f, 1.0f,  // 0 左上角
+    0.0f, 0.0f,  // 1 左下角
+    1.0f, 0.0f, // 2 右下角
+    1.0f, 1.0f // 3 右上角
   };
 
   gles::CreateXbo(GL_ARRAY_BUFFER, GL_STATIC_DRAW,

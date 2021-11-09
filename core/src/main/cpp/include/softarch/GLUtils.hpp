@@ -24,32 +24,34 @@
 #include <utils/Log.hpp>
 #include <softarch/ComType.hpp>
 #include <softarch/Task.hpp>
+#include <softarch/IComFunc.hpp>
 
 namespace clt {
 
   class gles {
+  ClassDeclare(gles)
   public:
     static inline void CheckGlError(const char *op) {
       for (GLint error = glGetError(); error != GL_NO_ERROR; error = glGetError()) {
-        Log::e(Log::EGL_TAG, "after %s() glError (0x%x)", op, error);
+        Log::e(target, "after %s() glError (0x%x)", op, error);
       }
     }
 
     static inline bool hasGlError(const char *op) {
       for (GLint error = glGetError(); error != GL_NO_ERROR; error = glGetError()) {
-        Log::e(Log::EGL_TAG, "after %s() glError (0x%x)", op, error);
+        Log::e(target, "after %s() glError (0x%x)", op, error);
         return true;
       }
       return false;
     }
 
     static inline void CheckEglError(const char *op) {
-      Log::e(Log::EGL_TAG, "after %s() eglError (0x%x)", op, eglGetError());
+      Log::e(target, "after %s() eglError (0x%x)", op, eglGetError());
     }
 
     static inline void PrintGLString(const char *name, GLenum s) {
       const char *v = (const char *) glGetString(s);
-      Log::i(Log::EGL_TAG, "GL %s = %s", name, v);
+      Log::i(target, "GL %s = %s", name, v);
     }
 
     /**
@@ -79,7 +81,7 @@ namespace clt {
           std::unique_ptr<char[]> buf(new char[infoLen]);
           if (buf) {
             glGetShaderInfoLog(shader, infoLen, nullptr, buf.get());
-            Log::e(Log::RENDER_TAG, "Could not compile shader %d:\n%s", shaderType,
+            Log::e(target, "Could not compile shader %d:\n%s", shaderType,
                    buf.get());
           }
           glDeleteShader(shader);
@@ -138,7 +140,7 @@ namespace clt {
             std::unique_ptr<char[]> buf(new char[bufLength]);
             if (buf) {
               glGetProgramInfoLog(program, bufLength, nullptr, buf.get());
-              Log::e(Log::RENDER_TAG, "Could not link program:\n%s", buf.get());
+              Log::e(target, "Could not link program:\n%s", buf.get());
             }
           }
           glDeleteProgram(program);

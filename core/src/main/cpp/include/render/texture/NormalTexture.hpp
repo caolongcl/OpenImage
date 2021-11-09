@@ -12,6 +12,7 @@ namespace clt {
    * RGBA 格式纹理
    */
   class NormalTexture final : virtual public Texture {
+  ClassDeclare(NormalTexture)
   public:
     NormalTexture();
 

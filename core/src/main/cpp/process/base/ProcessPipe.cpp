@@ -13,14 +13,14 @@
 using namespace clt;
 
 ProcessPipe::ProcessPipe()
-    : m_textures(new ProcessTextures()),
-      m_pixelReader(new PixelReaderPbo()),
-      m_buffers(new ProcessBuffers()) {
+  : m_textures(new ProcessTextures()),
+    m_pixelReader(new PixelReaderPbo()),
+    m_buffers(new ProcessBuffers()) {
 
 }
 
 bool ProcessPipe::Init() {
-  Log::v(Log::PROCESSOR_TAG, "ProcessPipe::Init");
+  Log::v(target, "ProcessPipe::Init");
 
   auto thread = Flow::Self()->CreateThread(s_pipeThread, true);
   if (thread != nullptr) {
@@ -50,14 +50,14 @@ void ProcessPipe::DeInit() {
   Flow::Self()->DestroyThread(s_dispatchThread);
   Flow::Self()->DestroyThread(s_readTextureThread);
 
-  Log::v(Log::PROCESSOR_TAG, "ProcessPipe::DeInit");
+  Log::v(target, "ProcessPipe::DeInit");
 }
 
 void ProcessPipe::Update(const std::size_t width, const std::size_t height) {
   std::size_t smallWidth = width;
   std::size_t smallHeight = height;
 
-  Log::d(Log::PROCESSOR_TAG, "ProcessPipe::Update width %d height %d", smallWidth, smallHeight);
+  Log::d(target, "ProcessPipe::Update width %d height %d", smallWidth, smallHeight);
 
   // 缩小以减少计算量
   float bufRate = 1.0f;
@@ -74,7 +74,7 @@ void ProcessPipe::Update(const std::size_t width, const std::size_t height) {
   auto thread = Flow::Self()->GetThread(s_pipeThread);
   if (thread != nullptr) {
     thread->Post([this, width = smallWidth, height = smallHeight]() {
-      Log::d(Log::PROCESSOR_TAG,
+      Log::d(target,
              "ProcessPipe::Update in pipe width %d height %d",
              width, height);
       m_textures->Update(width, height);
@@ -117,10 +117,10 @@ void ProcessPipe::PushReadTexture(std::shared_ptr<Texture> tex) {
 }
 
 void ProcessPipe::pushTask(const std::string &name) {
-  Log::v(Log::PROCESSOR_TAG, "ProcessPipe::PushTask %s", name.c_str());
+  Log::v(target, "ProcessPipe::PushTask %s", name.c_str());
 
   if (name.empty()) {
-    Log::w(Log::PROCESSOR_TAG, "ProcessPipe::PushTask invalid name %s", name.c_str());
+    Log::w(target, "ProcessPipe::PushTask invalid name %s", name.c_str());
     return;
   }
 
@@ -143,7 +143,7 @@ void ProcessPipe::pushTask(const std::string &name) {
 }
 
 void ProcessPipe::popTask(const std::string &name) {
-  Log::v(Log::PROCESSOR_TAG, "ProcessPipe::PopTask %s", name.c_str());
+  Log::v(target, "ProcessPipe::PopTask %s", name.c_str());
 
   auto thread = Flow::Self()->GetThread(s_pipeThread);
   if (thread != nullptr) {

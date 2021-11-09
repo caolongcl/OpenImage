@@ -12,12 +12,12 @@ using namespace clt;
 std::mutex Printer::s_mutex;
 
 bool Printer::Init() {
-  Log::v(Log::RES_TAG, "Printer::Init");
+  Log::v(target, "Printer::Init");
   return true;
 }
 
 void Printer::DeInit() {
-  Log::v(Log::RES_TAG, "Printer::DeInit");
+  Log::v(target, "Printer::DeInit");
 }
 
 void Printer::Print(const TextInfo &info) {

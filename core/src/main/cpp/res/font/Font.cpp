@@ -12,11 +12,11 @@
 using namespace clt;
 
 Font::Font(std::string path)
-    : m_loaded(false),
-      m_path(std::move(path)),
-      m_charGlyphSizeHint(0, 48),
-      m_fontRender(new FontRender()),
-      cTextCountPerWidth(32) {
+  : m_loaded(false),
+    m_path(std::move(path)),
+    m_charGlyphSizeHint(0, 48),
+    m_fontRender(new FontRender()),
+    cTextCountPerWidth(32) {
 
 }
 
@@ -31,7 +31,7 @@ void Font::DeInit() {
 }
 
 void Font::Load() {
-  Log::d(Log::RES_TAG, "Font::Load %s", m_path.c_str());
+  Log::d(target, "Font::Load %s", m_path.c_str());
   m_loaded = loadFont();
 }
 
@@ -46,20 +46,20 @@ void Font::RenderText(const TextInfo &info) {
 bool Font::loadFont() {
   std::fstream f(m_path.c_str());
   if (!f.good()) {
-    Log::e(Log::RES_TAG, "Could not find font %s", m_path.c_str());
+    Log::e(target, "Could not find font %s", m_path.c_str());
     return false;
   }
 
   FT_Library ft;
   if (FT_Init_FreeType(&ft)) {
-    Log::e(Log::RES_TAG, "Could not init FreeType Library");
+    Log::e(target, "Could not init FreeType Library");
     FT_Done_FreeType(ft);
     return false;
   }
 
   FT_Face face;
   if (FT_New_Face(ft, m_path.c_str(), 0, &face)) {
-    Log::e(Log::RES_TAG, "Failed to load font");
+    Log::e(target, "Failed to load font");
     FT_Done_Face(face);
     return false;
   }
@@ -69,7 +69,7 @@ bool Font::loadFont() {
 
   // 加载ASCII字符
   if (!loadChars(face)) {
-    Log::e(Log::RES_TAG, "Failed to load font");
+    Log::e(target, "Failed to load font");
     FT_Done_Face(face);
     FT_Done_FreeType(ft);
     return false;
@@ -93,7 +93,7 @@ bool Font::loadChars(Face &face) {
     glyph.index = index++;
 
     if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
-      Log::e(Log::RES_TAG, "Failed to load Glyph %c", (char) c);
+      Log::e(target, "Failed to load Glyph %c", (char) c);
       glyph.valid = false;
     } else {
       glyph.valid = true;
@@ -109,8 +109,8 @@ bool Font::loadChars(Face &face) {
       int bytes = glyph.pitch * glyph.size.h;
       if (bytes > 0) {
         Texture::BufferPtr
-            buffer(new Texture::Buffer[bytes]{0},
-                   [](const Texture::Buffer *const b) { delete[] b; });
+          buffer(new Texture::Buffer[bytes]{0},
+                 [](const Texture::Buffer *const b) { delete[] b; });
         for (int i = 0; i < bytes; ++i) {
           buffer.get()[i] = face->glyph->bitmap.buffer[i];;
         }
@@ -118,7 +118,7 @@ bool Font::loadChars(Face &face) {
 
 //        printGlyphBitmap(buffer, bytes);
 
-        Log::n(Log::GUI_TAG,
+        Log::n(target,
                "Font::loadChars %d %c size(%d %d) bearing(%d %d) advance(%d %d) pitch %d bytes %d %p",
                glyph.index, glyph.c,
                glyph.size.w, glyph.size.h,
@@ -146,8 +146,9 @@ bool Font::loadChars(Face &face) {
  */
 void Font::renderText(const TextInfo &info) {
   // position 都是屏幕窗口坐标系的，需要换算到实际绘制字体的坐标系位置
-  Float2 position{info.position.x * ((float) info.previewViewport.width / (float) info.displayViewport.width),
-                  info.position.y * ((float) info.previewViewport.height / (float) info.displayViewport.height)};
+  Float2 position{
+    info.position.x * ((float) info.previewViewport.width / (float) info.displayViewport.width),
+    info.position.y * ((float) info.previewViewport.height / (float) info.displayViewport.height)};
 
   float scale = info.scale * ((float) info.previewViewport.width / (float) cTextCountPerWidth) /
                 m_glyph->GetCharRectSize().w;
@@ -161,7 +162,7 @@ void Font::renderText(const TextInfo &info) {
   position.x = position.x + (float) info.previewViewport.x;
   position.y = -position.y + (float) info.previewViewport.y + (float) info.previewViewport.height;
 
-//    Log::e(Log::RENDER_TAG, "info.rotate %f", info.rotate);
+//    Log::e(target, "info.rotate %f", info.rotate);
 
   // 变换顺序和定义的相反
   glm::mat4 model(1.0f);
@@ -170,9 +171,11 @@ void Font::renderText(const TextInfo &info) {
   model = glm::translate(model, glm::vec3(-position.x, -position.y, 0.0f));
 
   glm::mat4 projection = glm::ortho((float) info.previewViewport.x,
-                                    (float) info.previewViewport.x + (float) info.previewViewport.width,
+                                    (float) info.previewViewport.x +
+                                    (float) info.previewViewport.width,
                                     (float) info.previewViewport.y,
-                                    (float) info.previewViewport.y + (float) info.previewViewport.height);
+                                    (float) info.previewViewport.y +
+                                    (float) info.previewViewport.height);
   // 绘制字体背景
   if (info.fillBg && info.bgColor.a != 0.f) {
     m_fontRender->RenderBackground(info.text, position, info.bgColor, scale, model, projection);
@@ -194,15 +197,15 @@ void Font::printGlyphBitmap(const Texture::BufferPtr &buffer, int bytes) {
 
   std::stringstream ss;
   std::string tmp = Utils::ToHexString(buffer.get(), bytes / 3);
-  Log::d(Log::GUI_TAG, "Font::loadChars %s", tmp.c_str());
+  Log::d(target, "Font::loadChars %s", tmp.c_str());
 
   tmp = Utils::ToHexString(buffer.get() + bytes / 3, bytes / 3);
-  Log::d(Log::GUI_TAG, "Font::loadChars %s", tmp.c_str());
+  Log::d(target, "Font::loadChars %s", tmp.c_str());
 
   tmp =
-      Utils::ToHexString(buffer.get() + bytes / 3 + bytes / 3,
-                         bytes - (bytes / 3 + bytes / 3));
-  Log::d(Log::GUI_TAG, "Font::loadChars %s", tmp.c_str());
+    Utils::ToHexString(buffer.get() + bytes / 3 + bytes / 3,
+                       bytes - (bytes / 3 + bytes / 3));
+  Log::d(target, "Font::loadChars %s", tmp.c_str());
 }
 
 const char *ArialFont::sName = "arial";

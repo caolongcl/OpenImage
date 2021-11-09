@@ -11,7 +11,7 @@ NormalTexture::NormalTexture() = default;
 bool NormalTexture::Init() {
   Texture::Init();
 
-  Log::v(Log::RENDER_TAG, "NormalTexture::Init id %d", m_id);
+  Log::v(target, "NormalTexture::Init id %d", m_id);
 
   bool hasError = false;
 

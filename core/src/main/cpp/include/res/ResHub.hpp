@@ -17,6 +17,7 @@ namespace clt {
    */
   template<typename T>
   class ResHub : public IComFunc<> {
+  ClassDeclare(ResHub)
   public:
     ResHub() = default;
 
@@ -32,7 +33,7 @@ namespace clt {
     void Add(const std::string &name, std::shared_ptr<T> res) {
       std::lock_guard<std::mutex> locker(m_mutex);
       if (m_res.size() > 32) {
-        Log::w(Log::RES_TAG, "to many res, clear");
+        Log::w(target, "to many res, clear");
         clear();
       }
       m_res.emplace(name, res);

@@ -19,7 +19,7 @@ namespace fs = std::__fs::filesystem;
 std::mutex ResManager::s_mutex;
 
 bool ResManager::Init() {
-  Log::v(Log::RES_TAG, "ResManager::Init");
+  Log::v(target, "ResManager::Init");
 
   m_shaders.Init();
   m_fonts.Init();
@@ -39,7 +39,7 @@ void ResManager::DeInit() {
   m_shaders.DeInit();
   m_fonts.DeInit();
 
-  Log::v(Log::RES_TAG, "ResManager::DeInit");
+  Log::v(target, "ResManager::DeInit");
 }
 
 void ResManager::ScanAndLoad(const std::string &path) {
@@ -82,11 +82,11 @@ std::shared_ptr<Shader> ResManager::LoadShader(const std::string &name) {
   }
 
   assert(!m_resPath.empty());
-  Log::v(Log::RES_TAG, "load shader %s", name.c_str());
+  Log::v(target, "load shader %s", name.c_str());
 
   std::string file = name + "_shader.yml";
   if (std::find(m_resFiles.cbegin(), m_resFiles.cend(), file) == m_resFiles.cend()) {
-    Log::w(Log::RES_TAG, "no shader %s ", name.c_str());
+    Log::w(target, "no shader %s ", name.c_str());
     return nullptr;
   } else {
     std::string root = m_resPath + "/shaders/";
@@ -118,7 +118,7 @@ void ResManager::SaveMatImageImmediate(const std::string &fileName, const cv::Ma
   std::string file = ResManager::Self()->GetFunctionAbsolutePath() + "/";
   file += fileName + ".jpg";
   cv::imwrite(file, image);
-  Log::v(Log::RES_TAG, "save mat picture %s", file.c_str());
+  Log::v(target, "save mat picture %s", file.c_str());
 }
 
 std::string ResManager::GetCameraParamsFile() const {
@@ -147,7 +147,7 @@ void ResManager::clearOldCalibrateImages() {
       std::string dirName(dir->d_name);
       auto pos = dirName.find_last_of('.');
       if (dirName != "." && dirName != ".." && dirName.substr(pos) == ".jpg") {
-        Log::d(Log::PROCESSOR_TAG, "remove old calibrate file %s", dirName.c_str());
+        Log::d(target, "remove old calibrate file %s", dirName.c_str());
         std::string fullPath = m_functionPath + "/" + dirName;
         std::remove(fullPath.c_str());
       }
@@ -164,7 +164,7 @@ const CalibrateData &ResManager::LoadCalibrateParams() {
   std::ifstream f(fileName.c_str());
   if (!f.good()) {
     f.close();
-    Log::w(Log::RES_TAG, "no calibrate_params.yml, load default");
+    Log::w(target, "no calibrate_params.yml, load default");
 
     YamlCreator creator(fileName);
     creator.Emit() << CalibrateData::Encode(m_calibrateData);
@@ -180,9 +180,9 @@ const CalibrateData &ResManager::LoadCalibrateParams() {
     }
 
     if (!got) {
-      Log::e(Log::RES_TAG, "parse calibrate_params.yml failed, load default");
+      Log::e(target, "parse calibrate_params.yml failed, load default");
     } else {
-      Log::d(Log::RES_TAG, "parse calibrate_params.yml success");
+      Log::d(target, "parse calibrate_params.yml success");
     }
   }
 
@@ -197,7 +197,7 @@ void ResManager::SaveCalibrateParams(Integer2 boardSize,
       || boardSquareSize.h != m_calibrateData.GetBoardSquareSize().h
       || markerSize.w != m_calibrateData.GetMarkerSize().w
       || markerSize.h != m_calibrateData.GetMarkerSize().h) {
-    Log::d(Log::RES_TAG, "SaveCalibrateParams calibrate_params changed");
+    Log::d(target, "SaveCalibrateParams calibrate_params changed");
 
     std::lock_guard<std::mutex> locker(s_mutex);
 
@@ -212,15 +212,15 @@ void ResManager::SaveCalibrateParams(Integer2 boardSize,
     // 清除旧参数拍摄的校正图片
     clearOldCalibrateImages();
   } else {
-    Log::w(Log::RES_TAG, "SaveCalibrateParams calibrate_params unchanged");
+    Log::w(target, "SaveCalibrateParams calibrate_params unchanged");
   }
 }
 
 std::shared_ptr<Shader> ResManager::makeShader(const YamlParse &yaml) {
   std::shared_ptr<Shader> shader = std::make_shared<Shader>(
-      getVertexShaderSrc(yaml),
-      getFragmentShaderSrc(yaml),
-      getComputeShaderSrc(yaml)
+    getVertexShaderSrc(yaml),
+    getFragmentShaderSrc(yaml),
+    getComputeShaderSrc(yaml)
   );
   shader->Init();
   return shader;
@@ -230,7 +230,7 @@ std::shared_ptr<Shader> ResManager::makeShader(const std::string &vertexSrc,
                                                const std::string &fragmentSrc,
                                                const std::string &computeSrc) {
   std::shared_ptr<Shader> shader = std::make_shared<Shader>(
-      vertexSrc, fragmentSrc, computeSrc
+    vertexSrc, fragmentSrc, computeSrc
   );
   shader->Init();
   return shader;
@@ -266,7 +266,7 @@ std::string ResManager::getShaderSrc(const YamlParse &yaml, const std::string &t
   std::regex reg1("_#2_");
   src = std::regex_replace(src.c_str(), reg1, ":");
 
-  Log::n(Log::RES_TAG, "src %s\n%s", type.c_str(), src.c_str());
+  Log::n(target, "src %s\n%s", type.c_str(), src.c_str());
 
   return src;
 }
@@ -280,7 +280,7 @@ bool ResManager::scanResFiles(const std::string &rootPath) {
       for (auto &it : fs::directory_iterator(rootEntry)) {
         if (it.is_regular_file()) {
           m_resFiles.emplace_back(it.path().filename().c_str());
-          Log::v(Log::RES_TAG, "res file %s", it.path().filename().c_str());
+          Log::v(target, "res file %s", it.path().filename().c_str());
         } else if (it.is_directory()) {
           scanResFiles(it.path());
         }
@@ -288,7 +288,7 @@ bool ResManager::scanResFiles(const std::string &rootPath) {
     }
   }
 
-  Log::e(Log::RES_TAG, "no exist resource path %d", root.string().c_str());
+  Log::e(target, "no exist resource path %d", root.string().c_str());
 #else
   m_resFiles.emplace_back("arial.ttf");
 
@@ -328,13 +328,13 @@ void ResManager::registerFonts(const std::string &name, std::shared_ptr<Font> fo
   if (font == nullptr)
     return;
 
-  Log::d(Log::RES_TAG, "ResManager::registerFonts %s", name.c_str());
+  Log::d(target, "ResManager::registerFonts %s", name.c_str());
 
   font->Init();
   font->Load();
 
   if (!font->Loaded()) {
-    Log::w(Log::RES_TAG,
+    Log::w(target,
            "ResManager::registerFonts %s failed",
            name.c_str());
 
@@ -345,7 +345,7 @@ void ResManager::registerFonts(const std::string &name, std::shared_ptr<Font> fo
 
   m_fonts.Add(name, font);
 
-  Log::v(Log::RES_TAG,
+  Log::v(target,
          "ResManager::registerFonts %s success", name.c_str());
 }
 
@@ -354,51 +354,51 @@ const char *ResManager::s_oes = "oes";
 const char *ResManager::s_copier = "copier";
 
 const char *ResManager::s_oesVertex =
-    "#version 300 es\n"
-    "\n"
-    "  layout(location = 0) in vec4 aPosition;\n"
-    "  layout(location = 1) in vec2 aTexCoords;\n"
-    "  out vec2 vTexCoords;\n"
-    "\n"
-    "  void main() {\n"
-    "  vTexCoords = vec2(aTexCoords.s, 1.0-aTexCoords.t);\n"
-    "  gl_Position = aPosition;\n"
-    "  }";
+  "#version 300 es\n"
+  "\n"
+  "  layout(location = 0) in vec4 aPosition;\n"
+  "  layout(location = 1) in vec2 aTexCoords;\n"
+  "  out vec2 vTexCoords;\n"
+  "\n"
+  "  void main() {\n"
+  "  vTexCoords = vec2(aTexCoords.s, 1.0-aTexCoords.t);\n"
+  "  gl_Position = aPosition;\n"
+  "  }";
 const char *ResManager::s_oesFragment =
-    "#version 300 es\n"
-    "\n"
-    "  #extension GL_OES_EGL_image_external_essl3 : require\n"
-    "\n"
-    "  precision mediump float;\n"
-    "  uniform samplerExternalOES uTexSampler;\n"
-    "\n"
-    "  in highp vec2 vTexCoords;\n"
-    "  layout(location = 0) out vec4 oFragColor;\n"
-    "  layout(location = 1) out vec4 oOtherFragColor;\n"
-    "\n"
-    "  void main() {\n"
-    "  oFragColor = texture(uTexSampler, vTexCoords);\n"
-    "  oOtherFragColor = oFragColor;\n"
-    "  }";
+  "#version 300 es\n"
+  "\n"
+  "  #extension GL_OES_EGL_image_external_essl3 : require\n"
+  "\n"
+  "  precision mediump float;\n"
+  "  uniform samplerExternalOES uTexSampler;\n"
+  "\n"
+  "  in highp vec2 vTexCoords;\n"
+  "  layout(location = 0) out vec4 oFragColor;\n"
+  "  layout(location = 1) out vec4 oOtherFragColor;\n"
+  "\n"
+  "  void main() {\n"
+  "  oFragColor = texture(uTexSampler, vTexCoords);\n"
+  "  oOtherFragColor = oFragColor;\n"
+  "  }";
 const char *ResManager::s_copierVertex =
-    "#version 300 es\n"
-    "\n"
-    "  layout(location = 0) in vec4 aPosition;\n"
-    "  layout(location = 1) in vec2 aTexCoords;\n"
-    "  out vec2 vTexCoords;\n"
-    "\n"
-    "  void main() {\n"
-    "  vTexCoords = aTexCoords;\n"
-    "  gl_Position = aPosition;\n"
-    "  }";
+  "#version 300 es\n"
+  "\n"
+  "  layout(location = 0) in vec4 aPosition;\n"
+  "  layout(location = 1) in vec2 aTexCoords;\n"
+  "  out vec2 vTexCoords;\n"
+  "\n"
+  "  void main() {\n"
+  "  vTexCoords = aTexCoords;\n"
+  "  gl_Position = aPosition;\n"
+  "  }";
 const char *ResManager::s_copierFragment =
-    "#version 300 es\n"
-    "\n"
-    "  precision mediump float;\n"
-    "  uniform sampler2D uTexSampler;\n"
-    "  in highp vec2 vTexCoords;\n"
-    "  out vec4 oFragColor;\n"
-    "\n"
-    "  void main() {\n"
-    "  oFragColor = texture(uTexSampler, vTexCoords);\n"
-    "  }";
+  "#version 300 es\n"
+  "\n"
+  "  precision mediump float;\n"
+  "  uniform sampler2D uTexSampler;\n"
+  "  in highp vec2 vTexCoords;\n"
+  "  out vec4 oFragColor;\n"
+  "\n"
+  "  void main() {\n"
+  "  oFragColor = texture(uTexSampler, vTexCoords);\n"
+  "  }";

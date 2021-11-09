@@ -15,8 +15,9 @@ namespace clt {
   class Surface;
 
   class Recorder final
-      : public IComFunc<std::shared_ptr<Copier>>,
-        public ICopierSurface<std::shared_ptr<Surface>> {
+    : public IComFunc<std::shared_ptr<Copier>>,
+      public ICopierSurface<std::shared_ptr<Surface>> {
+  ClassDeclare(Recorder)
   public:
     Recorder();
 

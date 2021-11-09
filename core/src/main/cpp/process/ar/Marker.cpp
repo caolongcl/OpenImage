@@ -44,7 +44,8 @@ const std::vector<Marker::Item> &Marker::GetMakers() const {
   return m_makersVec;
 }
 
-void Marker::detect(cv::Mat &imgGray, std::vector<Item> &possibleMarkers, int minContoursNum, int minSideLength) {
+void Marker::detect(cv::Mat &imgGray, std::vector<Item> &possibleMarkers, int minContoursNum,
+                    int minSideLength) {
   cv::Mat imgBin;
 
   // 自适应二值化
@@ -73,7 +74,7 @@ void Marker::detect(cv::Mat &imgGray, std::vector<Item> &possibleMarkers, int mi
     }
   }
 
-  Log::n(Log::PROCESSOR_TAG, "mark contour size %d size1 %d", allContours.size(), contours.size());
+  Log::n(target, "mark contour size %d size1 %d", allContours.size(), contours.size());
 
   std::vector<cv::Point> approxPolygon;
   for (auto &contour : contours) {
@@ -81,7 +82,7 @@ void Marker::detect(cv::Mat &imgGray, std::vector<Item> &possibleMarkers, int mi
     double eps = contour.size() * APPROXIMATION_CURVE_EPS; // 点距离拟合线段最大距离
     cv::approxPolyDP(contour, approxPolygon, eps, true);
 
-    Log::n(Log::PROCESSOR_TAG, "mark contour2 size %d size1 %d", contour.size(), approxPolygon.size());
+    Log::n(target, "mark contour2 size %d size1 %d", contour.size(), approxPolygon.size());
 
     // 必须4个点，凸多边形
     if (approxPolygon.size() == 4 && cv::isContourConvex(approxPolygon)) {
@@ -114,7 +115,8 @@ void Marker::detect(cv::Mat &imgGray, std::vector<Item> &possibleMarkers, int mi
   }
 }
 
-void Marker::recognize(cv::Mat &imgGray, std::vector<Item> &possibleMarkers, const std::vector<Code> &codes,
+void Marker::recognize(cv::Mat &imgGray, std::vector<Item> &possibleMarkers,
+                       const std::vector<Code> &codes,
                        std::vector<Item> &finalMarkers) {
   finalMarkers.clear();
 
@@ -129,7 +131,7 @@ void Marker::recognize(cv::Mat &imgGray, std::vector<Item> &possibleMarkers, con
   for (auto &possibleMarker : possibleMarkers) {
 //        cv::InputArray A(possibleMarker.corners);
 //        cv::InputArray B(dstMakerCoords);
-//        Log::v(Log::PROCESSOR_TAG, "marker contour checkVector %d %d", A.getMat().checkVector(2, CV_32F),
+//        Log::v(target, "marker contour checkVector %d %d", A.getMat().checkVector(2, CV_32F),
 //               B.getMat().checkVector(2, CV_32F));
     cv::Mat M = cv::getPerspectiveTransform(possibleMarker.corners, dstMakerCoords);
     cv::warpPerspective(imgGray, markerImage, M, cv::Size(MARKER_SIZE, MARKER_SIZE));
@@ -141,7 +143,7 @@ void Marker::recognize(cv::Mat &imgGray, std::vector<Item> &possibleMarkers, con
       decodeMarker(markerImage, bitMatrix);
 
       Code code = hammingCode(bitMatrix);
-      Log::n(Log::PROCESSOR_TAG, "marker hammingCode origin %s", code.to_string().c_str());
+      Log::n(target, "marker hammingCode origin %s", code.to_string().c_str());
 
       int rotateCounts;
       int id;
@@ -175,7 +177,7 @@ bool Marker::validMarkerByBoard(const cv::Mat &image) {
     for (int x = 0; x < 7; x += cellDelta) {
       int cellX = x * MARKER_CELL_SIZE;
       int countNonZeros = cv::countNonZero(
-          image(cv::Rect(cellX, cellY, MARKER_CELL_SIZE, MARKER_CELL_SIZE)));
+        image(cv::Rect(cellX, cellY, MARKER_CELL_SIZE, MARKER_CELL_SIZE)));
       if (countNonZeros > MARKER_CELL_SIZE * MARKER_CELL_SIZE / 4) {
         return false;
       }
@@ -194,7 +196,7 @@ void Marker::decodeMarker(cv::Mat &image, cv::Mat &bitMatrix) {
     for (int x = 0; x < 5; ++x) {
       int cellX = (x + 1) * MARKER_CELL_SIZE;
       int countNonZeros = countNonZero(
-          image(cv::Rect(cellX, cellY, MARKER_CELL_SIZE, MARKER_CELL_SIZE)));
+        image(cv::Rect(cellX, cellY, MARKER_CELL_SIZE, MARKER_CELL_SIZE)));
       if (countNonZeros > MARKER_CELL_SIZE * MARKER_CELL_SIZE / 2)
         bitMatrix.at<uchar>(y, x) = 1;
       else

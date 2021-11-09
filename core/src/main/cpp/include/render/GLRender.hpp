@@ -38,8 +38,8 @@ namespace clt {
    * 控制整个渲染流程
    */
   class GLRender final
-      : public IComFunc<std::shared_ptr<PreviewControllerCallback>>,
-        public MsgHandler {
+    : public IComFunc<std::shared_ptr<PreviewControllerCallback>>,
+      public MsgHandler {
   ClassDeclare(GLRender)
   MsgDefine(post_info)
 

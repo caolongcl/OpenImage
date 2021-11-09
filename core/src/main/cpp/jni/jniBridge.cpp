@@ -20,10 +20,10 @@ static ANativeWindow *gWindowCapture = nullptr;
 static ANativeWindow *gWindowRecord = nullptr;
 
 #define CheckPreviewController(pos) \
-if (gPreviewController == nullptr) {Log::w(Log::JNI_TAG, "PreviewController don`t exist in %s", #pos); return;}
+if (gPreviewController == nullptr) {Log::w("JniBridge", "PreviewController don`t exist in %s", #pos); return;}
 
 #define CheckPreviewControllerRet(pos) \
-if (gPreviewController == nullptr) {Log::w(Log::JNI_TAG, "PreviewController don`t exist in %s", #pos); return nullptr;}
+if (gPreviewController == nullptr) {Log::w("JniBridge", "PreviewController don`t exist in %s", #pos); return nullptr;}
 
 
 extern "C" JNIEXPORT
@@ -352,34 +352,34 @@ jstring JNICALL NativeGetParams(JNIEnv *env,
 // 为注册的jni接口的类名
 static const char *JNIREG_CLASS = "com/cwdx/core/preview/PreviewController";
 static JNINativeMethod sMethods[] = {
-    {"NativeInit",                 "()V",                                     (void *) NativeInit},
-    {"NativeDeInit",               "()V",                                     (void *) NativeDeInit},
-    {"NativeCreate",               "()V",                                     (void *) NativeCreate},
-    {"NativeDestroy",              "()V",                                     (void *) NativeDestroy},
-    {"NativeSetPreviewMode",       "(IIZZII)V",                               (void *) NativeSetPreviewMode},
-    {"NativeStart",                "()V",                                     (void *) NativeStart},
-    {"NativeResume",               "()V",                                     (void *) NativeResume},
-    {"NativePause",                "()V",                                     (void *) NativePause},
-    {"NativeStop",                 "()V",                                     (void *) NativeStop},
-    {"NativeNotifyFrameAvailable", "()V",                                     (void *) NativeNotifyFrameAvailable},
-    {"NativeSetSurface",           "(ILandroid/view/Surface;)V",              (void *) NativeSetSurface},
-    {"NativeSetSurfaceSize",       "(II)V",                                   (void *) NativeSetSurfaceSize},
-    {"NativeCapture",              "()V",                                     (void *) NativeCapture},
-    {"NativeRecord",               "(ZIF)V",                                  (void *) NativeRecord},
-    {"NativeSetFloatVar",          "(Ljava/lang/String;[F)V",                 (void *) NativeSetFloatVar},
-    {"NativeSetBoolVar",           "(Ljava/lang/String;Z)V",                  (void *) NativeSetBoolVar},
-    {"NativeSetIntVar",            "(Ljava/lang/String;[I)V",                 (void *) NativeSetIntVar},
-    {"NativeSetStringVar",         "(Ljava/lang/String;Ljava/lang/String;)V", (void *) NativeSetStringVar},
-    {"NativeEnableFilter",         "(Ljava/lang/String;Z)V",                  (void *) NativeEnableFilter},
-    {"NativeEnableProcess",        "(Ljava/lang/String;Z)V",                  (void *) NativeEnableProcess},
-    {"NativeUpdateTargetPos",      "(II)V",                                   (void *) NativeUpdateTargetPos},
-    {"NativeSetCalibrateParams",   "(IIFFFF)V",                               (void *) NativeSetCalibrateParams},
-    {"NativeGetParams",            "(Ljava/lang/String;)Ljava/lang/String;",  (void *) NativeGetParams},
+  {"NativeInit",                 "()V",                                     (void *) NativeInit},
+  {"NativeDeInit",               "()V",                                     (void *) NativeDeInit},
+  {"NativeCreate",               "()V",                                     (void *) NativeCreate},
+  {"NativeDestroy",              "()V",                                     (void *) NativeDestroy},
+  {"NativeSetPreviewMode",       "(IIZZII)V",                               (void *) NativeSetPreviewMode},
+  {"NativeStart",                "()V",                                     (void *) NativeStart},
+  {"NativeResume",               "()V",                                     (void *) NativeResume},
+  {"NativePause",                "()V",                                     (void *) NativePause},
+  {"NativeStop",                 "()V",                                     (void *) NativeStop},
+  {"NativeNotifyFrameAvailable", "()V",                                     (void *) NativeNotifyFrameAvailable},
+  {"NativeSetSurface",           "(ILandroid/view/Surface;)V",              (void *) NativeSetSurface},
+  {"NativeSetSurfaceSize",       "(II)V",                                   (void *) NativeSetSurfaceSize},
+  {"NativeCapture",              "()V",                                     (void *) NativeCapture},
+  {"NativeRecord",               "(ZIF)V",                                  (void *) NativeRecord},
+  {"NativeSetFloatVar",          "(Ljava/lang/String;[F)V",                 (void *) NativeSetFloatVar},
+  {"NativeSetBoolVar",           "(Ljava/lang/String;Z)V",                  (void *) NativeSetBoolVar},
+  {"NativeSetIntVar",            "(Ljava/lang/String;[I)V",                 (void *) NativeSetIntVar},
+  {"NativeSetStringVar",         "(Ljava/lang/String;Ljava/lang/String;)V", (void *) NativeSetStringVar},
+  {"NativeEnableFilter",         "(Ljava/lang/String;Z)V",                  (void *) NativeEnableFilter},
+  {"NativeEnableProcess",        "(Ljava/lang/String;Z)V",                  (void *) NativeEnableProcess},
+  {"NativeUpdateTargetPos",      "(II)V",                                   (void *) NativeUpdateTargetPos},
+  {"NativeSetCalibrateParams",   "(IIFFFF)V",                               (void *) NativeSetCalibrateParams},
+  {"NativeGetParams",            "(Ljava/lang/String;)Ljava/lang/String;",  (void *) NativeGetParams},
 };
 
 static const char *JNIREG_FFMPEG_CLASS = "com/cwdx/core/preview/FFmpegUtils";
 static JNINativeMethod sFFmpegMethods[] = {
-    {"NativeSetFFmpegDebug", "(Z)V", (void *) NativeSetFFmpegDebug},
+  {"NativeSetFFmpegDebug", "(Z)V", (void *) NativeSetFFmpegDebug},
 };
 
 static int registerNativeMethods(JNIEnv *env, const char *className,

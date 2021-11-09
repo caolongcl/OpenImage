@@ -22,6 +22,7 @@ namespace clt {
    */
   class OESCopier final : public IComFunc<>,
                           public Observable<OPreviewSize> {
+  ClassDeclare(OESCopier)
   VarDeclare(vflip)
   VarDeclare(hflip)
   VarDeclare(ratio)

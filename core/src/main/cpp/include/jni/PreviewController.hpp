@@ -18,9 +18,10 @@ namespace clt {
    * 控制整个预览、拍照、录制等流程
    */
   class PreviewController final
-      : public IComFunc<>,
-        public PreviewControllerCallback,
-        public std::enable_shared_from_this<PreviewControllerCallback> {
+    : public IComFunc<>,
+      public PreviewControllerCallback,
+      public std::enable_shared_from_this<PreviewControllerCallback> {
+  ClassDeclare(PreviewController);
   public:
     PreviewController();
 

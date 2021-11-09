@@ -8,21 +8,21 @@
 using namespace clt;
 
 ThreadPool::ThreadPool(std::string name, int numThreads)
-    : m_numThreads(numThreads),
-      m_taskQueue(MAX_TASKS),
-      m_syncStop(true),
-      m_name(std::move(name)),
-      m_running(false) {
+  : m_numThreads(numThreads),
+    m_taskQueue(MAX_TASKS),
+    m_syncStop(true),
+    m_name(std::move(name)),
+    m_running(false) {
 }
 
 ThreadPool::ThreadPool(std::string name,
                        bool syncStop,
                        int numThreads)
-    : m_numThreads(numThreads),
-      m_taskQueue(MAX_TASKS),
-      m_syncStop(syncStop),
-      m_name(std::move(name)),
-      m_running(false) {
+  : m_numThreads(numThreads),
+    m_taskQueue(MAX_TASKS),
+    m_syncStop(syncStop),
+    m_name(std::move(name)),
+    m_running(false) {
 }
 
 void ThreadPool::Start() {

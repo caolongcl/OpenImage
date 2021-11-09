@@ -9,7 +9,7 @@ using namespace clt;
 bool GrayscaleTexture::Init() {
   Texture::Init();
 
-  Log::v(Log::RENDER_TAG, "GrayscaleTexture::Init id %d", m_id);
+  Log::v(target, "GrayscaleTexture::Init id %d", m_id);
 
   bool hasError = false;
 

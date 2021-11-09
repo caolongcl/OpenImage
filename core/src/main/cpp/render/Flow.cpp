@@ -16,7 +16,7 @@ Flow::Flow()
 }
 
 bool Flow::Init() {
-  Log::v(Log::RENDER_TAG, "Flow::Init");
+  Log::v(target, "Flow::Init");
 
   // 基本线程
   m_render = std::make_shared<GLThread>("render");
@@ -38,7 +38,7 @@ void Flow::DeInit() {
   m_shared->DeInit();
   m_shared = nullptr;
 
-  Log::v(Log::RENDER_TAG, "Flow::DeInit");
+  Log::v(target, "Flow::DeInit");
 }
 
 void Flow::Post(const Task &t, const std::string &name) {

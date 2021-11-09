@@ -15,16 +15,16 @@
 using namespace clt;
 
 FaceDetector::FaceDetector()
-    : m_faceCascade(new CascadeClassifierFaceDetector()),
-      m_timeStatics() {
+  : m_faceCascade(new CascadeClassifierFaceDetector()),
+    m_timeStatics() {
 
 }
 
 bool FaceDetector::Init() {
-  Log::v(Log::PROCESSOR_TAG, "FaceDetector::Init");
+  Log::v(target, "FaceDetector::Init");
 
   const std::string file =
-      ResManager::Self()->GetResAbsolutePath("/opencv/haarcascade_frontalface_alt.xml");
+    ResManager::Self()->GetResAbsolutePath("/opencv/haarcascade_frontalface_alt.xml");
   m_faceCascade->Init(file);
 
   m_timeStatics.Init();
@@ -40,7 +40,7 @@ void FaceDetector::DeInit() {
   m_faceCascade->DeInit();
   m_timeStatics.DeInit();
 
-  Log::v(Log::PROCESSOR_TAG, "FaceDetector::DeInit");
+  Log::v(target, "FaceDetector::DeInit");
 }
 
 void FaceDetector::Process(std::shared_ptr<Buffer> buf) {
@@ -48,15 +48,15 @@ void FaceDetector::Process(std::shared_ptr<Buffer> buf) {
 
   process(*buf);
 
-  Log::n(Log::PROCESSOR_TAG, "face detect period %d ms", (Utils::CurTimeMilli() - lastTime));
+  Log::n(target, "face detect period %d ms", (Utils::CurTimeMilli() - lastTime));
 
   Log::debug([this, lastTime]() {
     m_timeStatics.Update(lastTime, [](long period) {
       TextInfo textInfo("face_detect:" + std::to_string(period) + "ms");
       textInfo.position = {100.0f, 200.0f};
       Flow::Self()->SendMsg(
-          TextMsg(Copier::target, Copier::msg_detect_face_info,
-                  std::make_shared<TextMsgData>(std::move(textInfo))));
+        TextMsg(Copier::target, Copier::msg_detect_face_info,
+                std::make_shared<TextMsgData>(std::move(textInfo))));
     });
   });
 }
@@ -77,7 +77,7 @@ void FaceDetector::process(const Buffer &buf) {
     m_faceCascade->Detect(frameGray, faces);
 
   } catch (std::exception &e) {
-    Log::e(Log::PROCESSOR_TAG, "face detect exception occur %s", e.what());
+    Log::e(target, "face detect exception occur %s", e.what());
   }
 
   if (faces.empty()) {
@@ -89,7 +89,7 @@ void FaceDetector::process(const Buffer &buf) {
   objects.reserve(faces.size());
 
   for (auto &face : faces) {
-    Log::n(Log::PROCESSOR_TAG, "face region (%d %d %d %d)", face.x, face.y, face.width, face.height);
+    Log::n(target, "face region (%d %d %d %d)", face.x, face.y, face.width, face.height);
 
     objects.emplace_back(Float2(buf.width, buf.height),
                          Float4{(float) face.x, (float) face.y,
@@ -98,5 +98,6 @@ void FaceDetector::process(const Buffer &buf) {
   }
 
   Flow::Self()->SendMsg(
-      PolygonMsg(Copier::target, Copier::msg_detect_face, std::make_shared<PolygonMsgData>(std::move(objects))));
+    PolygonMsg(Copier::target, Copier::msg_detect_face,
+               std::make_shared<PolygonMsgData>(std::move(objects))));
 }

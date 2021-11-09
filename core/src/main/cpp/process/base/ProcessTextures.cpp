@@ -11,7 +11,7 @@ using namespace clt;
 ProcessTextures::ProcessTextures() = default;
 
 bool ProcessTextures::Init() {
-  Log::v(Log::PROCESSOR_TAG, "ProcessTextures::Init");
+  Log::v(target, "ProcessTextures::Init");
 
   for (int i = 0; i < QUEUE_SIZE; ++i) {
     auto texture = std::make_shared<NormalTexture>(Constants::PROCESS_TEXTURE_UNIT);
@@ -48,7 +48,7 @@ void ProcessTextures::DeInit() {
 
   m_textures.clear();
 
-  Log::v(Log::PROCESSOR_TAG, "ProcessTextures::DeInit");
+  Log::v(target, "ProcessTextures::DeInit");
 }
 
 std::shared_ptr<Texture> ProcessTextures::PopWriteTexture() {

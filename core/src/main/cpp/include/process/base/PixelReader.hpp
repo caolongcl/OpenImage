@@ -13,6 +13,7 @@ namespace clt {
    * 从RGBA格式的纹理中读取颜色数据
    */
   class PixelReaderPbo final : public IPixelReader {
+  ClassDeclare(PixelReaderPbo);
   public:
     PixelReaderPbo();
 

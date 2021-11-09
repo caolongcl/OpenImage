@@ -15,7 +15,7 @@ Drawer::Drawer()
 }
 
 bool Drawer::Init(std::shared_ptr<Copier> copier) {
-  Log::v(Log::RENDER_TAG, "Drawer::Init");
+  Log::v(target, "Drawer::Init");
 
   m_copier = std::move(copier);
   m_surface = nullptr;
@@ -31,7 +31,7 @@ void Drawer::DeInit() {
   m_copier = nullptr;
   m_surface = nullptr;
 
-  Log::v(Log::RENDER_TAG, "Drawer::DeInit");
+  Log::v(target, "Drawer::DeInit");
 }
 
 void Drawer::RegisterSurface(std::shared_ptr<Surface> surface) {

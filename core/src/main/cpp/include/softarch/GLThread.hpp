@@ -22,6 +22,7 @@ namespace clt {
   class GLThread final : public IComFunc<std::shared_ptr<EGLCore>, bool>,
                          public IEGL,
                          public IMsg {
+  ClassDeclare(GLThread)
   public:
     explicit GLThread(const std::string &name);
 

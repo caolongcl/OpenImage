@@ -58,17 +58,6 @@ namespace clt {
 #endif
     }
 
-  public:
-    static const char *RENDER_TAG;
-    static const char *JNI_TAG;
-    static const char *PREVIEW_CTRL_TAG;
-    static const char *EGL_TAG;
-    static const char *GUI_TAG;
-    static const char *RES_TAG;
-    static const char *PROCESSOR_TAG;
-    static const char *GLTHREAD_TAG;
-    static const char *FFMPEG_TAG;
-
   private:
     enum LogLevel {
       Null,

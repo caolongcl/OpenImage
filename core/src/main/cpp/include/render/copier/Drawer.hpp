@@ -19,8 +19,9 @@ namespace clt {
    * 将最终的输出绘制到屏幕上
    */
   class Drawer final
-      : public IComFunc<std::shared_ptr<Copier>>,
-        public ICopierSurface<std::shared_ptr<Surface>> {
+    : public IComFunc<std::shared_ptr<Copier>>,
+      public ICopierSurface<std::shared_ptr<Surface>> {
+  ClassDeclare(Drawer)
   public:
     Drawer();
 

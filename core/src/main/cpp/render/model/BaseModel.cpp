@@ -15,7 +15,7 @@ BaseModel::BaseModel()
 }
 
 bool BaseModel::Init() {
-  Log::v(Log::RENDER_TAG, "BaseModel::Init");
+  Log::v(target, "BaseModel::Init");
 
   loadShader();
   loadModels();
@@ -42,7 +42,7 @@ void BaseModel::DeInit() {
   m_colorVars.Clear();
   m_mat4Vars.Clear();
 
-  Log::v(Log::RENDER_TAG, "BaseModel::DeInit");
+  Log::v(target, "BaseModel::DeInit");
 }
 
 void BaseModel::SetVariable(const std::string &varName, const glm::mat4 &var) {

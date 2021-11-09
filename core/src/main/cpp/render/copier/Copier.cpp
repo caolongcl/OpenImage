@@ -25,7 +25,7 @@ Copier::Copier() :
     m_displayParams() {}
 
 bool Copier::Init() {
-  Log::v(Log::RENDER_TAG, "Copier::Init");
+  Log::v(target, "Copier::Init");
 
   m_shader = ResManager::Self()->LoadShader("default");
   assert(m_shader != nullptr);
@@ -61,7 +61,7 @@ void Copier::DeInit() {
 
   m_displayParams = {};
 
-  Log::v(Log::RENDER_TAG, "Copier::DeInit");
+  Log::v(target, "Copier::DeInit");
 }
 
 void Copier::Update() {
@@ -69,7 +69,7 @@ void Copier::Update() {
 }
 
 void Copier::OnUpdate(OPreviewSize &&t) {
-  Log::d(Log::RENDER_TAG, "Copier::OnUpdate preview size (%d %d)", t.width, t.height);
+  Log::d(target, "Copier::OnUpdate preview size (%d %d)", t.width, t.height);
 
   m_previewParams.width = t.width;
   m_previewParams.height = t.height;
@@ -166,7 +166,7 @@ const Viewport &Copier::GetPreviewViewport() const {
 
 void Copier::update() {
   if (!m_displayParams.Valid() || !m_previewParams.Valid()) {
-    Log::w(Log::RENDER_TAG, "Copier::update params invalid, preview(%d %d) display(%d %d)",
+    Log::w(target, "Copier::update params invalid, preview(%d %d) display(%d %d)",
            m_previewParams.width, m_previewParams.height,
            m_displayParams.width, m_displayParams.height);
     return;
@@ -174,7 +174,7 @@ void Copier::update() {
 
   update(m_previewParams, m_displayParams);
 
-  Log::d(Log::RENDER_TAG,
+  Log::d(target,
          "Copier::update preview viewport (%d %d %d %d) display viewport (%d %d %d %d)",
          m_previewParams.viewport.x, m_previewParams.viewport.y,
          m_previewParams.viewport.width, m_previewParams.viewport.height,

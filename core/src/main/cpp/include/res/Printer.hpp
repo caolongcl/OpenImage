@@ -13,8 +13,9 @@
 namespace clt {
 
   class Printer final
-      : public IComFunc<>,
-        public IPrint {
+    : public IComFunc<>,
+      public IPrint {
+  ClassDeclare(Printer)
   public:
 
     bool Init() override;
@@ -27,7 +28,8 @@ namespace clt {
      * 绘制任务
      */
     struct PrintTask {
-      using InnerTask = std::function<TextInfo(const Viewport &displayViewport, const Viewport &realViewport)>;
+      using InnerTask = std::function<TextInfo(const Viewport &displayViewport,
+                                               const Viewport &realViewport)>;
 
       PrintTask(InnerTask &&_task) : task(std::forward<InnerTask>(_task)) {}
 

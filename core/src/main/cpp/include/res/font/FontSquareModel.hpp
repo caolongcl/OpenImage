@@ -13,6 +13,7 @@ namespace clt {
    * 字体绘制
    */
   class FontSquareModel : public IComFunc<> {
+  ClassDeclare(FontSquareModel)
   public:
     FontSquareModel();
 

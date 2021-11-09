@@ -41,8 +41,8 @@ import java.util.concurrent.TimeUnit;
 public class Camera implements ICamera {
   private static final String TAG = "Camera";
   private static final Comparator<Size> comparator = (left, right) ->
-      Long.signum((long) left.getWidth() * left.getHeight() -
-          (long) right.getWidth() * right.getHeight());
+    Long.signum((long) left.getWidth() * left.getHeight() -
+      (long) right.getWidth() * right.getHeight());
   private static Camera instance;
   // 监控摄像头是否可用
   private CameraManager.AvailabilityCallback mAvailabilityCallback = new CameraManager.AvailabilityCallback() {
@@ -89,7 +89,7 @@ public class Camera implements ICamera {
   private Handler mWorkerHandler;
   // 相机会话阶段回调
   private CameraCaptureSession.CaptureCallback mCaptureCallback
-      = new CameraCaptureSession.CaptureCallback() {
+    = new CameraCaptureSession.CaptureCallback() {
     @Override
     public void onCaptureProgressed(@NonNull CameraCaptureSession session,
                                     @NonNull CaptureRequest request,
@@ -157,7 +157,7 @@ public class Camera implements ICamera {
   @Override
   public void Create(@NonNull Context context) {
     mCameraManager = (CameraManager) context.getApplicationContext()
-        .getSystemService(Context.CAMERA_SERVICE);
+      .getSystemService(Context.CAMERA_SERVICE);
 
     queryDeviceParam(context);
     queryCamera(mCameraManager);
@@ -228,7 +228,7 @@ public class Camera implements ICamera {
             mPreviewRequestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
             // 自动对焦
             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
-                CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+              CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
 
             mPreviewRequest = mPreviewRequestBuilder.build();
             mCaptureSession.setRepeatingRequest(mPreviewRequest, mCaptureCallback, mWorkerHandler);
@@ -239,7 +239,7 @@ public class Camera implements ICamera {
 
         @Override
         public void onConfigureFailed(
-            @NonNull CameraCaptureSession cameraCaptureSession) {
+          @NonNull CameraCaptureSession cameraCaptureSession) {
           CLog.e(TAG, "创建预览失败");
         }
       }, mWorkerHandler);
@@ -300,7 +300,7 @@ public class Camera implements ICamera {
       Param param;
       for (String cameraId : manager.getCameraIdList()) {
         CameraCharacteristics characteristics
-            = manager.getCameraCharacteristics(cameraId);
+          = manager.getCameraCharacteristics(cameraId);
 
         Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
         if (facing == null) {
@@ -308,7 +308,7 @@ public class Camera implements ICamera {
         }
 
         StreamConfigurationMap map = characteristics.get(
-            CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+          CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
         if (map == null) {
           continue;
         }
@@ -456,8 +456,8 @@ public class Camera implements ICamera {
     @NonNull
     public String dumpParam() {
       Gson gson = new GsonBuilder()
-          .setPrettyPrinting()
-          .create();
+        .setPrettyPrinting()
+        .create();
 
       JsonObject root = new JsonObject();
       root.addProperty("id", cameraId);

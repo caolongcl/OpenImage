@@ -8,6 +8,7 @@
 #include <softarch/Task.hpp>
 #include <utils/Log.hpp>
 #include <softarch/IThreadFunc.hpp>
+#include <softarch/IComFunc.hpp>
 
 namespace clt {
 
@@ -15,6 +16,7 @@ namespace clt {
    * 线程池
    */
   class ThreadPool : public IThreadFunc {
+  ClassDeclare(ThreadPool)
   public:
     ThreadPool(std::string name, int numThreads = std::thread::hardware_concurrency());
 

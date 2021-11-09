@@ -17,7 +17,7 @@ Recorder::Recorder()
 }
 
 bool Recorder::Init(std::shared_ptr<Copier> copier) {
-  Log::v(Log::RENDER_TAG, "Recorder::Init");
+  Log::v(target, "Recorder::Init");
   m_copier = std::move(copier);
   m_surface = nullptr;
   return true;
@@ -30,7 +30,7 @@ void Recorder::DeInit() {
 
   m_copier = nullptr;
   m_recording = false;
-  Log::v(Log::RENDER_TAG, "Recorder::DeInit");
+  Log::v(target, "Recorder::DeInit");
 }
 
 void Recorder::RegisterSurface(std::shared_ptr<Surface> surface) {

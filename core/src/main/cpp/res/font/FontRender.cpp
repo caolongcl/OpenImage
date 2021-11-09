@@ -9,7 +9,7 @@
 using namespace clt;
 
 bool FontRender::Init(std::shared_ptr<CharsGroupGlyph> glyph) {
-  Log::v(Log::RES_TAG, "FontRender::Init");
+  Log::v(target, "FontRender::Init");
 
   m_glyph = std::move(glyph);
   m_charsTexture = std::make_shared<GrayscaleTexture>(GL_TEXTURE1);
@@ -45,7 +45,7 @@ void FontRender::DeInit() {
   m_shader = nullptr;
   m_bgShader = nullptr;
 
-  Log::v(Log::RES_TAG, "FontRender::DeInit");
+  Log::v(target, "FontRender::DeInit");
 }
 
 std::shared_ptr<Texture> &FontRender::GetTexture() {
@@ -75,7 +75,8 @@ void FontRender::RenderBackground(const std::string &text,
       continue;
 
     // 根据左下角原点计算
-    deltaYDown = std::max(static_cast<float>(charGlyph.size.y - charGlyph.bearing.y) * scale, deltaYDown);
+    deltaYDown = std::max(static_cast<float>(charGlyph.size.y - charGlyph.bearing.y) * scale,
+                          deltaYDown);
     bgHeight = std::max(static_cast<float>(charGlyph.size.h) * scale, bgHeight);
 
     // 更新位置到下一个字形的原点，注意单位是1/64像素
@@ -94,14 +95,15 @@ void FontRender::RenderBackground(const std::string &text,
   float startY = (pos.y - deltaYDown) - deltaY;
 
   GLfloat vertices[] = {
-      startX, startY + bgHeight, 0.0f, 0.0f, 0.0f, // 左上角
-      startX, startY, 0.0f, 0.0f, 0.0f,     // 左下角
-      startX + bgWidth, startY, 0.0f, 0.0f, 0.0f, // 右下角
-      startX + bgWidth, startY + bgHeight, 0.0f, 0.0f, 0.0f, // 右上角
+    startX, startY + bgHeight, 0.0f, 0.0f, 0.0f, // 左上角
+    startX, startY, 0.0f, 0.0f, 0.0f,     // 左下角
+    startX + bgWidth, startY, 0.0f, 0.0f, 0.0f, // 右下角
+    startX + bgWidth, startY + bgHeight, 0.0f, 0.0f, 0.0f, // 右上角
   };
 
   // 绘制背景
-  m_square->Bind(m_bgShader->PositionAttributeLocation(), m_bgShader->TexCoordinateAttributeLocation());
+  m_square->Bind(m_bgShader->PositionAttributeLocation(),
+                 m_bgShader->TexCoordinateAttributeLocation());
   m_square->UpdateVertex(vertices, sizeof(vertices));
 
   m_shader->SetFloat4(m_uniformBgLocColor, bgColor);
@@ -146,17 +148,18 @@ void FontRender::RenderText(const std::string &text,
     GLfloat htex = static_cast<float>(charGlyph.size.h) / m_glyph->GetCharGroupSize().h;
 
     GLfloat vertices[] = {
-        xpos, ypos + h, 0.0f, xtex, ytex + htex, // 左上角
-        xpos, ypos, 0.0f, xtex, ytex,     // 左下角
-        xpos + w, ypos, 0.0f, xtex + wtex, ytex, // 右下角
-        xpos + w, ypos + h, 0.0f, xtex + wtex, ytex + htex, // 右上角
+      xpos, ypos + h, 0.0f, xtex, ytex + htex, // 左上角
+      xpos, ypos, 0.0f, xtex, ytex,     // 左下角
+      xpos + w, ypos, 0.0f, xtex + wtex, ytex, // 右下角
+      xpos + w, ypos + h, 0.0f, xtex + wtex, ytex + htex, // 右上角
     };
 
     // 更新位置到下一个字形的原点，注意单位是1/64像素
     startX += static_cast<float>(charGlyph.advance.x >> 6) * scale;
 
     // 绘制字符
-    m_square->Bind(m_shader->PositionAttributeLocation(), m_shader->TexCoordinateAttributeLocation());
+    m_square->Bind(m_shader->PositionAttributeLocation(),
+                   m_shader->TexCoordinateAttributeLocation());
     m_square->UpdateVertex(vertices, sizeof(vertices));
 
     m_shader->SetFloat4(m_uniformTextColorLoc, color);

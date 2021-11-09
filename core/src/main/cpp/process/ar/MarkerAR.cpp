@@ -15,14 +15,14 @@
 using namespace clt;
 
 MarkerAR::MarkerAR()
-    : m_marker(new Marker()),
-      m_cameraDataGot(false),
-      m_timesStatics() {
+  : m_marker(new Marker()),
+    m_cameraDataGot(false),
+    m_timesStatics() {
 
 }
 
 bool MarkerAR::Init() {
-  Log::v(Log::PROCESSOR_TAG, "MarkerAR::Init");
+  Log::v(target, "MarkerAR::Init");
 
   m_timesStatics.Init();
   m_marker->Init();
@@ -42,7 +42,7 @@ bool MarkerAR::Init() {
   // 加载校正参数
   m_calibrateData = ResManager::Self()->LoadCalibrateParams();
 
-  Log::d(Log::PROCESSOR_TAG, "marker detect calibrate params:%s", m_calibrateData.GetJsonString().c_str());
+  Log::d(target, "marker detect calibrate params:%s", m_calibrateData.GetJsonString().c_str());
 
   return true;
 }
@@ -55,7 +55,7 @@ void MarkerAR::DeInit() {
   m_timesStatics.DeInit();
   m_marker->DeInit();
 
-  Log::v(Log::PROCESSOR_TAG, "MarkerAR::DeInit");
+  Log::v(target, "MarkerAR::DeInit");
 }
 
 void MarkerAR::Process(std::shared_ptr<Buffer> buf) {
@@ -64,7 +64,7 @@ void MarkerAR::Process(std::shared_ptr<Buffer> buf) {
   process(*buf);
 
   long delta = Utils::CurTimeMilli() - lastTime;
-  Log::n(Log::PROCESSOR_TAG, "marker detect period %d ms", delta);
+  Log::n(target, "marker detect period %d ms", delta);
 
   if (delta < 10) {
     std::this_thread::sleep_for(std::chrono::milliseconds(10 - delta));
@@ -75,8 +75,8 @@ void MarkerAR::Process(std::shared_ptr<Buffer> buf) {
       TextInfo textInfo("marker_detect:" + std::to_string(period) + "ms");
       textInfo.position = {100.0f, 200.0f};
       Flow::Self()->SendMsg(
-          TextMsg(Copier::target, Copier::msg_detect_marker_info,
-                  std::make_shared<TextMsgData>(std::move(textInfo))));
+        TextMsg(Copier::target, Copier::msg_detect_marker_info,
+                std::make_shared<TextMsgData>(std::move(textInfo))));
     });
   });
 }
@@ -92,7 +92,7 @@ void MarkerAR::process(const Buffer &buf) {
     m_marker->Detect(frameGray);
 
   } catch (std::exception &e) {
-    Log::e(Log::PROCESSOR_TAG, "marker detect exception occur %s", e.what());
+    Log::e(target, "marker detect exception occur %s", e.what());
   }
 
   auto &makers = m_marker->GetMakers();
@@ -106,12 +106,12 @@ void MarkerAR::process(const Buffer &buf) {
   polygonObjects.reserve(makers.size());
 
   for (auto &marker : makers) {
-    Log::n(Log::PROCESSOR_TAG, "mark id %d :", marker.id);
+    Log::n(target, "mark id %d :", marker.id);
     std::vector<Float2> points;
     points.reserve(marker.corners.size());
 
     for (auto &point : marker.corners) {
-      Log::n(Log::PROCESSOR_TAG, "region (%f %f)", point.x, point.y);
+      Log::n(target, "region (%f %f)", point.x, point.y);
       points.emplace_back(point.x, point.y);
     }
 
@@ -124,7 +124,7 @@ void MarkerAR::process(const Buffer &buf) {
 
   /// 2. 绘制 AR 模型
   if (!m_cameraDataGot) {
-    Log::e(Log::PROCESSOR_TAG, "no camera params");
+    Log::e(target, "no camera params");
     return;
   }
 
@@ -137,7 +137,7 @@ void MarkerAR::process(const Buffer &buf) {
   float near = 0.01f;
   float far = 1000.0f;
 
-  Log::n(Log::PROCESSOR_TAG, "real image size %f %f", width, height);
+  Log::n(target, "real image size %f %f", width, height);
 
   std::vector<BaseModelObject> baseModelObjects;
   baseModelObjects.reserve(makers.size());
@@ -188,12 +188,12 @@ void MarkerAR::process(const Buffer &buf) {
                                     BlueColor);
     }
   } catch (std::exception &e) {
-    Log::e(Log::PROCESSOR_TAG, "camera estimate exception occur %s", e.what());
+    Log::e(target, "camera estimate exception occur %s", e.what());
   }
 
   Flow::Self()->SendMsg(BaseModelMsg(BaseModel::target, BaseModel::msg_marker_ar,
                                      std::make_shared<BaseModelMsgData>(
-                                         std::move(baseModelObjects))));
+                                       std::move(baseModelObjects))));
 }
 
 
@@ -203,7 +203,7 @@ bool MarkerAR::estimateCameraView(const std::vector<cv::Point3f> &corners3d,
                                   cv::Mat &RMat, cv::Mat &TVec) {
   cv::Mat rotVec;
   if (!cv::solvePnP(corners3d, corners2d, cameraMatrix, distCoeff, rotVec, TVec)) {
-    Log::w(Log::PROCESSOR_TAG, "estimateCameraView failed");
+    Log::w(target, "estimateCameraView failed");
     return false;
   }
 
@@ -215,7 +215,7 @@ bool MarkerAR::estimateCameraView(const std::vector<cv::Point3f> &corners3d,
 //    ss << "camera estimate view " << RMat << std::endl;
 //    ss << "camera estimate view " << TVec << std::endl;
 //
-//    Log::e(Log::PROCESSOR_TAG, "--- %s", ss.str().c_str());
+//    Log::e(target, "--- %s", ss.str().c_str());
   return true;
 }
 
@@ -230,7 +230,7 @@ void MarkerAR::estimateModelView(const cv::Mat &RMat, const cv::Mat &TVec, cv::M
 
 //    std::stringstream ss;
 //    ss << "translation " << translation << std::endl;
-//    Log::e(Log::PROCESSOR_TAG, "=== %s", ss.str().c_str());
+//    Log::e(target, "=== %s", ss.str().c_str());
 
   modelView = cv::Mat::zeros(4, 4, CV_64FC1);
 
@@ -248,7 +248,7 @@ void MarkerAR::estimateModelView(const cv::Mat &RMat, const cv::Mat &TVec, cv::M
 
 //    std::stringstream sss;
 //    sss << "camera estimate view " << modelView << std::endl;
-//    Log::e(Log::PROCESSOR_TAG, "--- %s", sss.str().c_str());
+//    Log::e(target, "--- %s", sss.str().c_str());
 }
 
 void MarkerAR::estimateProjection(const cv::Mat &cameraMatrix,
@@ -273,7 +273,7 @@ void MarkerAR::estimateProjection(const cv::Mat &cameraMatrix,
 //    std::stringstream sss;
 //    sss << "estimateProjection " << projection << std::endl;
 //
-//    Log::e(Log::PROCESSOR_TAG, "--- %s", sss.str().c_str());
+//    Log::e(target, "--- %s", sss.str().c_str());
 }
 
 void MarkerAR::convertMatToGlm(const cv::Mat &modelView, const cv::Mat &projection,
@@ -314,7 +314,7 @@ void MarkerAR::getMarkerRealCoordinates(std::vector<cv::Point3f> &coords, Float2
   coords.emplace_back(0.5 * markerSize.w, -0.5 * markerSize.h, 0.0); // 右上角
 
 //    for (int i = 0; i < coords.size(); ++i) {
-//        Log::e(Log::PROCESSOR_TAG, "3d coords %f %f %f", coords[i].x, coords[i].y, coords[i].z);
+//        Log::e(target, "3d coords %f %f %f", coords[i].x, coords[i].y, coords[i].z);
 //    }
 }
 
@@ -327,8 +327,8 @@ void MarkerAR::getMarkerCoordinates(const std::vector<cv::Point2f> &bufCoords,
     coords.emplace_back(point.x / bufRatio, point.y / bufRatio);
   }
 
-//    Log::e(Log::PROCESSOR_TAG, "marker coords ------------------");
+//    Log::e(target, "marker coords ------------------");
 //    for (int i = 0; i < coords.size(); ++i) {
-//        Log::e(Log::PROCESSOR_TAG, "marker coords %f %f", coords[i].x, coords[i].y);
+//        Log::e(target, "marker coords %f %f", coords[i].x, coords[i].y);
 //    }
 }

@@ -15,7 +15,7 @@ Capturer::Capturer()
 }
 
 bool Capturer::Init(std::shared_ptr<Copier> copier) {
-  Log::v(Log::RENDER_TAG, "Capturer::Init");
+  Log::v(target, "Capturer::Init");
 
   m_copier = std::move(copier);
   m_surface = nullptr;
@@ -29,7 +29,7 @@ void Capturer::DeInit() {
 
   m_copier = nullptr;
   m_surface = nullptr;
-  Log::v(Log::RENDER_TAG, "Capturer::DeInit");
+  Log::v(target, "Capturer::DeInit");
 }
 
 void Capturer::RegisterSurface(std::shared_ptr<Surface> surface) {

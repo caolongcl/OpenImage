@@ -9,7 +9,7 @@ using namespace clt;
 std::mutex WorkerFlow::s_mutex;
 
 bool WorkerFlow::Init() {
-  Log::v(Log::PROCESSOR_TAG, "WorkerFlow::Init");
+  Log::v(target, "WorkerFlow::Init");
 
   {
     std::lock_guard<std::mutex> locker(s_mutex);
@@ -24,7 +24,7 @@ bool WorkerFlow::Init() {
 void WorkerFlow::DeInit() {
   m_pool->Stop();
   m_pool = nullptr;
-  Log::v(Log::PROCESSOR_TAG, "WorkerFlow::DeInit");
+  Log::v(target, "WorkerFlow::DeInit");
 }
 
 void WorkerFlow::Post(const Task &t) {

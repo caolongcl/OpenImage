@@ -7,8 +7,8 @@
 using namespace clt;
 
 FontSquareModel::FontSquareModel()
-    : m_vertexVbo(0),
-      m_ebo(0) {
+  : m_vertexVbo(0),
+    m_ebo(0) {
 }
 
 bool FontSquareModel::Init() {
@@ -28,8 +28,8 @@ bool FontSquareModel::Init() {
 
   // 绘制索引
   short index[] = {
-      0, 1, 2, // 左下三角形
-      0, 2, 3  // 右上三角形
+    0, 1, 2, // 左下三角形
+    0, 2, 3  // 右上三角形
   };
 
   gles::CreateXbo(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW,

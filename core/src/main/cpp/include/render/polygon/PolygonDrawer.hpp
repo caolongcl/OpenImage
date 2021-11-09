@@ -11,7 +11,7 @@ namespace clt {
   class PolygonDrawer : public FilterCom {
   public:
     PolygonDrawer(const std::string &type, const int priority = PriorityNormal)
-        : FilterCom(type, priority) {};
+      : FilterCom(type, priority) {};
 
     virtual ~PolygonDrawer() = default;
 

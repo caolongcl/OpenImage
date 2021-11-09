@@ -12,6 +12,7 @@ namespace clt {
    * 单通道纹理，主要用来渲染字体
    */
   class GrayscaleTexture final : public Texture {
+  ClassDeclare(GrayscaleTexture)
   public:
     GrayscaleTexture() = default;
 

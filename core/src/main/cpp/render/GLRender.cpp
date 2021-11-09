@@ -36,7 +36,7 @@ GLRender::GLRender()
 }
 
 bool GLRender::Init(InitParamType callback) {
-  Log::v(Log::RENDER_TAG, "GLRender::Init");
+  Log::v(target, "GLRender::Init");
 
   m_capture->Init(m_copier);
   m_recorder->Init(m_copier);
@@ -65,7 +65,7 @@ void GLRender::DeInit() {
   m_recorder->DeInit();
   m_capture->DeInit();
 
-  Log::v(Log::RENDER_TAG, "GLRender::DeInit");
+  Log::v(target, "GLRender::DeInit");
 }
 
 void GLRender::SetPreviewMode(int rotate, int ratio,

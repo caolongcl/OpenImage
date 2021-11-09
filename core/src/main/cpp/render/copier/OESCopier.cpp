@@ -19,7 +19,7 @@ OESCopier::OESCopier() :
 }
 
 bool OESCopier::Init() {
-  Log::v(Log::RENDER_TAG, "OESCopier::Init");
+  Log::v(target, "OESCopier::Init");
 
   m_shader = ResManager::Self()->LoadShader("oes");
   assert(m_shader != nullptr);
@@ -39,7 +39,7 @@ void OESCopier::DeInit() {
   m_shader = nullptr;
   m_input = nullptr;
   m_output = nullptr;
-  Log::v(Log::RENDER_TAG, "OESCopier::DeInit");
+  Log::v(target, "OESCopier::DeInit");
 }
 
 void OESCopier::SetInput(std::shared_ptr<Texture> input) {
@@ -152,7 +152,7 @@ void OESCopier::update() {
     m_output->Upload(targetW, targetH);
   }
 
-  Log::d(Log::RENDER_TAG,
+  Log::d(target,
          "OESCopier::Update clip offset(%f %f) clipped preview size(%d %d)",
          xOffset, yOffset, targetW, targetH);
 }
@@ -171,7 +171,7 @@ void OESCopier::update(int ratio, int originPreviewW, int originPreviewH,
   } else if (ratio == Constants::RATIO_16_9) {
     targetRatio = 16.0f / 9.0f;
   } else {
-    Log::w(Log::RENDER_TAG, "no support this ratio %d", ratio);
+    Log::w(target, "no support this ratio %d", ratio);
     return;
   }
 

@@ -15,6 +15,7 @@ namespace clt {
    */
   class EGLCore final : public IComFunc<>,
                         public IEGL {
+  ClassDeclare(EGLCore)
   public:
     EGLCore();
 

@@ -88,7 +88,8 @@ namespace clt {
      * @param far 远平面
      * @param projection 模拟实际的投影矩阵
      */
-    static void getRealWorldProjection(int width, int height, float near, float far, glm::mat4 &projection);
+    static void
+    getRealWorldProjection(int width, int height, float near, float far, glm::mat4 &projection);
 
     // 测试用
 

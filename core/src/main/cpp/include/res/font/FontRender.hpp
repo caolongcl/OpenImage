@@ -14,7 +14,8 @@ namespace clt {
    * 渲染字符
    */
   class FontRender final
-      : public IComFunc<std::shared_ptr<CharsGroupGlyph>> {
+    : public IComFunc<std::shared_ptr<CharsGroupGlyph>> {
+  ClassDeclare(FontRender)
   public:
     FontRender() = default;
 

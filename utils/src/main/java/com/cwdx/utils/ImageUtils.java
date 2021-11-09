@@ -81,7 +81,7 @@ public final class ImageUtils {
     }
 
     return Bitmap.createBitmap(
-        bitmap, cropRect.left, cropRect.top, cropRect.width(), cropRect.height());
+      bitmap, cropRect.left, cropRect.top, cropRect.width(), cropRect.height());
   }
 
   /**
@@ -104,7 +104,7 @@ public final class ImageUtils {
     }
 
     return Bitmap.createBitmap(
-        bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+      bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
   }
 
   /**
@@ -119,7 +119,7 @@ public final class ImageUtils {
     matrix.preRotate(degree);
 
     return Bitmap.createBitmap(
-        bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+      bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
   }
 
   /**
@@ -134,9 +134,9 @@ public final class ImageUtils {
    */
   public static boolean isAspectRatioValid(Size sourceSize, Rational aspectRatio) {
     return aspectRatio != null
-        && aspectRatio.floatValue() > 0
-        && isCropAspectRatioHasEffect(sourceSize, aspectRatio)
-        && !aspectRatio.isNaN();
+      && aspectRatio.floatValue() > 0
+      && isCropAspectRatioHasEffect(sourceSize, aspectRatio)
+      && !aspectRatio.isNaN();
   }
 
   /**
@@ -177,7 +177,7 @@ public final class ImageUtils {
    * @param rotation Rotation value being applied.
    */
   public static Rational rotate(
-      Rational rational, int rotation) {
+    Rational rational, int rotation) {
     if (rotation == 90 || rotation == 270) {
       return inverseRational(rational);
     }
@@ -186,12 +186,12 @@ public final class ImageUtils {
   }
 
   private static byte[] nv21ToJpeg(byte[] nv21, int width, int height, @Nullable Rect cropRect)
-      throws EncodeFailedException {
+    throws EncodeFailedException {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     YuvImage yuv = new YuvImage(nv21, ImageFormat.NV21, width, height, null);
     boolean success =
-        yuv.compressToJpeg(
-            cropRect == null ? new Rect(0, 0, width, height) : cropRect, 100, out);
+      yuv.compressToJpeg(
+        cropRect == null ? new Rect(0, 0, width, height) : cropRect, 100, out);
     if (!success) {
       throw new EncodeFailedException("YuvImage failed to encode jpeg.");
     }
@@ -221,7 +221,7 @@ public final class ImageUtils {
       yBuffer.get(nv21, position, image.getWidth());
       position += image.getWidth();
       yBuffer.position(
-          Math.min(ySize, yBuffer.position() - image.getWidth() + yPlane.getRowStride()));
+        Math.min(ySize, yBuffer.position() - image.getWidth() + yPlane.getRowStride()));
     }
 
     int chromaHeight = image.getHeight() / 2;
@@ -258,7 +258,7 @@ public final class ImageUtils {
     int denominator = aspectRatio.getDenominator();
 
     return sourceHeight != Math.round((sourceWidth / (float) numerator) * denominator)
-        || sourceWidth != Math.round((sourceHeight / (float) denominator) * numerator);
+      || sourceWidth != Math.round((sourceHeight / (float) denominator) * numerator);
   }
 
   private static Rational inverseRational(Rational rational) {
@@ -266,8 +266,8 @@ public final class ImageUtils {
       return rational;
     }
     return new Rational(
-        /*numerator=*/ rational.getDenominator(),
-        /*denominator=*/ rational.getNumerator());
+      /*numerator=*/ rational.getDenominator(),
+      /*denominator=*/ rational.getNumerator());
   }
 
   private static boolean shouldCropImage(Image image) {
@@ -289,12 +289,12 @@ public final class ImageUtils {
   }
 
   private static byte[] yuvImageToJpegByteArray(Image image)
-      throws EncodeFailedException {
+    throws EncodeFailedException {
     return nv21ToJpeg(
-        yuv_420_888toNv21(image),
-        image.getWidth(),
-        image.getHeight(),
-        shouldCropImage(image) ? image.getCropRect() : null);
+      yuv_420_888toNv21(image),
+      image.getWidth(),
+      image.getHeight(),
+      shouldCropImage(image) ? image.getCropRect() : null);
   }
 
   /**
@@ -327,9 +327,9 @@ public final class ImageUtils {
    */
   public static int convertInt(byte[] data, int offset) {
     return ((data[offset + 3] & 0xff) << 24) |  // A
-        ((data[offset] & 0xff) << 16) |           // R
-        ((data[offset + 1] & 0xff) << 8) |        // G
-        (data[offset + 2] & 0xff);                // B
+      ((data[offset] & 0xff) << 16) |           // R
+      ((data[offset + 1] & 0xff) << 8) |        // G
+      (data[offset + 2] & 0xff);                // B
   }
 
   /**

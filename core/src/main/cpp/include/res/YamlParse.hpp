@@ -7,18 +7,20 @@
 #include <utils/Log.hpp>
 #include <yaml-cpp/yaml.h>
 #include <softarch/std.hpp>
+#include <softarch/IComFunc.hpp>
 
 namespace clt {
   /**
    * 所有的配置信息都使用 YAML 格式存储
    */
   class YamlParse {
+  ClassDeclare(YamlParse)
   public:
     explicit YamlParse(const std::string &file) {
       std::fstream f;
       f.open(file, std::ios::in);
       if (!f.is_open()) {
-        Log::w(Log::RES_TAG, "YamlParse %s invalid", file.c_str());
+        Log::w(target, "YamlParse %s invalid", file.c_str());
         m_valid = false;
       } else {
         m_valid = true;
@@ -45,16 +47,18 @@ namespace clt {
     bool Valid() const {
       return m_valid;
     }
+
   private:
     YAML::Node m_node;
     bool m_valid;
   };
 
   class YamlCreator {
+  ClassDeclare(YamlCreator)
   public:
     explicit YamlCreator(const std::string &file) {
       if (file.empty()) {
-        Log::w(Log::RES_TAG, "YamlCreator %s invalid", file.c_str());
+        Log::w(target, "YamlCreator %s invalid", file.c_str());
       }
       m_file = file;
     }
@@ -69,7 +73,7 @@ namespace clt {
         out << m_emitter.c_str();
         out.flush();
       } else {
-        Log::w(Log::RES_TAG, "YamlCreator %s can't open file", m_file.c_str());
+        Log::w(target, "YamlCreator %s can't open file", m_file.c_str());
       }
       out.close();
     }

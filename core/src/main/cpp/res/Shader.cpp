@@ -9,20 +9,20 @@
 using namespace clt;
 
 Shader::Shader(const unsigned char *program)
-    : m_programId(0) {
+  : m_programId(0) {
   assert(program != nullptr);
-  Log::w(Log::RES_TAG, "don't support program binary");
+  Log::w(target, "don't support program binary");
 }
 
 Shader::Shader(const std::string &vertexSrc, const std::string &fragmentSrc)
-    : m_programId(0) {
+  : m_programId(0) {
   genShaderProgram(vertexSrc, fragmentSrc, "");
 }
 
 Shader::Shader(const std::string &vertexSrc,
                const std::string &fragmentSrc,
                const std::string &computeSrc)
-    : m_programId(0) {
+  : m_programId(0) {
   genShaderProgram(vertexSrc, fragmentSrc, computeSrc);
 }
 
@@ -89,7 +89,7 @@ bool Shader::genShaderProgram(const std::string &vertexSrc,
   m_attrLocColors = glGetAttribLocation(m_programId, "aColor");
   m_uniformLocSampler = glGetUniformLocation(m_programId, "uTexSampler");
 
-  Log::v(Log::RES_TAG,
+  Log::v(target,
          "shader loc: pos %d tex %d color %d sampler %d",
          m_attrLocPosition,
          m_attrLocTexCoords,

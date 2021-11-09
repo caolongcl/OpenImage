@@ -9,12 +9,12 @@ using namespace clt;
 
 #define CheckRet(ret) \
     if (!(ret)) {\
-        Log::e(Log::EGL_TAG,"CheckRet:%s", #ret);\
+        Log::e(EGLCore::target,"CheckRet:%s", #ret);\
         return;}
 
 #define CheckRetExit(ret) \
     if (!(ret)) {\
-        Log::e(Log::EGL_TAG,"CheckRetExit:%s", #ret);\
+        Log::e(EGLCore::target,"CheckRetExit:%s", #ret);\
         exit(EXIT_FAILURE);}
 
 #define EGL_NO_CONFIG (void *)0
@@ -36,7 +36,7 @@ EGLCore::~EGLCore() noexcept {
 }
 
 bool EGLCore::Init() {
-  Log::v(Log::EGL_TAG, "EGLCore::Init");
+  Log::v(target, "EGLCore::Init");
 
   CheckRetExit(createDisplay(m_display));
   CheckRetExit(chooseConfig(m_display, m_config));
@@ -46,14 +46,14 @@ bool EGLCore::Init() {
 }
 
 void EGLCore::DeInit() {
-  Log::v(Log::EGL_TAG, "EGLCore::DeInit");
+  Log::v(target, "EGLCore::DeInit");
 
   m_surfaces.clear();
   destroyContext();
 }
 
 void EGLCore::CreateWindowSurface(const std::string &name, ANativeWindow *window) {
-  Log::v(Log::EGL_TAG, "EGLCore::CreateWindowSurface");
+  Log::v(target, "EGLCore::CreateWindowSurface");
   if (m_surfaces.find(name) != m_surfaces.end()) return;
 
   EGLSurface surface;
@@ -62,7 +62,7 @@ void EGLCore::CreateWindowSurface(const std::string &name, ANativeWindow *window
 }
 
 void EGLCore::CreateOffScreenSurface(const std::string &name) {
-  Log::v(Log::EGL_TAG, "EGLCore::CreateOffScreenSurface");
+  Log::v(target, "EGLCore::CreateOffScreenSurface");
   if (m_surfaces.find(name) != m_surfaces.end()) return;
 
   EGLConfig config;
@@ -104,7 +104,7 @@ void EGLCore::SetPresentationTime(const std::string &name, khronos_stime_nanosec
 }
 
 std::shared_ptr<EGLCore> EGLCore::SharedEGL() {
-  Log::v(Log::EGL_TAG, "EGLCore::SharedEGL");
+  Log::v(target, "EGLCore::SharedEGL");
 
   assert(m_display != EGL_NO_DISPLAY);
   assert(m_config != EGL_NO_CONFIG);
@@ -132,7 +132,7 @@ bool EGLCore::createDisplay(EGLDisplay &display) {
     display = EGL_NO_DISPLAY;
     return false;
   }
-  Log::d(Log::EGL_TAG, "egl version {%d, %d}", majorVersion, minorVersion);
+  Log::d(target, "egl version {%d, %d}", majorVersion, minorVersion);
 
   printEglInfo();
 
@@ -184,7 +184,7 @@ bool EGLCore::createContext(EGLDisplay display, EGLConfig config, EGLContext &co
 
   const unsigned char *glslVersion = glGetString(GL_SHADING_LANGUAGE_VERSION);
   if (glslVersion != nullptr) {
-    Log::i(Log::EGL_TAG, "glsl version %s", glslVersion);
+    Log::i(target, "glsl version %s", glslVersion);
   }
 
   return true;
@@ -297,7 +297,7 @@ bool EGLCore::querySurfaceAttrb(EGLContext context, EGLSurface surface, EGLint w
                                 EGLint &value) {
   if (eglQuerySurface(context, surface, what, &value) != EGL_TRUE) {
     gles::CheckEglError("eglQuerySurface");
-    Log::d(Log::EGL_TAG, "what %d, value %d", what, value);
+    Log::d(target, "what %d, value %d", what, value);
     return false;
   }
   return true;
@@ -327,7 +327,7 @@ void EGLCore::destroyContext() {
       eglDestroyContext(m_display, m_context);
     }
     eglTerminate(m_display);
-    Log::i(Log::EGL_TAG, "EGLCore::destroyContext");
+    Log::i(target, "EGLCore::destroyContext");
   }
 
   m_display = EGL_NO_DISPLAY;
@@ -351,9 +351,9 @@ void EGLCore::printEglInfo() {
   if (m_display == EGL_NO_DISPLAY) {
     return;
   }
-  Log::i(Log::EGL_TAG, "########################## egl display info ##########################");
-  Log::i(Log::EGL_TAG, "%s", eglQueryString(m_display, EGL_VENDOR));
-  Log::i(Log::EGL_TAG, "%s", eglQueryString(m_display, EGL_VERSION));
-  Log::i(Log::EGL_TAG, "%s", eglQueryString(m_display, EGL_EXTENSIONS));
-  Log::i(Log::EGL_TAG, "######################################################################");
+  Log::i(target, "########################## egl display info ##########################");
+  Log::i(target, "%s", eglQueryString(m_display, EGL_VENDOR));
+  Log::i(target, "%s", eglQueryString(m_display, EGL_VERSION));
+  Log::i(target, "%s", eglQueryString(m_display, EGL_EXTENSIONS));
+  Log::i(target, "######################################################################");
 }
