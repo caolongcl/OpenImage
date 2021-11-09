@@ -88,7 +88,7 @@ namespace clt {
                       const std::string &format,
                       Args &&... args) {
 #ifdef __LOG__
-      std::string info = "[" + tag + "] " + format;
+      std::string info = tagAlign(tag) + format;
       __android_log_print(l, TAG, info.c_str(), std::forward<Args>(args)...);
 #endif
     }
@@ -97,9 +97,17 @@ namespace clt {
                       const std::string &tag,
                       const std::string &format) {
 #ifdef __LOG__
-      std::string info = "[" + tag + "] " + format;
+      std::string info = tagAlign(tag) + format;
       __android_log_print(l, TAG, info.c_str(), "");
 #endif
+    }
+
+    inline static std::string tagAlign(const std::string &tag) {
+      if (tag.size() >= 13) {
+        return "[" + tag.substr(0, 13) + "] ";
+      } else {
+        return "[" + tag + std::string(13 - tag.size(), ' ') + "] ";
+      }
     }
   };
 

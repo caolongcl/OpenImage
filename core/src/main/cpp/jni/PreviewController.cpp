@@ -17,10 +17,10 @@
 using namespace clt;
 
 PreviewController::PreviewController()
-    : m_previewing(false),
-      m_rendering(false),
-      m_render(new GLRender()),
-      m_renderDelayCount(0) {
+  : m_previewing(false),
+    m_rendering(false),
+    m_render(new GLRender()),
+    m_renderDelayCount(0) {
 }
 
 void PreviewController::Create(JavaVM *jvm, jobject thiz) {
@@ -80,253 +80,253 @@ void PreviewController::Destroy() {
 
 bool PreviewController::Init() {
   Flow::Self()->PostToRender(
-      [this]() {
-        Log::v(Log::PREVIEW_CTRL_TAG, "PreviewController::Init");
+    [this]() {
+      Log::v(Log::PREVIEW_CTRL_TAG, "PreviewController::Init");
 
-        // 初始化渲染器
-        m_render->Init(shared_from_this());
-      });
+      // 初始化渲染器
+      m_render->Init(shared_from_this());
+    });
 
   return true;
 }
 
 void PreviewController::DeInit() {
   Flow::Self()->PostToRender(
-      [this]() {
-        Log::v(Log::PREVIEW_CTRL_TAG, "DeInit");
+    [this]() {
+      Log::v(Log::PREVIEW_CTRL_TAG, "DeInit");
 
-        m_render->DeInit();
-      });
+      m_render->DeInit();
+    });
 }
 
 void PreviewController::SetPreviewMode(int rotate, int ratio,
                                        bool vFlip, bool hFlip,
                                        int width, int height) {
   Flow::Self()->PostToRender(
-      [this, rotate, ratio, vFlip, hFlip, width, height]() {
-        Log::d(Log::PREVIEW_CTRL_TAG,
-               "SetPreviewMode rotate %d ratio %d vFlip %d hFlip %d previewW %d previewH %d",
-               rotate, ratio, vFlip, hFlip, width, height);
+    [this, rotate, ratio, vFlip, hFlip, width, height]() {
+      Log::d(Log::PREVIEW_CTRL_TAG,
+             "SetPreviewMode rotate %d ratio %d vFlip %d hFlip %d previewW %d previewH %d",
+             rotate, ratio, vFlip, hFlip, width, height);
 
-        // 设置预览基本参数
-        m_render->SetPreviewMode(rotate, ratio, vFlip, hFlip, width, height);
+      // 设置预览基本参数
+      m_render->SetPreviewMode(rotate, ratio, vFlip, hFlip, width, height);
 
-        // 将预览纹理设置给 Java 层相机预览 SurfaceTexture
-        JniUtils::DoOutCurJvm(m_JavaVM, [this](JNIEnv *env) {
-          Log::d(Log::PREVIEW_CTRL_TAG, "CreatePreviewTex :%d", m_render->GetPreviewTexId());
+      // 将预览纹理设置给 Java 层相机预览 SurfaceTexture
+      JniUtils::DoOutCurJvm(m_JavaVM, [this](JNIEnv *env) {
+        Log::d(Log::PREVIEW_CTRL_TAG, "CreatePreviewTex :%d", m_render->GetPreviewTexId());
 
-          env->CallVoidMethod(m_Thiz, m_SetPreviewTextureMethod, m_render->GetPreviewTexId());
-        }, "PreviewController::SetPreviewMode");
-      });
+        env->CallVoidMethod(m_Thiz, m_SetPreviewTextureMethod, m_render->GetPreviewTexId());
+      }, "PreviewController::SetPreviewMode");
+    });
 }
 
 void PreviewController::Start() {
   Flow::Self()->PostToRender(
-      [this]() {
-        Log::d(Log::PREVIEW_CTRL_TAG, "Start");
+    [this]() {
+      Log::d(Log::PREVIEW_CTRL_TAG, "Start");
 
-        m_previewing = true;
+      m_previewing = true;
 
-        // 开启 Java 层相机预览
-        JniUtils::DoOutCurJvm(m_JavaVM, [this](JNIEnv *env) {
-          env->CallVoidMethod(m_Thiz, m_StartPreviewMethod);
-        }, "PreviewController::Start");
-      });
+      // 开启 Java 层相机预览
+      JniUtils::DoOutCurJvm(m_JavaVM, [this](JNIEnv *env) {
+        env->CallVoidMethod(m_Thiz, m_StartPreviewMethod);
+      }, "PreviewController::Start");
+    });
 }
 
 void PreviewController::Resume() {
   Flow::Self()->PostToRender(
-      [this]() {
-        Log::d(Log::PREVIEW_CTRL_TAG, "Resume");
+    [this]() {
+      Log::d(Log::PREVIEW_CTRL_TAG, "Resume");
 
-        m_rendering = true;
-      });
+      m_rendering = true;
+    });
 }
 
 void PreviewController::Pause() {
   Flow::Self()->PostToRender(
-      [this]() {
-        Log::d(Log::PREVIEW_CTRL_TAG, "Pause");
+    [this]() {
+      Log::d(Log::PREVIEW_CTRL_TAG, "Pause");
 
-        m_rendering = false;
+      m_rendering = false;
 
-        // 清空当前滤镜和任务
-        m_render->ClearFilters();
-        m_render->ClearProcessTasks();
-      });
+      // 清空当前滤镜和任务
+      m_render->ClearFilters();
+      m_render->ClearProcessTasks();
+    });
 }
 
 void PreviewController::NotifyFrameAvailable() {
   Flow::Self()->PostToRender(
-      [this]() {
-        if (!m_previewing)
-          return;
+    [this]() {
+      if (!m_previewing)
+        return;
 
-        // SurfaceTexture.updateTexImage，采集的图像到了 PreviewTexture
-        JniUtils::DoOutCurJvm(m_JavaVM, [this](JNIEnv *env) {
-          env->CallVoidMethod(m_Thiz, m_UpdateFrameMethod);
-        }, "PreviewController::NotifyFrameAvailable");
+      // SurfaceTexture.updateTexImage，采集的图像到了 PreviewTexture
+      JniUtils::DoOutCurJvm(m_JavaVM, [this](JNIEnv *env) {
+        env->CallVoidMethod(m_Thiz, m_UpdateFrameMethod);
+      }, "PreviewController::NotifyFrameAvailable");
 
-        if (!m_rendering || m_renderDelayCount++ < 1)
-          return;
+      if (!m_rendering || m_renderDelayCount++ < 1)
+        return;
 
-        // 将PreviewTexture绘制到SurfaceView中显示出来
-        m_render->Render();
-      });
+      // 将PreviewTexture绘制到SurfaceView中显示出来
+      m_render->Render();
+    });
 }
 
 void PreviewController::Stop() {
   Flow::Self()->PostToRender(
-      [this]() {
-        Log::d(Log::PREVIEW_CTRL_TAG, "Stop");
+    [this]() {
+      Log::d(Log::PREVIEW_CTRL_TAG, "Stop");
 
-        m_renderDelayCount = 0;
-        m_previewing = false;
+      m_renderDelayCount = 0;
+      m_previewing = false;
 
-        // 关闭 Java 层相机预览
+      // 关闭 Java 层相机预览
+      JniUtils::DoOutCurJvm(m_JavaVM, [this](JNIEnv *env) {
+        env->CallVoidMethod(m_Thiz, m_StopPreviewMethod);
+      }, "PreviewController::Stop");
+
+      // 停止录制
+      int fps, bitrate;
+      bool recording = m_render->GetRecordState(fps, bitrate);
+      if (recording) {
+        Log::d(Log::PREVIEW_CTRL_TAG, "PreviewController::Stop stop record");
+
+        m_render->Record(false, 0, 0);
+
+        // 创建或销毁 Mediacodec
         JniUtils::DoOutCurJvm(m_JavaVM, [this](JNIEnv *env) {
-          env->CallVoidMethod(m_Thiz, m_StopPreviewMethod);
-        }, "PreviewController::Stop");
-
-        // 停止录制
-        int fps, bitrate;
-        bool recording = m_render->GetRecordState(fps, bitrate);
-        if (recording) {
-          Log::d(Log::PREVIEW_CTRL_TAG, "PreviewController::Stop stop record");
-
-          m_render->Record(false, 0, 0);
-
-          // 创建或销毁 Mediacodec
-          JniUtils::DoOutCurJvm(m_JavaVM, [this](JNIEnv *env) {
-            env->CallVoidMethod(m_Thiz, m_ConfigEncoderMethod, false, 0, 0, 0, 0);
-          });
-        }
-      });
+          env->CallVoidMethod(m_Thiz, m_ConfigEncoderMethod, false, 0, 0, 0, 0);
+        });
+      }
+    });
 }
 
 void PreviewController::SetSurface(int type, ANativeWindow *window) {
   Flow::Self()->PostToRender(
-      [this, type, window]() {
-        Log::d(Log::PREVIEW_CTRL_TAG, "SetSurface %s's surface %s",
-               Constants::SurfaceTypeName(type).c_str(),
-               Utils::GetBoolStr(window != nullptr).c_str());
+    [this, type, window]() {
+      Log::d(Log::PREVIEW_CTRL_TAG, "SetSurface %s's surface %s",
+             Constants::SurfaceTypeName(type).c_str(),
+             Utils::GetBoolStr(window != nullptr).c_str());
 
-        m_render->SetSurface(type, window);
-      });
+      m_render->SetSurface(type, window);
+    });
 }
 
 void PreviewController::SetSurfaceSize(int width, int height) {
   Flow::Self()->PostToRender(
-      [this, width, height]() {
-        Log::d(Log::PREVIEW_CTRL_TAG, "SetSurfaceSize %d %d",
-               width, height);
+    [this, width, height]() {
+      Log::d(Log::PREVIEW_CTRL_TAG, "SetSurfaceSize %d %d",
+             width, height);
 
-        m_render->SetSurfaceSize(width, height);
-      });
+      m_render->SetSurfaceSize(width, height);
+    });
 }
 
 void PreviewController::Capture() {
   Flow::Self()->PostToRender(
-      [this]() {
-        Log::d(Log::PREVIEW_CTRL_TAG, "Capture");
+    [this]() {
+      Log::d(Log::PREVIEW_CTRL_TAG, "Capture");
 
-        if (m_previewing && m_rendering) {
-          m_render->Capture();
-        }
-      });
+      if (m_previewing && m_rendering) {
+        m_render->Capture();
+      }
+    });
 }
 
 void PreviewController::Record(bool start, int fps, float factor) {
   Flow::Self()->PostToRender(
-      [this, start, fps, factor]() {
-        int bitrate = 0;
-        int width, height;
-        m_render->GetCaptureSize(width, height);
-        bitrate = static_cast<int>(static_cast<float >(width * height * fps) * factor);
+    [this, start, fps, factor]() {
+      int bitrate = 0;
+      int width, height;
+      m_render->GetCaptureSize(width, height);
+      bitrate = static_cast<int>(static_cast<float >(width * height * fps) * factor);
 
-        Log::d(Log::PREVIEW_CTRL_TAG,
-               "Record %s fps %d factor %f bitrate %d",
-               (start ? "start" : "stop"), fps, factor, bitrate);
+      Log::d(Log::PREVIEW_CTRL_TAG,
+             "Record %s fps %d factor %f bitrate %d",
+             (start ? "start" : "stop"), fps, factor, bitrate);
 
-        m_render->Record(start, fps, bitrate);
+      m_render->Record(start, fps, bitrate);
 
-        // 创建或销毁 Mediacodec 录制编码器
-        JniUtils::DoOutCurJvm(m_JavaVM, [&, this](JNIEnv *env) {
-          if (start) {
-            Log::d(Log::PREVIEW_CTRL_TAG,
-                   "start config encoder wh(%d %d) fps %d bitrate %d",
-                   width, height, fps, bitrate);
+      // 创建或销毁 Mediacodec 录制编码器
+      JniUtils::DoOutCurJvm(m_JavaVM, [&, this](JNIEnv *env) {
+        if (start) {
+          Log::d(Log::PREVIEW_CTRL_TAG,
+                 "start config encoder wh(%d %d) fps %d bitrate %d",
+                 width, height, fps, bitrate);
 
-            env->CallVoidMethod(m_Thiz, m_ConfigEncoderMethod, true, width, height, fps,
-                                bitrate);
-          } else {
-            Log::d(Log::PREVIEW_CTRL_TAG, "stop config encoder");
+          env->CallVoidMethod(m_Thiz, m_ConfigEncoderMethod, true, width, height, fps,
+                              bitrate);
+        } else {
+          Log::d(Log::PREVIEW_CTRL_TAG, "stop config encoder");
 
-            env->CallVoidMethod(m_Thiz, m_ConfigEncoderMethod, false, 0, 0, 0, 0);
-          }
-        });
+          env->CallVoidMethod(m_Thiz, m_ConfigEncoderMethod, false, 0, 0, 0, 0);
+        }
       });
+    });
 }
 
 void PreviewController::SetVar(const std::string &name, const Var &var) {
   Flow::Self()->PostToRender(
-      [this, name, var]() {
-        Log::d(Log::PREVIEW_CTRL_TAG, "SetVar %s %s", name.c_str(), var.Dump().c_str());
+    [this, name, var]() {
+      Log::d(Log::PREVIEW_CTRL_TAG, "SetVar %s %s", name.c_str(), var.Dump().c_str());
 
-        if (m_previewing) {
-          m_render->SetVar(name, var);
-        }
-      });
+      if (m_previewing) {
+        m_render->SetVar(name, var);
+      }
+    });
 }
 
 void PreviewController::SetString(const std::string &name, const std::string &str) {
   Flow::Self()->PostToRender(
-      [this, name, str]() {
-        Log::v(Log::PREVIEW_CTRL_TAG, "SetString %s %s", name.c_str(), str.c_str());
-        if (name == "basedir") {
+    [this, name, str]() {
+      Log::v(Log::PREVIEW_CTRL_TAG, "SetString %s %s", name.c_str(), str.c_str());
+      if (name == "basedir") {
 //                    Flow::Self()->PostToShared([str]() {
-          ResManager::Self()->RegisterBaseDir(str);
+        ResManager::Self()->RegisterBaseDir(str);
 //                    });
-        } else if (name == "funcdir") {
+      } else if (name == "funcdir") {
 //                    Flow::Self()->PostToShared([str]() {
-          ResManager::Self()->RegisterFunctionDir(str);
+        ResManager::Self()->RegisterFunctionDir(str);
 //                    });
-        }
-      });
+      }
+    });
 }
 
 void PreviewController::EnableFilter(const std::string &name, bool enable) {
   Flow::Self()->PostToRender(
-      [this, name, enable]() {
-        Log::d(Log::PREVIEW_CTRL_TAG, "EnableFilter %s %s", name.c_str(),
-               Utils::GetBoolStr(enable).c_str());
+    [this, name, enable]() {
+      Log::d(Log::PREVIEW_CTRL_TAG, "EnableFilter %s %s", name.c_str(),
+             Utils::GetBoolStr(enable).c_str());
 
-        if (m_previewing) {
-          m_render->EnableFilter(name, enable);
-        }
-      });
+      if (m_previewing) {
+        m_render->EnableFilter(name, enable);
+      }
+    });
 }
 
 void PreviewController::EnableProcess(const std::string &name, bool enable) {
   Flow::Self()->PostToRender(
-      [this, name, enable]() {
-        Log::d(Log::PREVIEW_CTRL_TAG, "EnableProcess %s %s", name.c_str(),
-               Utils::GetBoolStr(enable).c_str());
+    [this, name, enable]() {
+      Log::d(Log::PREVIEW_CTRL_TAG, "EnableProcess %s %s", name.c_str(),
+             Utils::GetBoolStr(enable).c_str());
 
-        if (m_previewing) {
-          m_render->EnableProcess(name, enable);
-        }
-      });
+      if (m_previewing) {
+        m_render->EnableProcess(name, enable);
+      }
+    });
 }
 
 void PreviewController::UpdateTargetPos(int x, int y) {
   Flow::Self()->PostToRender(
-      [this, x, y]() {
-        if (m_previewing) {
-          // Log::d(Log::PREVIEW_CTRL_TAG, "UpdateTargetPosition x %d y %d", x, y);
-          m_render->UpdateTargetPosition(x, y);
-        }
-      });
+    [this, x, y]() {
+      if (m_previewing) {
+        // Log::d(Log::PREVIEW_CTRL_TAG, "UpdateTargetPosition x %d y %d", x, y);
+        m_render->UpdateTargetPosition(x, y);
+      }
+    });
 }
 
 /**
@@ -388,14 +388,14 @@ void PreviewController::SetCalibrateParams(int boardSizeWidth, int boardSizeHeig
                                            float boardSquareSizeWidth, float boardSquareSizeHeight,
                                            float markerSizeWidth, float markerSizeHeight) {
   Flow::Self()->PostToRender(
-      [this, boardSizeWidth, boardSizeHeight,
-          boardSquareSizeWidth, boardSquareSizeHeight,
-          markerSizeWidth, markerSizeHeight]() {
-        ResManager::Self()->SaveCalibrateParams(
-            {boardSizeWidth, boardSizeHeight},
-            {boardSquareSizeWidth, boardSquareSizeHeight},
-            {markerSizeWidth, markerSizeHeight});
-      });
+    [this, boardSizeWidth, boardSizeHeight,
+      boardSquareSizeWidth, boardSquareSizeHeight,
+      markerSizeWidth, markerSizeHeight]() {
+      ResManager::Self()->SaveCalibrateParams(
+        {boardSizeWidth, boardSizeHeight},
+        {boardSquareSizeWidth, boardSquareSizeHeight},
+        {markerSizeWidth, markerSizeHeight});
+    });
 }
 
 std::string PreviewController::GetParams(const std::string &paramsGroupName) {
@@ -450,7 +450,8 @@ void PreviewController::cacheJniMethod(JNIEnv *env) {
   CheckMethodIDExit(m_UpdateFrameMethod, FromNativeUpdateFrame);
 
   // 创建Java层拍照surface
-  m_CreateImageReaderMethod = env->GetMethodID(previewClass, "FromNativeCreateImageReader", "(II)V");
+  m_CreateImageReaderMethod = env->GetMethodID(previewClass, "FromNativeCreateImageReader",
+                                               "(II)V");
   CheckMethodIDExit(m_CreateImageReaderMethod, FromNativeCreateImageReader);
 
   // 创建Java层录制surface及创建MediaCodec
@@ -458,7 +459,8 @@ void PreviewController::cacheJniMethod(JNIEnv *env) {
   CheckMethodIDExit(m_ConfigEncoderMethod, FromNativeConfigEncoder);
 
   // 在Java层将资源拷贝到应用目录下
-  m_LoadAssetsMethod = env->GetMethodID(previewClass, "FromNativeLoadAssets", "()Ljava/lang/String;");
+  m_LoadAssetsMethod = env->GetMethodID(previewClass, "FromNativeLoadAssets",
+                                        "()Ljava/lang/String;");
   CheckMethodIDExit(m_LoadAssetsMethod, FromNativeLoadAssets);
 
   // 通过Java层显示信息

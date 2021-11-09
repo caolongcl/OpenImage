@@ -15,8 +15,8 @@ import android.widget.Toast;
 import androidx.annotation.IntDef;
 
 import com.cwdx.core.platform.HWEncoder;
-import com.cwdx.utils.ImageUtils;
 import com.cwdx.utils.CLog;
+import com.cwdx.utils.ImageUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
