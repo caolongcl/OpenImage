@@ -22,7 +22,7 @@ ProcessPipe::ProcessPipe()
 bool ProcessPipe::Init() {
   Log::v(target, "ProcessPipe::Init");
 
-  auto thread = Flow::Self()->CreateThread(s_pipeThread, true);
+  auto thread = Flow::Self()->CreateThread(s_pipeThread, true, true);
   if (thread != nullptr) {
     thread->Post([this]() {
       m_textures->Init();
@@ -46,8 +46,8 @@ void ProcessPipe::DeInit() {
     });
   }
 
-  Flow::Self()->DestroyThread(s_dispatchThread);
   Flow::Self()->DestroyThread(s_readTextureThread);
+  Flow::Self()->DestroyThread(s_dispatchThread);
   Flow::Self()->DestroyThread(s_pipeThread);
 
   Log::v(target, "ProcessPipe::DeInit");
@@ -130,6 +130,7 @@ void ProcessPipe::pushTask(const std::string &name) {
       if (m_tasks.find(name) == m_tasks.cend()) {
         auto task = ProcessFactory::Create(name);
         if (task != nullptr) {
+          task->Init();
           if (task->IsBufferProcess()) {
             std::lock_guard<std::mutex> locker(m_dispatchMutex);
             m_tasks[name] = task;
@@ -148,7 +149,9 @@ void ProcessPipe::popTask(const std::string &name) {
   auto thread = Flow::Self()->GetThread(s_pipeThread);
   if (thread != nullptr) {
     thread->Post([this, name]() {
-      if (m_tasks.find(name) != m_tasks.cend()) {
+      auto iterator = m_tasks.find(name);
+      if (iterator != m_tasks.cend()) {
+        iterator->second->DeInit();
         std::lock_guard<std::mutex> locker(m_dispatchMutex);
         m_tasks.erase(name);
       }
@@ -176,6 +179,9 @@ void ProcessPipe::clearProcessTasks() {
   auto thread = Flow::Self()->GetThread(s_pipeThread);
   if (thread != nullptr) {
     thread->Post([this]() {
+      for (auto &task:m_tasks) {
+        task.second->DeInit();
+      }
       std::lock_guard<std::mutex> locker(m_dispatchMutex);
       m_tasks.clear();
     });

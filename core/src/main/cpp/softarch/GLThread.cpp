@@ -16,6 +16,14 @@ GLThread::GLThread(const std::string &name)
 
 }
 
+GLThread::GLThread(const std::string &name, bool syncStop)
+  : m_thread(new SingleThreadPool(name, syncStop)),
+    m_egl(nullptr),
+    m_name(name),
+    m_needEgl(true) {
+
+}
+
 bool GLThread::Init(std::shared_ptr<EGLCore> egl, bool needEgl) {
   m_needEgl = needEgl;
 
@@ -57,6 +65,18 @@ void GLThread::DeInit() {
 
 void GLThread::Post(const Task &t) {
   m_thread->AddTask(t);
+}
+
+void GLThread::Clear() {
+  m_thread->Clear();
+}
+
+void GLThread::ClearAndAddLast(const Task &t) {
+  m_thread->ClearAndAddLast(t);
+}
+
+void GLThread::ClearAndAddLast(Task &&t) {
+  m_thread->ClearAndAddLast(std::forward<Task>(t));
 }
 
 std::thread::id GLThread::Id() const {

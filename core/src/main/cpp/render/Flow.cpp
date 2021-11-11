@@ -63,13 +63,13 @@ void Flow::PostToShared(const Task &t) {
   }
 }
 
-std::shared_ptr<GLThread> Flow::CreateThread(const std::string &name, bool needEgl) {
+std::shared_ptr<GLThread> Flow::CreateThread(const std::string &name, bool needEgl, bool syncStop) {
   if (m_flows.find(name) == m_flows.end()) {
     if (m_render == nullptr) {
       return nullptr;
     }
 
-    auto thread = std::make_shared<GLThread>(name);
+    auto thread = std::make_shared<GLThread>(name, syncStop);
     thread->Init(m_render->SelfEGL(), needEgl);
 
     {
@@ -81,6 +81,10 @@ std::shared_ptr<GLThread> Flow::CreateThread(const std::string &name, bool needE
   } else {
     return m_flows.at(name);
   }
+}
+
+std::shared_ptr<GLThread> Flow::CreateThread(const std::string &name, bool needEgl) {
+  return CreateThread(name, needEgl, true);
 }
 
 std::shared_ptr<GLThread> Flow::CreateThread(const std::string &name) {

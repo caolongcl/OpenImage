@@ -10,21 +10,21 @@ using namespace clt;
 
 BufferProcessTask::BufferProcessTask(std::string name, std::shared_ptr<IProcessTask> task)
   : m_name(std::move(name)), m_task(std::move(task)) {
-
   Log::v(target, "BufferProcessTask %s", m_name.c_str());
-
-  m_task->Init();
 }
 
 BufferProcessTask::~BufferProcessTask() {
-  m_task->DeInit();
-
   Log::v(target, "~BufferProcessTask %s", m_name.c_str());
 }
 
-bool BufferProcessTask::Init() { return true; }
+bool BufferProcessTask::Init() {
+  m_task->Init();
+  return true;
+}
 
-void BufferProcessTask::DeInit() {}
+void BufferProcessTask::DeInit() {
+  m_task->DeInit();
+}
 
 void BufferProcessTask::Process(std::shared_ptr<Buffer> buf) {
   if (buf != nullptr) {

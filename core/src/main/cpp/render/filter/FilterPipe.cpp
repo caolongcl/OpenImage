@@ -115,7 +115,7 @@ void FilterPipe::Filter() {
 //  auto time = std::chrono::steady_clock::now();
   static int count = 0;
   ++count;
-  if (count % 15 == 0) {
+//  if (count % 15 == 0) {
     auto processTexture = m_processTextureReader->PopWriteTexture();
     if (processTexture != nullptr) {
       gles::SetViewport(0, 0, processTexture->Width(), processTexture->Height());
@@ -127,7 +127,7 @@ void FilterPipe::Filter() {
       m_processTextureReader->PushReadTexture(processTexture);
       m_processTextureReader->Process();
     }
-  }
+//  }
 
   /// 2. 处理 OESCopier 输出纹理
   auto output = m_oesCopier->GetOutput();

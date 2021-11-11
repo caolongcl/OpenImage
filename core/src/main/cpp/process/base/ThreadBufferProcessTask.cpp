@@ -14,26 +14,24 @@ using namespace clt;
 ThreadBufferProcessTask::ThreadBufferProcessTask(std::string name, std::shared_ptr<IProcessTask> task)
   : m_task(new BufferProcessTask(std::move(name), std::move(task))) {
   m_workerName = "thread_buffer_process||" + std::to_string(Utils::CurTimeMilli());
-
-  m_worker = Flow::Self()->CreateThread(m_workerName);
 }
 
-ThreadBufferProcessTask::~ThreadBufferProcessTask() {
-  Flow::Self()->DestroyThread(m_workerName);
-  m_worker = nullptr;
-}
+ThreadBufferProcessTask::~ThreadBufferProcessTask() = default;
 
 bool ThreadBufferProcessTask::Init() {
+  m_worker = Flow::Self()->CreateThread(m_workerName);
   m_worker->Post([this]() { m_task->Init(); });
   return true;
 }
 
 void ThreadBufferProcessTask::DeInit() {
-  m_worker->Post([this]() { m_task->DeInit(); });
+  m_worker->ClearAndAddLast([this]() { m_task->DeInit(); });
+  Flow::Self()->DestroyThread(m_workerName);
+  m_worker = nullptr;
 }
 
 void ThreadBufferProcessTask::Process(std::shared_ptr<Buffer> buf) {
-  if (buf != nullptr) {
+  if (m_worker != nullptr && buf != nullptr) {
     m_worker->Post([this, buf]() { m_task->Process(buf); });
   }
 }

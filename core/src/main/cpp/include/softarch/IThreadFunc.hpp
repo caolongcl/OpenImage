@@ -25,6 +25,12 @@ namespace clt {
 
     virtual void AddTask(Task &&t) = 0;
 
+    virtual void Clear() = 0;
+
+    virtual void ClearAndAddLast(const Task &t) = 0;
+
+    virtual void ClearAndAddLast(Task &&t) = 0;
+
     virtual std::thread::id Id() = 0;
   };
 

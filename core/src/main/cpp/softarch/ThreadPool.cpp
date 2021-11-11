@@ -41,7 +41,7 @@ void ThreadPool::AddTask(const Task &t) {
 
   bool success = m_taskQueue.Add(t);
   if (!success) {
-    Log::d(target, "%s can't add anymore", m_name.c_str());
+    Log::v(target, "%s can't add anymore", m_name.c_str());
   }
 }
 
@@ -50,15 +50,34 @@ void ThreadPool::AddTask(Task &&t) {
 
   bool success = m_taskQueue.Add(std::forward<Task>(t));
   if (!success) {
-    Log::d(target, "%s can't add anymore", m_name.c_str());
+    Log::v(target, "%s can't add anymore", m_name.c_str());
   }
+}
+
+
+void ThreadPool::Clear() {
+  m_taskQueue.Clear();
+}
+
+void ThreadPool::ClearAndAddLast(const Task &t) {
+  m_taskQueue.ClearAndAddLast([this, &t]() {
+    t();
+    m_running = false;
+  });
+}
+
+void ThreadPool::ClearAndAddLast(Task &&t) {
+  m_taskQueue.ClearAndAddLast([this, t1 = std::move(t)]() {
+    t1();
+    m_running = false;
+  });
 }
 
 void ThreadPool::start(int numThreads) {
   m_running = true;
 
   for (size_t i = 0; i < numThreads; i++) {
-    m_threadGroup.push_back(std::make_shared<std::thread>(&ThreadPool::run, this));
+    m_threadGroup.push_back(std::make_shared<std::thread>(&ThreadPool::runOne, this));
   }
 }
 
@@ -76,12 +95,26 @@ void ThreadPool::run() {
   }
 }
 
-void ThreadPool::stop() {
-  m_stopAdd = true;
+void ThreadPool::runOne() {
+  while (m_running) {
+    Task task;
+    m_taskQueue.Get(task);
 
+    if (!m_running) return;
+
+    if (task) {
+      task();
+    }
+  }
+}
+
+void ThreadPool::stop() {
   Log::v(target, "%s stopping", m_name.c_str());
-  m_taskQueue.Stop();
+
+  m_stopAdd = true;
   m_running = false;
+
+  m_taskQueue.Stop();
 
   for (auto &thread : m_threadGroup) {
     if (thread)

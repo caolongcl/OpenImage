@@ -63,9 +63,7 @@ void PixelReaderPbo::Read(std::shared_ptr<Texture> tex, std::shared_ptr<Buffer> 
 
   readFromPbos(tex, buf);
 
-  Log::n(target,
-         "pixel data produce %d ms",
-         (Utils::CurTimeMilli() - lastTime));
+  Log::n(target, "pixel data produce %d ms", (Utils::CurTimeMilli() - lastTime));
 }
 
 void PixelReaderPbo::createPbos() {

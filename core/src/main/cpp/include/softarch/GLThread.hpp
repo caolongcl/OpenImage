@@ -26,6 +26,8 @@ namespace clt {
   public:
     explicit GLThread(const std::string &name);
 
+    explicit GLThread(const std::string &name, bool syncStop);
+
     ~GLThread() = default;
 
     bool Init(std::shared_ptr<EGLCore>, bool needEgl) override;
@@ -33,6 +35,12 @@ namespace clt {
     void DeInit() override;
 
     void Post(const Task &t);
+
+    void Clear();
+
+    void ClearAndAddLast(const Task &t);
+
+    void ClearAndAddLast(Task &&t);
 
     std::thread::id Id() const;
 

@@ -15,7 +15,7 @@ namespace clt {
   template<typename T>
   class SyncQueue {
   public:
-    SyncQueue(int size) : m_maxSize(size), m_needStop(false) {}
+    SyncQueue(int size) : m_maxSize(size), m_needStop(false), m_stopAdd(false) {}
 
     bool Add(const T &item) {
       add(item);
@@ -46,6 +46,24 @@ namespace clt {
 
       list = std::move(m_queue);
       m_notFull.notify_one();
+    }
+
+    void Clear() {
+      std::unique_lock<std::mutex> locker(m_mutex);
+      if (m_needStop) return;
+
+      if (notEmpty()) {
+        m_queue.clear();
+        m_notFull.notify_one();
+      }
+    }
+
+    void ClearAndAddLast(T &&item) {
+      clearAndAddLast(std::forward<T>(item));
+    }
+
+    void ClearAndAddLast(const T &item) {
+      clearAndAddLast(item);
     }
 
     void Stop() {
@@ -90,11 +108,26 @@ namespace clt {
     }
 
     template<typename F>
+    void clearAndAddLast(F &&item) {
+      std::unique_lock<std::mutex> locker(m_mutex);
+      if (m_needStop || m_stopAdd) return;
+
+      m_stopAdd = true;
+
+      if (notEmpty()) {
+        m_queue.clear();
+        m_queue.push_back(std::forward<F>(item));
+        m_notEmpty.notify_one();
+        m_notFull.notify_all();
+      }
+    }
+
+    template<typename F>
     void add(F &&item) {
       std::unique_lock<std::mutex> locker(m_mutex);
-      m_notFull.wait(locker, [this] { return m_needStop || notFull(); });
+      m_notFull.wait(locker, [this] { return m_needStop || m_stopAdd || notFull(); });
 
-      if (m_needStop) return;
+      if (m_needStop || m_stopAdd) return;
 
       m_queue.push_back(std::forward<F>(item));
       m_notEmpty.notify_one();
@@ -108,6 +141,7 @@ namespace clt {
 
     int m_maxSize;
     bool m_needStop;
+    bool m_stopAdd;
   };
 
 }

@@ -34,6 +34,12 @@ namespace clt {
 
     void AddTask(Task &&t) override;
 
+    void Clear() override;
+
+    void ClearAndAddLast(const Task &t) override;
+
+    void ClearAndAddLast(Task &&t) override;
+
     const std::string Name() const { return m_name; }
 
   protected:
@@ -43,6 +49,8 @@ namespace clt {
     void start(int numThreads);
 
     void run();
+
+    void runOne();
 
     void stop();
 
