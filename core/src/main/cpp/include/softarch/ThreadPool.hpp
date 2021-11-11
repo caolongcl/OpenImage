@@ -49,7 +49,7 @@ namespace clt {
     void stopSync();
 
   private:
-    const int MAX_TASKS = 200;
+    const int MAX_TASKS = 100;
     int m_numThreads;
     std::list<std::shared_ptr<std::thread>> m_threadGroup;
     SyncQueue<Task> m_taskQueue;
@@ -57,6 +57,7 @@ namespace clt {
     std::once_flag m_flag;
     bool m_syncStop;
     std::string m_name;
+    std::atomic_bool m_stopAdd;
   };
 
 }

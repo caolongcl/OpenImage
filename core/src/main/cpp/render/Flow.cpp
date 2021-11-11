@@ -11,8 +11,8 @@ using namespace clt;
 std::mutex Flow::s_mutex;
 
 Flow::Flow()
-    : m_render(nullptr),
-      m_shared(nullptr) {
+  : m_render(nullptr),
+    m_shared(nullptr) {
 }
 
 bool Flow::Init() {
@@ -32,11 +32,11 @@ bool Flow::Init() {
 }
 
 void Flow::DeInit() {
-  m_render->DeInit();
-  m_render = nullptr;
-
   m_shared->DeInit();
   m_shared = nullptr;
+
+  m_render->DeInit();
+  m_render = nullptr;
 
   Log::v(target, "Flow::DeInit");
 }

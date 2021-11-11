@@ -9,8 +9,6 @@
 
 namespace clt {
 
-  class GLThread;
-
   class BufferProcessTask final : public IBufferProcessTask {
   ClassDeclare(BufferProcessTask);
   public:

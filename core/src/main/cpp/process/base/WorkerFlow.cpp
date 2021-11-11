@@ -13,7 +13,7 @@ bool WorkerFlow::Init() {
 
   {
     std::lock_guard<std::mutex> locker(s_mutex);
-    m_pool = std::make_shared<ThreadPool>("WorkerFlow", false, POOL_SIZE);
+    m_pool = std::make_shared<ThreadPool>("WorkerFlow", true, POOL_SIZE);
   }
 
   m_pool->Start();

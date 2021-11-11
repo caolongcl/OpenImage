@@ -31,8 +31,7 @@ namespace clt {
       std::unique_lock<std::mutex> locker(m_mutex);
       m_notEmpty.wait(locker, [this]() { return m_needStop || notEmpty(); });
 
-      if (m_needStop)
-        return;
+      if (m_needStop) return;
 
       item = m_queue.front();
       m_queue.pop_front();
@@ -43,8 +42,7 @@ namespace clt {
       std::unique_lock<std::mutex> locker(m_mutex);
       m_notEmpty.wait(locker, [this]() { return m_needStop || notEmpty(); });
 
-      if (m_needStop)
-        return;
+      if (m_needStop) return;
 
       list = std::move(m_queue);
       m_notFull.notify_one();
@@ -96,8 +94,7 @@ namespace clt {
       std::unique_lock<std::mutex> locker(m_mutex);
       m_notFull.wait(locker, [this] { return m_needStop || notFull(); });
 
-      if (m_needStop)
-        return;
+      if (m_needStop) return;
 
       m_queue.push_back(std::forward<F>(item));
       m_notEmpty.notify_one();

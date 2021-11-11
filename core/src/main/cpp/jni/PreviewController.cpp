@@ -56,8 +56,6 @@ void PreviewController::Create(JavaVM *jvm, jobject thiz) {
 }
 
 void PreviewController::Destroy() {
-  Log::v(target, "PreviewController::Destroy");
-
   // 等待所有耗时任务停止
   WorkerFlow::Self()->DeInit();
 
@@ -76,6 +74,7 @@ void PreviewController::Destroy() {
 
   m_JavaVM = nullptr;
   m_Thiz = nullptr;
+  Log::v(target, "PreviewController::Destroy");
 }
 
 bool PreviewController::Init() {

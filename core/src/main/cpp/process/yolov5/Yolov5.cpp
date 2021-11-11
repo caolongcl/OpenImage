@@ -43,10 +43,10 @@ bool Yolov5::Init(const std::string &paramPath, const std::string &modelPath, bo
   Log::d(target, "has gpu %d, use gpu %d", hasGPU, m_useGPU);
 
   ncnn::set_cpu_powersave(0);
-  ncnn::set_omp_num_threads(ncnn::get_big_cpu_count());
+  ncnn::set_omp_num_threads(1);
 
   m_net.opt.use_vulkan_compute = m_useGPU;
-  m_net.opt.num_threads = ncnn::get_big_cpu_count();
+  m_net.opt.num_threads = 1;
 //  m_net.opt.blob_allocator = &m_blobPoolAlloc;
 //  m_net.opt.workspace_allocator = &m_workspacePoolAlloc;
   m_net.opt.use_fp16_arithmetic = true;  // fp16运算加速
@@ -79,7 +79,7 @@ Yolov5::Detect(const cv::Mat &image, float threshold, float nmsThreshold) {
 
   auto ex = m_net.create_extractor();
   ex.set_light_mode(true);
-  ex.set_num_threads(4);
+  ex.set_num_threads(1);
   if (m_useGPU) {
     ex.set_vulkan_compute(m_useGPU);
   }

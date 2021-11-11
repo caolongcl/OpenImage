@@ -112,16 +112,21 @@ void FilterPipe::OnUpdate(OPreviewSize &&t) {
 
 void FilterPipe::Filter() {
   /// 1. 拷贝给 process。TODO 考虑融合 1 2
-  auto processTexture = m_processTextureReader->PopWriteTexture();
-  if (processTexture != nullptr) {
-    gles::SetViewport(0, 0, processTexture->Width(), processTexture->Height());
-    gles::UseFbo(m_fbo, processTexture->Id(), [this]() {
-      m_oesCopier->CopyFrame();
-    });
+//  auto time = std::chrono::steady_clock::now();
+  static int count = 0;
+  ++count;
+  if (count % 15 == 0) {
+    auto processTexture = m_processTextureReader->PopWriteTexture();
+    if (processTexture != nullptr) {
+      gles::SetViewport(0, 0, processTexture->Width(), processTexture->Height());
+      gles::UseFbo(m_fbo, processTexture->Id(), [this]() {
+        m_oesCopier->CopyFrame();
+      });
 
-    // 通知 process pipe 处理
-    m_processTextureReader->PushReadTexture(processTexture);
-    m_processTextureReader->Process();
+      // 通知 process pipe 处理
+      m_processTextureReader->PushReadTexture(processTexture);
+      m_processTextureReader->Process();
+    }
   }
 
   /// 2. 处理 OESCopier 输出纹理
@@ -150,6 +155,9 @@ void FilterPipe::Filter() {
   gles::UseFbo(m_fbo, output->Id(), [this]() {
     m_copier->Copy();
   });
+
+//  Log::d(target, "duration %f ms",
+//         std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - time).count());
 }
 
 GLuint FilterPipe::PreviewTexId() const {

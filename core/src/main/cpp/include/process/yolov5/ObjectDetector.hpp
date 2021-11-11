@@ -5,14 +5,14 @@
 #pragma once
 
 #include <utils/Utils.hpp>
-#include <process/base/BufferProcessTask.hpp>
+#include <process/base/ThreadBufferProcessTask.hpp>
 #include <process/base/ProcessUtils.hpp>
 #include <process/yolov5/Yolov5.hpp>
 
 namespace clt {
   class ObjectDetector final : public IBufferProcessTask {
   ClassDeclare(ObjectDetector)
-  ClassWrapper(BufferProcessTask)
+  ClassWrapper(ThreadBufferProcessTask)
   public:
     ObjectDetector();
 

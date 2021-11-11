@@ -46,9 +46,9 @@ void ProcessPipe::DeInit() {
     });
   }
 
-  Flow::Self()->DestroyThread(s_pipeThread);
   Flow::Self()->DestroyThread(s_dispatchThread);
   Flow::Self()->DestroyThread(s_readTextureThread);
+  Flow::Self()->DestroyThread(s_pipeThread);
 
   Log::v(target, "ProcessPipe::DeInit");
 }
@@ -61,7 +61,7 @@ void ProcessPipe::Update(const std::size_t width, const std::size_t height) {
 
   // 缩小以减少计算量
   float bufRate = 1.0f;
-  const int minSize = 180;
+  const int minSize = 640;
   if (smallWidth > minSize) {
     bufRate = (float) minSize / (float) smallWidth;
     smallWidth = minSize;
