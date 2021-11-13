@@ -66,12 +66,9 @@ std::vector<Yolov5::BoxInfo>
 Yolov5::Detect(const cv::Mat &image, float threshold, float nmsThreshold) {
   int inWidth = image.cols;
   int inHeight = image.rows;
-  int targetWidth = s_inputSize / 2;
-  int targetHeight = s_inputSize / 2;
 
   ncnn::Mat in_net = ncnn::Mat::from_pixels_resize(image.data, ncnn::Mat::PIXEL_RGB, inWidth,
-                                                   inHeight,
-                                                   targetWidth, targetHeight);
+                                                   inHeight, s_inputSize / 2, s_inputSize / 2);
 
   const float norm[3] = {1 / 255.f, 1 / 255.f, 1 / 255.f};
   const float mean[3] = {0, 0, 0};

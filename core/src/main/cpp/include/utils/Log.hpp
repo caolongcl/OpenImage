@@ -11,6 +11,7 @@ namespace clt {
   /**
    * 定向Log到__android_log_print
    * ^(?!.*(Indicator|NcLib|SDM|CameraService|CamX|TCPBufferManager)).*$
+   * ^(?!.*(Indicator|NcLib|SDM|CameraService|CamX|TCPBufferManager|SELinux|android.system.suspend@1.0-service)).*$
    * ^(.*(OpenSrc|PreviewController|GLRender|Processor|GLThread|EGL|ThreadPool|RES|SyncQueue|GUI|DEBUG)).*$
    */
   class Log {

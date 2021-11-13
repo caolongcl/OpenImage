@@ -28,8 +28,6 @@ namespace clt {
     void process(const Buffer &buf);
 
   private:
-    static ncnn::Mutex mutex;
-
     std::shared_ptr<Yolov5> m_yolov5;
     TimeStatics m_timeStatics;
   };

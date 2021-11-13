@@ -14,8 +14,6 @@
 
 using namespace clt;
 
-ncnn::Mutex ObjectDetector::mutex;
-
 ObjectDetector::ObjectDetector()
   : m_yolov5(new Yolov5()),
     m_timeStatics() {
@@ -68,11 +66,11 @@ void ObjectDetector::process(const Buffer &buf) {
 
   try {
     cv::Mat frame(buf.height, buf.width, CV_8UC4, buf.data.get());
-    cv::cvtColor(frame, frame, cv::COLOR_RGBA2RGB);
+    cv::cvtColor(frame, frame, cv::COLOR_BGRA2RGB);
     cv::flip(frame, frame, 0); // 上下翻转
 
-//        ResManager::Self()->SaveMatImage("FaceDetectorGray", frameGray);
-    boxInfo = m_yolov5->Detect(frame, 0.5, 0.5);
+//    ResManager::Self()->SaveMatImage("FaceDetectorGray", frame);
+    boxInfo = m_yolov5->Detect(frame, 0.3, 0.7);
 
   } catch (std::exception &e) {
     Log::e(target, "object detect exception occur %s", e.what());
@@ -86,15 +84,17 @@ void ObjectDetector::process(const Buffer &buf) {
   std::vector<PolygonObject> objects;
   objects.reserve(boxInfo.size());
 
+  Log::d(target, "----------------------------------------------------------------------------------------");
   for (auto &box : boxInfo) {
-    Log::d(target, "object %s region (%f %f %f %f)", m_yolov5->LabelStr(box.label).c_str(),
-           box.x1, box.y1, (box.y1 - box.x1 + 1),
-           (box.y2 - box.x2 + 1));
+    Log::d(target, "%s %.2f (%.2f %.2f %.2f %.2f)", m_yolov5->LabelStr(box.label).c_str(), box.score,
+           box.x1, box.y1, (box.x2 - box.x1 + 1),
+           (box.y2 - box.y1 + 1));
 
     objects.emplace_back(Float2(buf.width, buf.height),
                          Float4{(float) box.x1, (float) box.y1,
-                                (float) (box.y1 - box.x1 + 1), (box.y2 - box.x2 + 1)},
-                         GreenColor, m_yolov5->LabelStr(box.label));
+                                (float) (box.x2 - box.x1 + 1), (box.y2 - box.y1 + 1)},
+                         Colors[box.label % ColorsSize],
+                         m_yolov5->LabelStr(box.label) + " " + std::to_string(box.score));
   }
 
   Flow::Self()->SendMsg(

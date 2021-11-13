@@ -62,10 +62,10 @@ void ProcessPipe::Update(const std::size_t width, const std::size_t height) {
   // 缩小以减少计算量
   float bufRate = 1.0f;
   const int minSize = 640;
-  if (smallWidth > minSize) {
-    bufRate = (float) minSize / (float) smallWidth;
-    smallWidth = minSize;
-    smallHeight = Utils::RoundToEven(smallHeight * bufRate);
+  if (smallHeight > minSize) {
+    bufRate = (float) minSize / (float) smallHeight;
+    smallHeight = minSize;
+    smallWidth = Utils::RoundToEven(smallWidth * bufRate);
   }
 
   // 实际处理的图像大小和实际预览大小的比例
@@ -169,9 +169,7 @@ void ProcessPipe::postBufferToWorker(const std::shared_ptr<IProcessTask> &task,
                                      const std::shared_ptr<Buffer> &buf) {
   if (task != nullptr && buf != nullptr) {
     auto dataBuf = std::make_shared<Buffer>(buf->data, buf->width, buf->height, buf->channel);
-    WorkerFlow::Self()->Post([task, dataBuf]() {
-      task->Process(dataBuf);
-    });
+    task->Process(dataBuf);
   }
 }
 
