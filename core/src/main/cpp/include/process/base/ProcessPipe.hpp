@@ -12,7 +12,7 @@
 #include <process/base/ProcessBuffers.hpp>
 #include <process/base/PixelReader.hpp>
 #include <softarch/Observer.hpp>
-#include <process/base/IProcessTextureReader.hpp>
+#include <process/base/ProcessSource.hpp>
 
 namespace clt {
 
@@ -23,7 +23,7 @@ namespace clt {
    */
   class ProcessPipe final : public IComFunc<>,
                             public IComUpdate<const std::size_t, const std::size_t>,
-                            public IProcessTextureReader,
+                            public IFeeder,
                             public Observer<OPreviewSize> {
   ClassDeclare(ProcessPipe)
   public:
@@ -39,11 +39,7 @@ namespace clt {
 
     void EnableProcess(const std::string &name, bool enable);
 
-    std::shared_ptr<Texture> PopWriteTexture() override;
-
-    void PushReadTexture(std::shared_ptr<Texture> tex) override;
-
-    void Process() override;
+    void Feed(const Feeder &feeder) override;
 
     void ClearProcessTasks();
 
@@ -52,39 +48,40 @@ namespace clt {
     }
 
   private:
+    void eat(const IEater::Eater &eater);
+
     void pushTask(const std::string &name);
 
     void popTask(const std::string &name);
 
-    static void postNormalToWorker(const std::shared_ptr<IProcessTask> &task);
+    static void dispatch(const std::shared_ptr<IProcessTask> &task);
 
-    static void postBufferToWorker(const std::shared_ptr<IProcessTask> &task,
-                                   const std::shared_ptr<Buffer> &buf);
+    static void dispatch(const std::shared_ptr<IProcessTask> &task,
+                         const std::shared_ptr<Buffer> &buf);
+
+    static void dispatchSingle(const std::shared_ptr<IProcessTask> &task);
 
     void clearProcessTasks();
 
-    void readTexture();
+    bool hasBufferTask();
 
-    void dispatchBuffer();
-
-    bool hasBufferTasks();
+    bool hasNormalTask();
 
     constexpr static const char *s_pipeThread = "ProcessPipe::pipe";
-    constexpr static const char *s_readTextureThread = "ProcessPipe::read";
-    constexpr static const char *s_dispatchThread = "ProcessPipe::dispatch";
+    constexpr static const int s_sourceSize = 8;
+
+    enum class TaskType : int {
+      eBufferTask,
+      eNormalTask,
+    };
 
   private:
-    // buffer 任务队列
     std::unordered_map<std::string, std::shared_ptr<IProcessTask>> m_tasks;
-
-    std::mutex m_dispatchMutex;
-
-    // 管理纹理队列
-    std::shared_ptr<ProcessTextures> m_textures;
-
+    std::unordered_map<TaskType, std::list<std::shared_ptr<IProcessTask>>> m_tasksByClass;
+    std::shared_ptr<ProcessSource> m_source;
     std::shared_ptr<PixelReaderPbo> m_pixelReader;
-
-    // 管理数据队列
-    std::shared_ptr<ProcessBuffers> m_buffers;
+    std::mutex m_mutex;
+    Task m_eatTask;
+    Task m_normalTask;
   };
 }

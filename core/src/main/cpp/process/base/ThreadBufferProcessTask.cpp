@@ -25,13 +25,14 @@ bool ThreadBufferProcessTask::Init() {
 }
 
 void ThreadBufferProcessTask::DeInit() {
-  m_worker->ClearAndAddLast([this]() { m_task->DeInit(); });
+  m_worker->Limit();
+  m_worker->Clear();
+  m_worker->Post([this]() { m_task->DeInit(); });
   Flow::Self()->DestroyThread(m_workerName);
-  m_worker = nullptr;
 }
 
 void ThreadBufferProcessTask::Process(std::shared_ptr<Buffer> buf) {
-  if (m_worker != nullptr && buf != nullptr) {
-    m_worker->Post([this, buf]() { m_task->Process(buf); });
+  if (buf != nullptr) {
+    m_worker->PostByLimit([this, buf]() { m_task->Process(buf); });
   }
 }

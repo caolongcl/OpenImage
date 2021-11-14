@@ -13,7 +13,7 @@
 #include <render/texture/OESTexture.hpp>
 #include <render/texture/NormalTexture.hpp>
 #include <render/copier/Copier.hpp>
-#include <process/base/IProcessTextureReader.hpp>
+#include <process/base/ProcessSource.hpp>
 #include <res/SquareModel.hpp>
 #include <render/filter/FilterCom.hpp>
 
@@ -21,7 +21,7 @@ using namespace clt;
 
 bool FilterPipe::Init(std::shared_ptr<OESCopier> oesCopier,
                       std::shared_ptr<Copier> copier,
-                      std::shared_ptr<IProcessTextureReader> processTextureReader) {
+                      std::shared_ptr<IFeeder> feeder) {
   assert(oesCopier != nullptr);
   assert(copier != nullptr);
   assert(processTextureReader != nullptr);
@@ -51,7 +51,7 @@ bool FilterPipe::Init(std::shared_ptr<OESCopier> oesCopier,
   m_copier->Init();
 
   // 负责读取纹理像素传递给 ProcessPipe 处理
-  m_processTextureReader = processTextureReader;
+  m_feeder = feeder;
 
   // 初始化备用纹理
   for (auto &tex: m_filterTextures) {
@@ -95,7 +95,7 @@ void FilterPipe::DeInit() {
   m_copierBlitTexture->DeInit();
   m_copierBlitTexture = nullptr;
 
-  m_processTextureReader = nullptr;
+  m_feeder = nullptr;
 
   m_squareModel->DeInit();
   m_squareModel = nullptr;
@@ -113,22 +113,12 @@ void FilterPipe::OnUpdate(OPreviewSize &&t) {
 void FilterPipe::Filter() {
   /// 1. 拷贝给 process。TODO 考虑融合 1 2
 //  auto time = std::chrono::steady_clock::now();
-  static int count = 0;
-  ++count;
-  if (count % 15 == 0) {
-    auto processTexture = m_processTextureReader->PopWriteTexture();
-    if (processTexture != nullptr) {
-      gles::SetViewport(0, 0, processTexture->Width(), processTexture->Height());
-      gles::UseFbo(m_fbo, processTexture->Id(), [this]() {
-        m_oesCopier->CopyFrame();
-      });
-
-      // 通知 process pipe 处理
-      m_processTextureReader->PushReadTexture(processTexture);
-    }
-  }
-
-  m_processTextureReader->Process();
+  m_feeder->Feed([this](std::shared_ptr<Texture> &texture) {
+    gles::SetViewport(0, 0, texture->Width(), texture->Height());
+    gles::UseFbo(m_fbo, texture->Id(), [this]() {
+      m_oesCopier->CopyFrame();
+    });
+  });
 
   /// 2. 处理 OESCopier 输出纹理
   auto output = m_oesCopier->GetOutput();

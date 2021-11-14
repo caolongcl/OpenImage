@@ -25,6 +25,8 @@ namespace clt {
     virtual bool IsBufferProcess() const { return false; }
 
     virtual bool IsNormalProcess() const { return false; }
+
+    virtual bool IsSingleProcess() const { return false; }
   };
 
 
@@ -39,12 +41,11 @@ namespace clt {
     bool IsBufferProcess() const override { return true; }
 
   private:
-
     void Process() override {}
   };
 
   /**
-   * 一次性任务
+   * 任务
    */
   struct INormalProcessTask : public IProcessTask {
     INormalProcessTask() = default;
@@ -54,7 +55,20 @@ namespace clt {
     bool IsNormalProcess() const override { return true; }
 
   private:
+    void Process(std::shared_ptr<Buffer> Buffer) override {}
+  };
 
+  /**
+ * 一次性任务
+ */
+  struct ISingleProcessTask : public IProcessTask {
+    ISingleProcessTask() = default;
+
+    virtual ~ISingleProcessTask() = default;
+
+    bool IsSingleProcess() const override { return true; }
+
+  private:
     void Process(std::shared_ptr<Buffer> Buffer) override {}
   };
 

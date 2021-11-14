@@ -48,8 +48,6 @@ namespace clt {
     std::size_t m_width;
     std::size_t m_height;
     std::size_t m_pboBytes;
-
-    std::mutex m_mutex;
   };
 
 }

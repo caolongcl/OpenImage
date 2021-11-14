@@ -11,11 +11,6 @@ SingleThreadPool::SingleThreadPool(const std::string &name)
 
 }
 
-SingleThreadPool::SingleThreadPool(const std::string &name, bool syncStop)
-  : ThreadPool(name, syncStop, 1) {
-
-}
-
 std::thread::id SingleThreadPool::Id() {
   return ThreadPool::Id();
 }

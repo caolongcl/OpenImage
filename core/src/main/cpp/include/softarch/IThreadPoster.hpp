@@ -24,6 +24,8 @@ namespace clt {
     virtual void Post(const Task &t, const std::string &name) = 0;
 
     virtual void Post(const Task &t) = 0;
+
+    virtual void Clear(const std::string &name) = 0;
   };
 
 }

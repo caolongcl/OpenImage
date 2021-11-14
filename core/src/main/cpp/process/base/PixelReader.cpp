@@ -37,8 +37,6 @@ void PixelReaderPbo::DeInit() {
 }
 
 void PixelReaderPbo::Update(const std::size_t width, const std::size_t height) {
-  std::lock_guard<std::mutex> locker(m_mutex);
-
   m_width = width;
   m_height = height;
 
@@ -56,8 +54,6 @@ void PixelReaderPbo::Read(std::shared_ptr<Texture> tex, std::shared_ptr<Buffer> 
   assert(buf != nullptr);
   assert(tex->Width() == buf->width && tex->Height() == buf->height);
   assert(*buf && buf->bytes == m_pboBytes);
-
-  std::lock_guard<std::mutex> locker(m_mutex);
 
   long lastTime = Utils::CurTimeMilli();
 

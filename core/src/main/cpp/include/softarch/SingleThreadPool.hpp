@@ -15,8 +15,6 @@ namespace clt {
   public:
     explicit SingleThreadPool(const std::string &name);
 
-    explicit SingleThreadPool(const std::string &name, bool syncStop);
-
     ~SingleThreadPool() = default;
 
     std::thread::id Id() override;

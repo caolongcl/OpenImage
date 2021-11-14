@@ -10,21 +10,9 @@ using namespace clt;
 ThreadPool::ThreadPool(std::string name, int numThreads)
   : m_numThreads(numThreads),
     m_taskQueue(MAX_TASKS),
-    m_syncStop(true),
     m_name(std::move(name)),
     m_running(false),
-    m_stopAdd(false) {
-}
-
-ThreadPool::ThreadPool(std::string name,
-                       bool syncStop,
-                       int numThreads)
-  : m_numThreads(numThreads),
-    m_taskQueue(MAX_TASKS),
-    m_syncStop(syncStop),
-    m_name(std::move(name)),
-    m_running(false),
-    m_stopAdd(false) {
+    m_limit(false) {
 }
 
 void ThreadPool::Start() {
@@ -33,12 +21,22 @@ void ThreadPool::Start() {
 }
 
 void ThreadPool::Stop() {
-  std::call_once(m_flag, [this] { m_syncStop ? stopSync() : stop(); });
+  std::call_once(m_flag, [this] { stop(); });
+}
+
+void ThreadPool::StopSync() {
+  std::call_once(m_flag, [this] { stopSync(); });
+}
+
+void ThreadPool::StopSync(const Task &t) {
+  std::call_once(m_flag, [this, t] { stopSync(t); });
+}
+
+void ThreadPool::StopSync(Task &&t) {
+  std::call_once(m_flag, [this, t1 = std::move(t)] { stopSync(t1); });
 }
 
 void ThreadPool::AddTask(const Task &t) {
-  if (m_stopAdd) return;
-
   bool success = m_taskQueue.Add(t);
   if (!success) {
     Log::v(target, "%s can't add anymore", m_name.c_str());
@@ -46,31 +44,32 @@ void ThreadPool::AddTask(const Task &t) {
 }
 
 void ThreadPool::AddTask(Task &&t) {
-  if (m_stopAdd) return;
-
   bool success = m_taskQueue.Add(std::forward<Task>(t));
   if (!success) {
     Log::v(target, "%s can't add anymore", m_name.c_str());
   }
 }
 
+void ThreadPool::AddTaskByLimit(const Task &t) {
+  if (m_limit) return;
+  AddTask(t);
+}
+
+void ThreadPool::AddTaskByLimit(Task &&t) {
+  if (m_limit) return;
+  AddTask(std::forward<Task>(t));
+}
+
+void ThreadPool::Limit() {
+  m_limit = true;
+}
+
+void ThreadPool::UnLimit() {
+  m_limit = false;
+}
 
 void ThreadPool::Clear() {
   m_taskQueue.Clear();
-}
-
-void ThreadPool::ClearAndAddLast(const Task &t) {
-  m_taskQueue.ClearAndAddLast([this, &t]() {
-    t();
-    m_running = false;
-  });
-}
-
-void ThreadPool::ClearAndAddLast(Task &&t) {
-  m_taskQueue.ClearAndAddLast([this, t1 = std::move(t)]() {
-    t1();
-    m_running = false;
-  });
 }
 
 void ThreadPool::start(int numThreads) {
@@ -109,9 +108,6 @@ void ThreadPool::runOne() {
 }
 
 void ThreadPool::stop() {
-  Log::v(target, "%s stopping", m_name.c_str());
-
-  m_stopAdd = true;
   m_running = false;
 
   m_taskQueue.Stop();
@@ -122,23 +118,13 @@ void ThreadPool::stop() {
   }
 
   m_threadGroup.clear();
-
-  Log::v(target, "%s stopped", m_name.c_str());
+  Log::v(target, "%s stop stopped", m_name.c_str());
 }
 
 void ThreadPool::stopSync() {
-  m_stopAdd = true;
-  m_taskQueue.Add(std::forward<Task>([this]() {
+  m_taskQueue.StopSync([this]() {
     m_running = false;
-  }));
-
-  Log::v(target, "%s stopSync wait all tasks finish begin", m_name.c_str());
-  while (!m_taskQueue.Empty()) {
-    std::this_thread::yield();
-  }
-  Log::v(target, "%s stopSync wait all tasks finish end", m_name.c_str());
-
-  m_taskQueue.Stop();
+  });
 
   for (auto &thread : m_threadGroup) {
     if (thread) {
@@ -146,6 +132,24 @@ void ThreadPool::stopSync() {
     }
   }
 
+  m_taskQueue.Stop();
+  m_threadGroup.clear();
+  Log::v(target, "%s stopSync stopped", m_name.c_str());
+}
+
+void ThreadPool::stopSync(const Task &t) {
+  m_taskQueue.StopSync([this, t]() {
+    t();
+    m_running = false;
+  });
+
+  for (auto &thread : m_threadGroup) {
+    if (thread) {
+      thread->join();
+    }
+  }
+
+  m_taskQueue.Stop();
   m_threadGroup.clear();
   Log::v(target, "%s stopSync stopped", m_name.c_str());
 }

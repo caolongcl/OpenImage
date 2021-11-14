@@ -10,31 +10,22 @@ std::mutex WorkerFlow::s_mutex;
 
 bool WorkerFlow::Init() {
   Log::v(target, "WorkerFlow::Init");
-
-  {
-    std::lock_guard<std::mutex> locker(s_mutex);
-    m_pool = std::make_shared<ThreadPool>("WorkerFlow", true, POOL_SIZE);
-  }
-
+  m_pool = std::make_shared<ThreadPool>("WorkerFlow", POOL_SIZE);
   m_pool->Start();
-
   return true;
 }
 
 void WorkerFlow::DeInit() {
+  m_pool->Limit();
+  m_pool->Clear();
   m_pool->Stop();
-  m_pool = nullptr;
   Log::v(target, "WorkerFlow::DeInit");
 }
 
 void WorkerFlow::Post(const Task &t) {
-  if (m_pool != nullptr) {
-    m_pool->AddTask(t);
-  }
+  m_pool->AddTaskByLimit(t);
 }
 
 void WorkerFlow::Post(Task &&t) {
-  if (m_pool != nullptr) {
-    m_pool->AddTask(std::forward<Task>(t));
-  }
+  m_pool->AddTaskByLimit(std::forward<Task>(t));
 }

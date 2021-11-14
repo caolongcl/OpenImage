@@ -9,29 +9,51 @@
 #include <process/facedetector/FaceDetector.hpp>
 #include <process/base/WorkerFlow.hpp>
 #include <res/ResManager.hpp>
+#include <process/base/TextureBuffer.hpp>
 
 using namespace clt;
 
 ProcessPipe::ProcessPipe()
-  : m_textures(new ProcessTextures()),
+  : m_source(new ProcessSource(s_sourceSize)),
     m_pixelReader(new PixelReaderPbo()),
-    m_buffers(new ProcessBuffers()) {
-
+    m_eatTask(),
+    m_normalTask() {
 }
 
 bool ProcessPipe::Init() {
   Log::v(target, "ProcessPipe::Init");
 
-  auto thread = Flow::Self()->CreateThread(s_pipeThread, true, true);
-  if (thread != nullptr) {
-    thread->Post([this]() {
-      m_textures->Init();
-      m_pixelReader->Init();
-      m_buffers->Init();
-    });
-  }
-  Flow::Self()->CreateThread(s_readTextureThread, true);
-  Flow::Self()->CreateThread(s_dispatchThread);
+  m_source->Init();
+  m_pixelReader->Init();
+
+  auto thread = Flow::Self()->CreateThread(s_pipeThread, true);
+
+  m_eatTask = [this, thread]() {
+    if (thread != nullptr) {
+      eat([this, thread](SourceItem &item) {
+        auto &tasks = m_tasksByClass[TaskType::eBufferTask];
+        if (!tasks.empty()) {
+          m_pixelReader->Read(item->GetTexture(), item->GetBuffer());
+          for (auto &task : tasks) {
+            dispatch(task, item->GetBuffer());
+          }
+          thread->PostByLimit(m_eatTask);
+        }
+      });
+    }
+  };
+
+  m_normalTask = [this, thread]() {
+    if (thread != nullptr) {
+      auto &tasks = m_tasksByClass[TaskType::eNormalTask];
+      if (!tasks.empty()) {
+        for (auto &task : tasks) {
+          dispatch(task);
+        }
+        thread->PostByLimit(m_normalTask);
+      }
+    }
+  };
 
   return true;
 }
@@ -39,16 +61,13 @@ bool ProcessPipe::Init() {
 void ProcessPipe::DeInit() {
   auto thread = Flow::Self()->GetThread(s_pipeThread);
   if (thread != nullptr) {
-    thread->Post([this]() {
-      m_buffers->DeInit();
-      m_pixelReader->DeInit();
-      m_textures->DeInit();
-    });
+    thread->Limit();
+    thread->Clear();
+    Flow::Self()->DestroyThread(s_pipeThread);
   }
 
-  Flow::Self()->DestroyThread(s_readTextureThread);
-  Flow::Self()->DestroyThread(s_dispatchThread);
-  Flow::Self()->DestroyThread(s_pipeThread);
+  m_source->DeInit();
+  m_pixelReader->DeInit();
 
   Log::v(target, "ProcessPipe::DeInit");
 }
@@ -73,13 +92,10 @@ void ProcessPipe::Update(const std::size_t width, const std::size_t height) {
 
   auto thread = Flow::Self()->GetThread(s_pipeThread);
   if (thread != nullptr) {
-    thread->Post([this, width = smallWidth, height = smallHeight]() {
-      Log::d(target,
-             "ProcessPipe::Update in pipe width %d height %d",
-             width, height);
-      m_textures->Update(width, height);
+    thread->Post([this, width, height]() {
+      Log::d(target, "ProcessPipe::Update in pipe width %d height %d", width, height);
+      m_source->Update(width, height);
       m_pixelReader->Update(width, height);
-      m_buffers->Update(width, height);
     });
   }
 }
@@ -88,14 +104,15 @@ void ProcessPipe::ClearProcessTasks() {
   clearProcessTasks();
 }
 
-void ProcessPipe::Process() {
-  auto thread = Flow::Self()->GetThread(s_pipeThread);
-  if (thread != nullptr) {
-    thread->Post([this]() {
-      readTexture();
-      dispatchBuffer();
-    });
+void ProcessPipe::Feed(const Feeder &feeder) {
+  {
+    std::lock_guard<std::mutex> locker(m_mutex);
+    if (!hasBufferTask()) {
+      return;
+    }
   }
+
+  m_source->Feed(feeder);
 }
 
 void ProcessPipe::EnableProcess(const std::string &name, bool enable) {
@@ -103,16 +120,6 @@ void ProcessPipe::EnableProcess(const std::string &name, bool enable) {
     pushTask(name);
   } else {
     popTask(name);
-  }
-}
-
-std::shared_ptr<Texture> ProcessPipe::PopWriteTexture() {
-  return m_textures->PopWriteTexture();
-}
-
-void ProcessPipe::PushReadTexture(std::shared_ptr<Texture> tex) {
-  if (tex != nullptr) {
-    m_textures->PushReadTexture(tex);
   }
 }
 
@@ -126,16 +133,31 @@ void ProcessPipe::pushTask(const std::string &name) {
 
   auto thread = Flow::Self()->GetThread(s_pipeThread);
   if (thread != nullptr) {
-    thread->Post([this, name]() {
+    thread->Post([this, name, thread]() {
       if (m_tasks.find(name) == m_tasks.cend()) {
         auto task = ProcessFactory::Create(name);
         if (task != nullptr) {
           task->Init();
           if (task->IsBufferProcess()) {
-            std::lock_guard<std::mutex> locker(m_dispatchMutex);
-            m_tasks[name] = task;
+            {
+              std::lock_guard<std::mutex> locker(m_mutex);
+              m_tasks[name] = task;
+              m_tasksByClass[TaskType::eBufferTask].push_back(task);
+            }
+            if (hasBufferTask()) {
+              thread->PostByLimit(m_eatTask);
+            }
           } else if (task->IsNormalProcess()) {
-            postNormalToWorker(task);
+            {
+              std::lock_guard<std::mutex> locker(m_mutex);
+              m_tasks[name] = task;
+              m_tasksByClass[TaskType::eNormalTask].push_back(task);
+            }
+            if (hasNormalTask()) {
+              thread->PostByLimit(m_normalTask);
+            }
+          } else {
+            dispatch(task);
           }
         }
       }
@@ -152,24 +174,46 @@ void ProcessPipe::popTask(const std::string &name) {
       auto iterator = m_tasks.find(name);
       if (iterator != m_tasks.cend()) {
         iterator->second->DeInit();
-        std::lock_guard<std::mutex> locker(m_dispatchMutex);
-        m_tasks.erase(name);
+        {
+          std::lock_guard<std::mutex> locker(m_mutex);
+          m_tasks.erase(name);
+          if (iterator->second->IsBufferProcess()) {
+            m_tasksByClass[TaskType::eBufferTask].remove(iterator->second);
+          } else if (iterator->second->IsNormalProcess()) {
+            m_tasksByClass[TaskType::eNormalTask].remove(iterator->second);
+          }
+        }
       }
     });
   }
 }
 
-void ProcessPipe::postNormalToWorker(const std::shared_ptr<IProcessTask> &task) {
-  WorkerFlow::Self()->Post([task]() {
-    task->Process();
-  });
+void ProcessPipe::eat(const IEater::Eater &eater) {
+  if (hasBufferTask()) {
+    m_source->Eat(eater);
+  }
 }
 
-void ProcessPipe::postBufferToWorker(const std::shared_ptr<IProcessTask> &task,
-                                     const std::shared_ptr<Buffer> &buf) {
+void ProcessPipe::dispatch(const std::shared_ptr<IProcessTask> &task) {
+  if (task->IsSingleProcess()) {
+    dispatchSingle(task);
+  } else if (task->IsNormalProcess()) {
+    task->Process();
+  }
+}
+
+void ProcessPipe::dispatch(const std::shared_ptr<IProcessTask> &task,
+                           const std::shared_ptr<Buffer> &buf) {
   if (task != nullptr && buf != nullptr) {
     auto dataBuf = std::make_shared<Buffer>(buf->data, buf->width, buf->height, buf->channel);
     task->Process(dataBuf);
+  }
+}
+void ProcessPipe::dispatchSingle(const std::shared_ptr<IProcessTask> &task) {
+  if (task != nullptr) {
+    WorkerFlow::Self()->Post([task]() {
+      task->Process();
+    });
   }
 }
 
@@ -180,74 +224,19 @@ void ProcessPipe::clearProcessTasks() {
       for (auto &task:m_tasks) {
         task.second->DeInit();
       }
-      std::lock_guard<std::mutex> locker(m_dispatchMutex);
-      m_tasks.clear();
-    });
-  }
-}
-
-void ProcessPipe::readTexture() {
-  auto thread = Flow::Self()->GetThread(s_readTextureThread);
-  if (thread != nullptr) {
-    thread->Post([this]() {
-      auto tex = m_textures->PopReadTexture();
-      auto buf = m_buffers->PopWriteBuffer();
-
-      if (tex != nullptr && buf != nullptr) {
-        bool read;
-        {
-          std::lock_guard<std::mutex> locker(m_dispatchMutex);
-          read = hasBufferTasks();
-        }
-
-        if (read) {
-          m_pixelReader->Read(tex, buf);
-        }
-      }
-
-      if (tex != nullptr) {
-        m_textures->PushWriteTexture(tex);
-      }
-
-      if (buf != nullptr) {
-        m_buffers->PushReadBuffer(buf);
+      {
+        std::lock_guard<std::mutex> locker(m_mutex);
+        m_tasks.clear();
+        m_tasksByClass.clear();
       }
     });
   }
 }
 
-void ProcessPipe::dispatchBuffer() {
-  auto thread = Flow::Self()->GetThread(s_readTextureThread);
-  if (thread != nullptr) {
-    thread->Post([this]() {
-      auto buf = m_buffers->PopReadBuffer();
-
-      if (buf != nullptr) {
-        bool dispatch;
-        decltype(m_tasks) tmp;
-        {
-          std::lock_guard<std::mutex> locker(m_dispatchMutex);
-          dispatch = hasBufferTasks();
-          if (dispatch) {
-            tmp = m_tasks;
-          }
-        }
-        if (dispatch) {
-          for (auto &task : tmp) {
-            postBufferToWorker(task.second, buf);
-          }
-        }
-
-        m_buffers->PushWriteBuffer(buf);
-      }
-    });
-  }
+bool ProcessPipe::hasBufferTask() {
+  return !m_tasksByClass[TaskType::eBufferTask].empty();
 }
 
-bool ProcessPipe::hasBufferTasks() {
-  return !m_tasks.empty() &&
-         std::find_if(m_tasks.begin(), m_tasks.end(),
-                      [](auto &elem) {
-                        return elem.second->IsBufferProcess();
-                      }) != m_tasks.end();
+bool ProcessPipe::hasNormalTask() {
+  return !m_tasksByClass[TaskType::eNormalTask].empty();
 }

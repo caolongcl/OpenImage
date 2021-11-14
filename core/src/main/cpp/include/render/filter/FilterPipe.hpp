@@ -18,7 +18,7 @@ namespace clt {
 
   class Copier;
 
-  class IProcessTextureReader;
+  class IFeeder;
 
   class Texture;
 
@@ -30,7 +30,7 @@ namespace clt {
    * 滤镜渲染管道,管理所有滤镜
    */
   class FilterPipe final
-    : public IComFunc<std::shared_ptr<OESCopier>, std::shared_ptr<Copier>, std::shared_ptr<IProcessTextureReader>>,
+    : public IComFunc<std::shared_ptr<OESCopier>, std::shared_ptr<Copier>, std::shared_ptr<IFeeder>>,
       public Observer<OPreviewSize>,
       public std::enable_shared_from_this<FilterPipe> {
   ClassDeclare(FilterPipe)
@@ -43,7 +43,7 @@ namespace clt {
 
     bool Init(std::shared_ptr<OESCopier> oesCopier,
               std::shared_ptr<Copier> copier,
-              std::shared_ptr<IProcessTextureReader>) override;
+              std::shared_ptr<IFeeder>) override;
 
     void DeInit() override;
 
@@ -130,7 +130,7 @@ namespace clt {
     std::shared_ptr<Texture> m_oesTexture;
     std::shared_ptr<OESCopier> m_oesCopier;
     std::shared_ptr<Copier> m_copier;
-    std::shared_ptr<IProcessTextureReader> m_processTextureReader;
+    std::shared_ptr<IFeeder> m_feeder;
     std::shared_ptr<SquareModel> m_squareModel;
 
     /**

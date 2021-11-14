@@ -31,13 +31,13 @@ namespace clt {
 
     void Post(const Task &t) override;
 
+    void Clear(const std::string &name) override;
+
     void PostToRender(const Task &t);
 
     void PostToShared(const Task &t);
 
     /// 线程创建和销毁，获取线程，获取调用线程
-    std::shared_ptr<GLThread> CreateThread(const std::string &name, bool needEgl, bool syncStop);
-
     std::shared_ptr<GLThread> CreateThread(const std::string &name, bool needEgl);
 
     std::shared_ptr<GLThread> CreateThread(const std::string &name);

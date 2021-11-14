@@ -81,7 +81,6 @@ bool PreviewController::Init() {
   Flow::Self()->PostToRender(
     [this]() {
       Log::v(target, "PreviewController::Init");
-
       // 初始化渲染器
       m_render->Init(shared_from_this());
     });
@@ -92,9 +91,8 @@ bool PreviewController::Init() {
 void PreviewController::DeInit() {
   Flow::Self()->PostToRender(
     [this]() {
-      Log::v(target, "DeInit");
-
       m_render->DeInit();
+      Log::v(target, "DeInit");
     });
 }
 
@@ -145,13 +143,13 @@ void PreviewController::Resume() {
 void PreviewController::Pause() {
   Flow::Self()->PostToRender(
     [this]() {
-      Log::d(target, "Pause");
-
       m_rendering = false;
 
       // 清空当前滤镜和任务
       m_render->ClearFilters();
       m_render->ClearProcessTasks();
+
+      Log::d(target, "Pause");
     });
 }
 
@@ -177,8 +175,6 @@ void PreviewController::NotifyFrameAvailable() {
 void PreviewController::Stop() {
   Flow::Self()->PostToRender(
     [this]() {
-      Log::d(target, "Stop");
-
       m_renderDelayCount = 0;
       m_previewing = false;
 
@@ -200,6 +196,7 @@ void PreviewController::Stop() {
           env->CallVoidMethod(m_Thiz, m_ConfigEncoderMethod, false, 0, 0, 0, 0);
         });
       }
+      Log::d(target, "Stop");
     });
 }
 

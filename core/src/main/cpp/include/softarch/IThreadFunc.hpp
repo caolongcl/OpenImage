@@ -21,15 +21,25 @@ namespace clt {
 
     virtual void Stop() = 0;
 
+    virtual void StopSync() = 0;
+
+    virtual void StopSync(const Task &t) = 0;
+
+    virtual void StopSync(Task &&t) = 0;
+
     virtual void AddTask(const Task &t) = 0;
 
     virtual void AddTask(Task &&t) = 0;
 
+    virtual void AddTaskByLimit(const Task &t) = 0;
+
+    virtual void AddTaskByLimit(Task &&t) = 0;
+
+    virtual void Limit() = 0;
+
+    virtual void UnLimit() = 0;
+
     virtual void Clear() = 0;
-
-    virtual void ClearAndAddLast(const Task &t) = 0;
-
-    virtual void ClearAndAddLast(Task &&t) = 0;
 
     virtual std::thread::id Id() = 0;
   };

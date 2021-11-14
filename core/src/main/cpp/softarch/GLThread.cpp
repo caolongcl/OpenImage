@@ -13,15 +13,6 @@ GLThread::GLThread(const std::string &name)
     m_egl(nullptr),
     m_name(name),
     m_needEgl(true) {
-
-}
-
-GLThread::GLThread(const std::string &name, bool syncStop)
-  : m_thread(new SingleThreadPool(name, syncStop)),
-    m_egl(nullptr),
-    m_name(name),
-    m_needEgl(true) {
-
 }
 
 bool GLThread::Init(std::shared_ptr<EGLCore> egl, bool needEgl) {
@@ -60,23 +51,27 @@ void GLThread::DeInit() {
     });
   }
 
-  m_thread->Stop();
+  m_thread->StopSync();
 }
 
 void GLThread::Post(const Task &t) {
   m_thread->AddTask(t);
 }
 
+void GLThread::PostByLimit(const Task &t) {
+  m_thread->AddTaskByLimit(t);
+}
+
+void GLThread::Limit() {
+  m_thread->Limit();
+}
+
+void GLThread::UnLimit() {
+  m_thread->UnLimit();
+}
+
 void GLThread::Clear() {
   m_thread->Clear();
-}
-
-void GLThread::ClearAndAddLast(const Task &t) {
-  m_thread->ClearAndAddLast(t);
-}
-
-void GLThread::ClearAndAddLast(Task &&t) {
-  m_thread->ClearAndAddLast(std::forward<Task>(t));
 }
 
 std::thread::id GLThread::Id() const {
