@@ -25,6 +25,8 @@ namespace clt {
 
     void Process(std::shared_ptr<Buffer> buf) override;
 
+    void Process(std::shared_ptr<Buffer> buf, Task &&task) override;
+
   private:
     std::shared_ptr<BufferProcessTask> m_task;
     std::shared_ptr<GLThread> m_worker;

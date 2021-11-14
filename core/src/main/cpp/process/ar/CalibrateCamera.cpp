@@ -38,6 +38,11 @@ void CalibrateCamera::Process() {
   process();
 }
 
+void CalibrateCamera::Process(Task &&task) {
+  process();
+  task();
+}
+
 void CalibrateCamera::process() {
   Log::v(target, "CalibrateCamera::process");
 

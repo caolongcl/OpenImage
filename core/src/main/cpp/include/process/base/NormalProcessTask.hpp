@@ -22,6 +22,8 @@ namespace clt {
 
     void Process() override;
 
+    void Process(Task &&task) override;
+
   private:
     std::string m_name;
     // 具体任务

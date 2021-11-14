@@ -28,6 +28,8 @@ namespace clt {
 
     void Process() override;
 
+    void Process(Task &&task) override;
+
   private:
     void process();
 

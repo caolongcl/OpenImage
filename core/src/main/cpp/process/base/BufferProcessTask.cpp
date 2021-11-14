@@ -31,3 +31,10 @@ void BufferProcessTask::Process(std::shared_ptr<Buffer> buf) {
     m_task->Process(buf);
   }
 }
+
+void BufferProcessTask::Process(std::shared_ptr<Buffer> buf, Task &&task) {
+  if (buf != nullptr) {
+    m_task->Process(buf);
+    task();
+  }
+}

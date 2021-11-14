@@ -81,6 +81,11 @@ void MarkerAR::Process(std::shared_ptr<Buffer> buf) {
   });
 }
 
+void MarkerAR::Process(std::shared_ptr<Buffer> buf, Task &&task) {
+  Process(buf);
+  task();
+}
+
 void MarkerAR::process(const Buffer &buf) {
   /// 1. 检测标记位置和姿态
   try {

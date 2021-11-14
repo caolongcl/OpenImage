@@ -5,6 +5,7 @@
 #pragma once
 
 #include <softarch/std.hpp>
+#include <utils/Log.hpp>
 
 namespace clt {
 
@@ -19,7 +20,7 @@ namespace clt {
       : m_size(size),
         m_front(0),
         m_rear(0),
-        m_freeSize(size),
+        m_frontSize(0),
         m_data(size) {
     }
 
@@ -27,7 +28,7 @@ namespace clt {
       std::lock_guard<std::mutex> lockGuard(m_mutex);
       m_front = 0;
       m_rear = 0;
-      m_freeSize = m_size;
+      m_frontSize = 0;
     }
 
     bool Front(T &item) {
@@ -69,36 +70,38 @@ namespace clt {
 
   private:
     bool empty() const {
-      return m_rear == m_front && m_freeSize == 0;
+      return (m_rear == m_front) && (m_frontSize == 0);
     }
 
     bool full() const {
-      return m_rear == m_front && m_freeSize == m_size;
+      return (m_rear == m_front) && (m_frontSize == m_size);
     }
 
     void push() {
       if (!full()) {
         forward(m_rear);
-        ++m_freeSize;
+        ++m_frontSize;
+        Log::d("RingQueue", "push front %d rear %d size %d", m_front, m_rear, m_frontSize);
       }
     }
 
     void pop() {
       if (!empty()) {
         forward(m_front);
-        --m_freeSize;
+        --m_frontSize;
+        Log::d("RingQueue", "pop  front %d rear %d size %d", m_front, m_rear, m_frontSize);
       }
     }
 
     bool last() {
       if (!empty()) {
-        while (m_freeSize != 1) {
+        while (m_frontSize != 1) {
           forward(m_front);
-          --m_freeSize;
+          --m_frontSize;
+          Log::d("RingQueue", "pop0 front %d rear %d size %d", m_front, m_rear, m_frontSize);
         }
         return true;
       }
-
       return false;
     }
 
@@ -110,14 +113,14 @@ namespace clt {
       return m_data[m_rear];
     }
 
-    int forward(int &index) {
-      index = (++index) % m_size;
+    void forward(int &index) {
+      index = (index + 1) % m_size;
     }
   protected:
     int m_size;
     int m_front;
     int m_rear;
-    int m_freeSize;
+    int m_frontSize;
     std::vector<T> m_data;
     std::mutex m_mutex;
   };

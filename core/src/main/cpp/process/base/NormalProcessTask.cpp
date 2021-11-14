@@ -23,3 +23,8 @@ void NormalProcessTask::DeInit() {}
 void NormalProcessTask::Process() {
   m_task->Process();
 }
+
+void NormalProcessTask::Process(Task &&task) {
+  m_task->Process();
+  task();
+}

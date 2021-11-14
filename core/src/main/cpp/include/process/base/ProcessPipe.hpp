@@ -48,7 +48,11 @@ namespace clt {
     }
 
   private:
-    void eat(const IEater::Eater &eater);
+    void Reset() override {}
+
+    void Signal(bool status) override {}
+
+    bool eat(const IEater::Eater &eater);
 
     void pushTask(const std::string &name);
 
@@ -58,6 +62,11 @@ namespace clt {
 
     static void dispatch(const std::shared_ptr<IProcessTask> &task,
                          const std::shared_ptr<Buffer> &buf);
+
+    static void dispatch(const std::shared_ptr<IProcessTask> &task, Task &&signal);
+
+    static void dispatch(const std::shared_ptr<IProcessTask> &task,
+                         const std::shared_ptr<Buffer> &buf, Task &&signal);
 
     static void dispatchSingle(const std::shared_ptr<IProcessTask> &task);
 
@@ -70,18 +79,15 @@ namespace clt {
     constexpr static const char *s_pipeThread = "ProcessPipe::pipe";
     constexpr static const int s_sourceSize = 8;
 
-    enum class TaskType : int {
-      eBufferTask,
-      eNormalTask,
-    };
+    using TaskWithName = std::function<void(const std::string &name)>;
 
   private:
     std::unordered_map<std::string, std::shared_ptr<IProcessTask>> m_tasks;
-    std::unordered_map<TaskType, std::list<std::shared_ptr<IProcessTask>>> m_tasksByClass;
+    std::unordered_map<ProcessTaskType, std::unordered_map<std::string, std::shared_ptr<IProcessTask>>> m_tasksByClass;
     std::shared_ptr<ProcessSource> m_source;
     std::shared_ptr<PixelReaderPbo> m_pixelReader;
     std::mutex m_mutex;
-    Task m_eatTask;
-    Task m_normalTask;
+    TaskWithName m_eatTask;
+    TaskWithName m_normalTask;
   };
 }

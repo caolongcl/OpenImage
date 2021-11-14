@@ -13,14 +13,26 @@
 
 using namespace clt;
 
-#define CreateProcess(type, process) \
-if (type == process::target) {\
+#define CreateProcess(name, process) \
+if (name == process::target) {\
 return std::make_shared<process::Wrapper>(process::target, std::make_shared<process>());}
 
-std::shared_ptr<IProcessTask> ProcessFactory::Create(const std::string &type) {
-  CreateProcess(type, FaceDetector)
-  CreateProcess(type, CalibrateCamera)
-  CreateProcess(type, MarkerAR)
-  CreateProcess(type, ObjectDetector);
+std::shared_ptr<IProcessTask> ProcessFactory::Create(const std::string &name) {
+  CreateProcess(name, FaceDetector)
+  CreateProcess(name, CalibrateCamera)
+  CreateProcess(name, MarkerAR)
+  CreateProcess(name, ObjectDetector)
   return nullptr;
+}
+
+#define DetectProcessType(name, process) \
+if (name == process::target) {\
+return process::s_type;}
+
+ProcessTaskType ProcessFactory::Type(const std::string &name) {
+  DetectProcessType(name, FaceDetector)
+  DetectProcessType(name, CalibrateCamera)
+  DetectProcessType(name, MarkerAR)
+  DetectProcessType(name, ObjectDetector)
+  return ProcessTaskType::eUnknownTask;
 }

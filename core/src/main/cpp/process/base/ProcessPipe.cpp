@@ -28,29 +28,45 @@ bool ProcessPipe::Init() {
 
   auto thread = Flow::Self()->CreateThread(s_pipeThread, true);
 
-  m_eatTask = [this, thread]() {
+  m_eatTask = [this, thread](const std::string &name) {
+    Log::d(target, "pipe task1 %s", name.c_str());
     if (thread != nullptr) {
-      eat([this, thread](SourceItem &item) {
-        auto &tasks = m_tasksByClass[TaskType::eBufferTask];
-        if (!tasks.empty()) {
+      Log::d(target, "pipe task2 %s", name.c_str());
+      bool ret = eat([this, thread, name](SourceItem &item) {
+        Log::d(target, "pipe task3 %s", name.c_str());
+        auto &tasks = m_tasksByClass[ProcessTaskType::eBufferTask];
+        auto task = tasks.find(name);
+        if (task != tasks.end()) {
           m_pixelReader->Read(item->GetTexture(), item->GetBuffer());
-          for (auto &task : tasks) {
-            dispatch(task, item->GetBuffer());
-          }
-          thread->PostByLimit(m_eatTask);
+          dispatch(task->second, item->GetBuffer(), [this, thread, name]() {
+            if (thread != nullptr) {
+              thread->PostByLimit([this, name]() {
+                m_eatTask(name);
+              });
+            }
+          });
         }
       });
+      if (!ret) {
+        thread->PostByLimit([this, name]() {
+          m_eatTask(name);
+        });
+      }
     }
   };
 
-  m_normalTask = [this, thread]() {
+  m_normalTask = [this, thread](const std::string &name) {
     if (thread != nullptr) {
-      auto &tasks = m_tasksByClass[TaskType::eNormalTask];
-      if (!tasks.empty()) {
-        for (auto &task : tasks) {
-          dispatch(task);
-        }
-        thread->PostByLimit(m_normalTask);
+      auto &tasks = m_tasksByClass[ProcessTaskType::eNormalTask];
+      auto task = tasks.find(name);
+      if (task != tasks.end()) {
+        dispatch(task->second, [this, thread, name]() {
+          if (thread != nullptr) {
+            thread->PostByLimit([this, name]() {
+              m_normalTask(name);
+            });
+          }
+        });
       }
     }
   };
@@ -133,6 +149,10 @@ void ProcessPipe::pushTask(const std::string &name) {
 
   auto thread = Flow::Self()->GetThread(s_pipeThread);
   if (thread != nullptr) {
+    if (ProcessFactory::Type(name) == ProcessTaskType::eBufferTask) {
+
+    }
+    
     thread->Post([this, name, thread]() {
       if (m_tasks.find(name) == m_tasks.cend()) {
         auto task = ProcessFactory::Create(name);
@@ -142,20 +162,23 @@ void ProcessPipe::pushTask(const std::string &name) {
             {
               std::lock_guard<std::mutex> locker(m_mutex);
               m_tasks[name] = task;
-              m_tasksByClass[TaskType::eBufferTask].push_back(task);
+              m_tasksByClass[ProcessTaskType::eBufferTask][name] = task;
             }
-            if (hasBufferTask()) {
-              thread->PostByLimit(m_eatTask);
-            }
+
+            thread->PostByLimit([this, name]() {
+              Log::d(target, "pipe task0 %s", name.c_str());
+              m_eatTask(name);
+            });
           } else if (task->IsNormalProcess()) {
             {
               std::lock_guard<std::mutex> locker(m_mutex);
               m_tasks[name] = task;
-              m_tasksByClass[TaskType::eNormalTask].push_back(task);
+              m_tasksByClass[ProcessTaskType::eNormalTask][name] = task;
             }
-            if (hasNormalTask()) {
-              thread->PostByLimit(m_normalTask);
-            }
+
+            thread->PostByLimit([this, name]() {
+              m_normalTask(name);
+            });
           } else {
             dispatch(task);
           }
@@ -178,9 +201,15 @@ void ProcessPipe::popTask(const std::string &name) {
           std::lock_guard<std::mutex> locker(m_mutex);
           m_tasks.erase(name);
           if (iterator->second->IsBufferProcess()) {
-            m_tasksByClass[TaskType::eBufferTask].remove(iterator->second);
+            m_tasksByClass[ProcessTaskType::eBufferTask].erase(iterator->first);
+            if (!hasBufferTask()) {
+              m_source->Reset();
+            }
           } else if (iterator->second->IsNormalProcess()) {
-            m_tasksByClass[TaskType::eNormalTask].remove(iterator->second);
+            m_tasksByClass[ProcessTaskType::eNormalTask].erase(iterator->first);
+            if (!hasNormalTask()) {
+
+            }
           }
         }
       }
@@ -188,10 +217,8 @@ void ProcessPipe::popTask(const std::string &name) {
   }
 }
 
-void ProcessPipe::eat(const IEater::Eater &eater) {
-  if (hasBufferTask()) {
-    m_source->Eat(eater);
-  }
+bool ProcessPipe::eat(const IEater::Eater &eater) {
+  return m_source->Eat(eater);
 }
 
 void ProcessPipe::dispatch(const std::shared_ptr<IProcessTask> &task) {
@@ -209,6 +236,23 @@ void ProcessPipe::dispatch(const std::shared_ptr<IProcessTask> &task,
     task->Process(dataBuf);
   }
 }
+
+void ProcessPipe::dispatch(const std::shared_ptr<IProcessTask> &task, Task &&signal) {
+  if (task->IsSingleProcess()) {
+    dispatchSingle(task);
+  } else if (task->IsNormalProcess()) {
+    task->Process(std::move(signal));
+  }
+}
+
+void ProcessPipe::dispatch(const std::shared_ptr<IProcessTask> &task,
+                           const std::shared_ptr<Buffer> &buf, Task &&signal) {
+  if (task != nullptr && buf != nullptr) {
+    auto dataBuf = std::make_shared<Buffer>(buf->data, buf->width, buf->height, buf->channel);
+    task->Process(dataBuf, std::move(signal));
+  }
+}
+
 void ProcessPipe::dispatchSingle(const std::shared_ptr<IProcessTask> &task) {
   if (task != nullptr) {
     WorkerFlow::Self()->Post([task]() {
@@ -234,9 +278,11 @@ void ProcessPipe::clearProcessTasks() {
 }
 
 bool ProcessPipe::hasBufferTask() {
-  return !m_tasksByClass[TaskType::eBufferTask].empty();
+  auto tasks = m_tasksByClass.find(ProcessTaskType::eBufferTask);
+  return tasks != m_tasksByClass.end() && !tasks->second.empty();
 }
 
 bool ProcessPipe::hasNormalTask() {
-  return !m_tasksByClass[TaskType::eNormalTask].empty();
+  auto tasks = m_tasksByClass.find(ProcessTaskType::eNormalTask);
+  return tasks != m_tasksByClass.end() && !tasks->second.empty();
 }

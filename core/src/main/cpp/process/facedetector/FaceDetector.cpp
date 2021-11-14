@@ -61,6 +61,11 @@ void FaceDetector::Process(std::shared_ptr<Buffer> buf) {
   });
 }
 
+void FaceDetector::Process(std::shared_ptr<Buffer> buf, Task &&task) {
+  Process(buf);
+  task();
+}
+
 void FaceDetector::process(const Buffer &buf) {
   std::vector<cv::Rect> faces;
 

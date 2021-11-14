@@ -6,10 +6,20 @@
 
 #include <softarch/std.hpp>
 #include <softarch/IComFunc.hpp>
+#include <softarch/Task.hpp>
 
 namespace clt {
 
   class Buffer;
+
+  enum class ProcessTaskType : int {
+    eBufferTask,
+    eNormalTask,
+    eSingleTask,
+    eUnknownTask
+  };
+
+#define DefineProcessType(type) public:constexpr static const ProcessTaskType s_type = type;
 
   struct IProcessTask : public IComFunc<> {
     IProcessTask() = default;
@@ -19,8 +29,12 @@ namespace clt {
     // 需要处理数据的任务
     virtual void Process(std::shared_ptr<Buffer> buf) = 0;
 
+    virtual void Process(std::shared_ptr<Buffer> buf, Task &&task) = 0;
+
     // 普通任务
     virtual void Process() = 0;
+
+    virtual void Process(Task &&task) = 0;
 
     virtual bool IsBufferProcess() const { return false; }
 
@@ -34,6 +48,8 @@ namespace clt {
    * 持续处理 Buffer 的任务
    */
   struct IBufferProcessTask : public IProcessTask {
+  DefineProcessType(ProcessTaskType::eBufferTask);
+
     IBufferProcessTask() = default;
 
     virtual ~IBufferProcessTask() = default;
@@ -42,12 +58,16 @@ namespace clt {
 
   private:
     void Process() override {}
+
+    void Process(Task &&task) override {}
   };
 
   /**
    * 任务
    */
   struct INormalProcessTask : public IProcessTask {
+  DefineProcessType(ProcessTaskType::eNormalTask);
+
     INormalProcessTask() = default;
 
     virtual ~INormalProcessTask() = default;
@@ -56,12 +76,16 @@ namespace clt {
 
   private:
     void Process(std::shared_ptr<Buffer> Buffer) override {}
+
+    void Process(std::shared_ptr<Buffer> buf, Task &&task) override {}
   };
 
   /**
  * 一次性任务
  */
   struct ISingleProcessTask : public IProcessTask {
+  DefineProcessType(ProcessTaskType::eSingleTask);
+
     ISingleProcessTask() = default;
 
     virtual ~ISingleProcessTask() = default;
@@ -70,6 +94,8 @@ namespace clt {
 
   private:
     void Process(std::shared_ptr<Buffer> Buffer) override {}
+
+    void Process(std::shared_ptr<Buffer> buf, Task &&task) override {}
   };
 
   /**
@@ -77,7 +103,9 @@ namespace clt {
    */
   class ProcessFactory {
   public:
-    static std::shared_ptr<IProcessTask> Create(const std::string &type);
+    static std::shared_ptr<IProcessTask> Create(const std::string &name);
+
+    static ProcessTaskType Type(const std::string &name);
   };
 
 }

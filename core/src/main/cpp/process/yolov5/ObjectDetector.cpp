@@ -61,6 +61,11 @@ void ObjectDetector::Process(std::shared_ptr<Buffer> buf) {
   });
 }
 
+void ObjectDetector::Process(std::shared_ptr<Buffer> buf, Task &&task) {
+  Process(buf);
+  task();
+}
+
 void ObjectDetector::process(const Buffer &buf) {
   std::vector<Yolov5::BoxInfo> boxInfo;
 

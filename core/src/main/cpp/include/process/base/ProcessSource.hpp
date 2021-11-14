@@ -24,6 +24,10 @@ namespace clt {
     virtual ~IFeeder() = default;
 
     virtual void Feed(const Feeder &feeder) = 0;
+
+    virtual void Reset() = 0;
+
+    virtual void Signal(bool status) = 0;
   };
 
   struct IEater {
@@ -33,7 +37,7 @@ namespace clt {
 
     virtual ~IEater() = default;
 
-    virtual void Eat(const Eater &eater) = 0;
+    virtual bool Eat(const Eater &eater) = 0;
   };
 
 
@@ -41,6 +45,7 @@ namespace clt {
                               public IComUpdate<const std::size_t, const std::size_t>,
                               public IFeeder,
                               public IEater {
+  ClassDeclare(ProcessSource);
   public:
     class TextureBufferRingQueue final : public SoureceQueue,
                                          public IComFunc<>,
@@ -70,10 +75,17 @@ namespace clt {
 
     void Feed(const Feeder &feeder) override;
 
-    void Eat(const Eater &eater) override;
+    bool Eat(const Eater &eater) override;
+
+    void Reset() override;
+
+    void Signal(bool status) override;
 
   private:
     std::shared_ptr<TextureBufferRingQueue> m_queue;
     int m_size;
+    std::mutex m_mutex;
+    std::condition_variable m_notEmpty;
+    bool m_noWaitSignal;
   };
 }
