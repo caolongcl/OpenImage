@@ -7,11 +7,14 @@
 #include <softarch/std.hpp>
 #include <softarch/IComFunc.hpp>
 #include <softarch/RingQueue.hpp>
+#include <process/base/IPixelReader.hpp>
 
 namespace clt {
   class TextureBuffer;
 
   class Texture;
+
+  class PixelReaderPbo;
 
   using SourceItem = std::shared_ptr<TextureBuffer>;
   using SoureceQueue = RingQueue<SourceItem>;
@@ -26,8 +29,6 @@ namespace clt {
     virtual void Feed(const Feeder &feeder) = 0;
 
     virtual void Reset() = 0;
-
-    virtual void Signal(bool status) = 0;
   };
 
   struct IEater {
@@ -44,7 +45,8 @@ namespace clt {
   class ProcessSource final : public IComFunc<>,
                               public IComUpdate<const std::size_t, const std::size_t>,
                               public IFeeder,
-                              public IEater {
+                              public IEater,
+                              public IPixelReader {
   ClassDeclare(ProcessSource);
   public:
     class TextureBufferRingQueue final : public SoureceQueue,
@@ -77,15 +79,13 @@ namespace clt {
 
     bool Eat(const Eater &eater) override;
 
-    void Reset() override;
+    void Read(std::shared_ptr<Texture> tex, std::shared_ptr<Buffer> buf) override;
 
-    void Signal(bool status) override;
+    void Reset() override;
 
   private:
     std::shared_ptr<TextureBufferRingQueue> m_queue;
+    std::shared_ptr<PixelReaderPbo> m_pixelReader;
     int m_size;
-    std::mutex m_mutex;
-    std::condition_variable m_notEmpty;
-    bool m_noWaitSignal;
   };
 }

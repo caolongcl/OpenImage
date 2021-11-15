@@ -16,8 +16,7 @@ namespace clt {
   /**
    * 读取像素的方法
    */
-  struct IPixelReader : public IComFunc<>,
-                        public IComUpdate<const std::size_t, const std::size_t> {
+  struct IPixelReader {
 
     IPixelReader() = default;
 

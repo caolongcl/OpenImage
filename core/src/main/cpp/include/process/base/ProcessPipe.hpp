@@ -50,8 +50,6 @@ namespace clt {
   private:
     void Reset() override {}
 
-    void Signal(bool status) override {}
-
     bool eat(const IEater::Eater &eater);
 
     void pushTask(const std::string &name);
@@ -70,8 +68,6 @@ namespace clt {
 
     static void dispatchSingle(const std::shared_ptr<IProcessTask> &task);
 
-    void clearProcessTasks();
-
     bool hasBufferTask();
 
     bool hasNormalTask();
@@ -85,7 +81,6 @@ namespace clt {
     std::unordered_map<std::string, std::shared_ptr<IProcessTask>> m_tasks;
     std::unordered_map<ProcessTaskType, std::unordered_map<std::string, std::shared_ptr<IProcessTask>>> m_tasksByClass;
     std::shared_ptr<ProcessSource> m_source;
-    std::shared_ptr<PixelReaderPbo> m_pixelReader;
     std::mutex m_mutex;
     TaskWithName m_eatTask;
     TaskWithName m_normalTask;

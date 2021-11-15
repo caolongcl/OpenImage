@@ -114,7 +114,7 @@ void FilterPipe::Filter() {
   /// 1. 拷贝给 process。TODO 考虑融合 1 2
 //  auto time = std::chrono::steady_clock::now();
 static int count = 0;
-if (++count % 30 == 0) {
+if (++count % 15 == 0) {
   m_feeder->Feed([this](std::shared_ptr<Texture> &texture) {
     gles::SetViewport(0, 0, texture->Width(), texture->Height());
     gles::UseFbo(m_fbo, texture->Id(), [this]() {

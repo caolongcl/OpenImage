@@ -5,6 +5,7 @@
 #pragma once
 
 #include <softarch/std.hpp>
+#include <utils/Log.hpp>
 
 namespace clt {
 
@@ -13,18 +14,31 @@ namespace clt {
    * 比如从 ProcessPipe 管道中读取的纹理像素值
    */
   struct Buffer final {
+    static long s_count;
+    static std::mutex s_mutex;
+
     using DataType = unsigned char;
     using DataPtrType = unsigned char *;
     using ValueType = std::shared_ptr<DataType>;
 
-    Buffer() : data(nullptr), bytes(0), width(0), height(0), channel(0) {}
+    Buffer()
+      : data(nullptr), bytes(0), width(0), height(0), channel(0) {
+      {
+        std::lock_guard<std::mutex> lockGuard(s_mutex);
+        ++s_count;
+        Log::v("Buffer", "create %d", s_count);
+      }
+    }
 
     Buffer(std::size_t w, std::size_t h, std::size_t c = 4)
       : width(w), height(h), channel(c) {
+      {
+        std::lock_guard<std::mutex> lockGuard(s_mutex);
+        ++s_count;
+        Log::v("Buffer", "create %d", s_count);
+      }
       bytes = width * height * channel * sizeof(DataType);
-
-      ValueType
-        value(new DataType[bytes], [](const DataType *const b) { delete[] b; });
+      ValueType value(new DataType[bytes], [](const DataType *const b) { delete[] b; });
       data = std::move(value);
     }
 
@@ -34,28 +48,45 @@ namespace clt {
       width = 0;
       height = 0;
       channel = 0;
+      {
+        std::lock_guard<std::mutex> lockGuard(s_mutex);
+        Log::v("Buffer", "destroy %d", s_count);
+        --s_count;
+      }
     }
 
     Buffer(ValueType &d, std::size_t w, std::size_t h, std::size_t c = 4)
       : width(w), height(h), channel(c) {
+      {
+        std::lock_guard<std::mutex> lockGuard(s_mutex);
+        ++s_count;
+        Log::v("Buffer", "create %d", s_count);
+      }
       bytes = width * height * channel * sizeof(DataType);
-
-      ValueType
-        value(new DataType[bytes], [](const DataType *const b) { delete[] b; });
+      ValueType value(new DataType[bytes], [](const DataType *const b) { delete[] b; });
       data = std::move(value);
       std::memmove(data.get(), d.get(), bytes);
     }
 
     Buffer(ValueType &&d, std::size_t w, std::size_t h, std::size_t c = 4)
       : data(std::move(d)), width(w), height(h), channel(c) {
+      {
+        std::lock_guard<std::mutex> lockGuard(s_mutex);
+        ++s_count;
+        Log::v("Buffer", "create %d", s_count);
+      }
       bytes = width * height * channel * sizeof(DataType);
       d = nullptr;
     }
 
     Buffer(const Buffer &buf)
       : bytes(buf.bytes), width(buf.width), height(buf.height), channel(buf.channel) {
-      ValueType
-        value(new DataType[bytes], [](const DataType *const b) { delete[] b; });
+      {
+        std::lock_guard<std::mutex> lockGuard(s_mutex);
+        ++s_count;
+        Log::v("Buffer", "create %d", s_count);
+      }
+      ValueType value(new DataType[bytes], [](const DataType *const b) { delete[] b; });
       data = value;
       std::memmove(data.get(), buf.data.get(), bytes);
     }
@@ -66,8 +97,7 @@ namespace clt {
       height = buf.height;
       channel = buf.channel;
 
-      ValueType
-        value(new DataType[bytes], [](const DataType *const b) { delete[] b; });
+      ValueType value(new DataType[bytes], [](const DataType *const b) { delete[] b; });
       data = value;
       std::memmove(data.get(), buf.data.get(), bytes);
 
@@ -77,6 +107,11 @@ namespace clt {
     Buffer(Buffer &&buf)
       : data(std::move(buf.data)), bytes(buf.bytes), width(buf.width), height(buf.height),
         channel(buf.channel) {
+      {
+        std::lock_guard<std::mutex> lockGuard(s_mutex);
+        ++s_count;
+        Log::v("Buffer", "create %d", s_count);
+      }
       buf.data = nullptr;
       buf.bytes = 0;
       buf.width = 0;

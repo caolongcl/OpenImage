@@ -15,7 +15,6 @@ using namespace clt;
 
 ProcessPipe::ProcessPipe()
   : m_source(new ProcessSource(s_sourceSize)),
-    m_pixelReader(new PixelReaderPbo()),
     m_eatTask(),
     m_normalTask() {
 }
@@ -24,20 +23,17 @@ bool ProcessPipe::Init() {
   Log::v(target, "ProcessPipe::Init");
 
   m_source->Init();
-  m_pixelReader->Init();
 
   auto thread = Flow::Self()->CreateThread(s_pipeThread, true);
 
   m_eatTask = [this, thread](const std::string &name) {
-    Log::d(target, "pipe task1 %s", name.c_str());
     if (thread != nullptr) {
-      Log::d(target, "pipe task2 %s", name.c_str());
       bool ret = eat([this, thread, name](SourceItem &item) {
-        Log::d(target, "pipe task3 %s", name.c_str());
+        Log::d(target, "pipe task %s", name.c_str());
         auto &tasks = m_tasksByClass[ProcessTaskType::eBufferTask];
         auto task = tasks.find(name);
         if (task != tasks.end()) {
-          m_pixelReader->Read(item->GetTexture(), item->GetBuffer());
+          m_source->Read(item->GetTexture(), item->GetBuffer());
           dispatch(task->second, item->GetBuffer(), [this, thread, name]() {
             if (thread != nullptr) {
               thread->PostByLimit([this, name]() {
@@ -83,7 +79,6 @@ void ProcessPipe::DeInit() {
   }
 
   m_source->DeInit();
-  m_pixelReader->DeInit();
 
   Log::v(target, "ProcessPipe::DeInit");
 }
@@ -111,13 +106,30 @@ void ProcessPipe::Update(const std::size_t width, const std::size_t height) {
     thread->Post([this, width, height]() {
       Log::d(target, "ProcessPipe::Update in pipe width %d height %d", width, height);
       m_source->Update(width, height);
-      m_pixelReader->Update(width, height);
     });
   }
 }
 
 void ProcessPipe::ClearProcessTasks() {
-  clearProcessTasks();
+  auto thread = Flow::Self()->GetThread(s_pipeThread);
+  if (thread != nullptr) {
+    thread->Limit();
+    thread->Clear();
+    thread->Post([this]() {
+      auto tasks = m_tasks;
+      {
+        std::lock_guard<std::mutex> locker(m_mutex);
+        m_tasks.clear();
+        m_tasksByClass.clear();
+      }
+
+      for (auto &task:tasks) {
+        task.second->DeInit();
+      }
+
+      m_source->Reset();
+    });
+  }
 }
 
 void ProcessPipe::Feed(const Feeder &feeder) {
@@ -149,10 +161,6 @@ void ProcessPipe::pushTask(const std::string &name) {
 
   auto thread = Flow::Self()->GetThread(s_pipeThread);
   if (thread != nullptr) {
-    if (ProcessFactory::Type(name) == ProcessTaskType::eBufferTask) {
-
-    }
-    
     thread->Post([this, name, thread]() {
       if (m_tasks.find(name) == m_tasks.cend()) {
         auto task = ProcessFactory::Create(name);
@@ -164,9 +172,8 @@ void ProcessPipe::pushTask(const std::string &name) {
               m_tasks[name] = task;
               m_tasksByClass[ProcessTaskType::eBufferTask][name] = task;
             }
-
+            thread->UnLimit();
             thread->PostByLimit([this, name]() {
-              Log::d(target, "pipe task0 %s", name.c_str());
               m_eatTask(name);
             });
           } else if (task->IsNormalProcess()) {
@@ -176,6 +183,7 @@ void ProcessPipe::pushTask(const std::string &name) {
               m_tasksByClass[ProcessTaskType::eNormalTask][name] = task;
             }
 
+            thread->UnLimit();
             thread->PostByLimit([this, name]() {
               m_normalTask(name);
             });
@@ -196,7 +204,8 @@ void ProcessPipe::popTask(const std::string &name) {
     thread->Post([this, name]() {
       auto iterator = m_tasks.find(name);
       if (iterator != m_tasks.cend()) {
-        iterator->second->DeInit();
+        auto task = iterator->second;
+
         {
           std::lock_guard<std::mutex> locker(m_mutex);
           m_tasks.erase(name);
@@ -212,6 +221,8 @@ void ProcessPipe::popTask(const std::string &name) {
             }
           }
         }
+
+        task->DeInit();
       }
     });
   }
@@ -257,22 +268,6 @@ void ProcessPipe::dispatchSingle(const std::shared_ptr<IProcessTask> &task) {
   if (task != nullptr) {
     WorkerFlow::Self()->Post([task]() {
       task->Process();
-    });
-  }
-}
-
-void ProcessPipe::clearProcessTasks() {
-  auto thread = Flow::Self()->GetThread(s_pipeThread);
-  if (thread != nullptr) {
-    thread->Post([this]() {
-      for (auto &task:m_tasks) {
-        task.second->DeInit();
-      }
-      {
-        std::lock_guard<std::mutex> locker(m_mutex);
-        m_tasks.clear();
-        m_tasksByClass.clear();
-      }
     });
   }
 }

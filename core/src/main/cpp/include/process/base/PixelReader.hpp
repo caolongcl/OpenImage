@@ -12,7 +12,9 @@ namespace clt {
   /**
    * 从RGBA格式的纹理中读取颜色数据
    */
-  class PixelReaderPbo final : public IPixelReader {
+  class PixelReaderPbo final : public IComFunc<>,
+                               public IComUpdate<const std::size_t, const std::size_t>,
+                               public IPixelReader {
   ClassDeclare(PixelReaderPbo);
   public:
     PixelReaderPbo();
