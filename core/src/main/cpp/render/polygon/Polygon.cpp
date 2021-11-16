@@ -9,11 +9,13 @@
 using namespace clt;
 
 Polygon::Polygon()
-    : PolygonDrawer(target),
-      m_color(RedColor),
-      m_lineWidth(10),
-      m_vertexCount(0),
-      m_fill(false) {
+  : PolygonDrawer(target),
+    m_color(RedColor),
+    m_lineWidth(10),
+    m_pointSize(32.0f),
+    m_vertexCount(0),
+    m_toPoints(false),
+    m_fill(false) {
 
 }
 
@@ -75,6 +77,7 @@ void Polygon::UpdatePolygon(const PolygonObject &object, const Viewport &viewpor
 
   VarSet(Polygon::var_fill, polygon.fill);
   VarSet(Polygon::var_color, polygon.color);
+  VarSet(Polygon::var_to_points, polygon.toPoints);
 
   m_model.Bind(m_shader->PositionAttributeLocation());
   m_model.UpdateVertex(polygon.region);
@@ -100,32 +103,42 @@ void Polygon::loadShader() {
   m_uniformLocProjection = glGetUniformLocation(m_shader->ProgramId(), "uProjection");
   m_uniformLocModel = glGetUniformLocation(m_shader->ProgramId(), "uModel");
   m_uniformLocColor = glGetUniformLocation(m_shader->ProgramId(), "uColor");
+  m_uniformLocPointSize = glGetUniformLocation(m_shader->ProgramId(), "uPointSize");
 }
 
 void Polygon::updateValue() {
   m_shader->SetFloat4(m_uniformLocColor, m_color);
   m_shader->SetMatrix4(m_uniformLocProjection, m_projection);
   m_shader->SetMatrix4(m_uniformLocModel, glm::mat4(1.0f));
+  m_shader->SetFloat1(m_uniformLocPointSize, m_pointSize);
 }
 
 void Polygon::registerVar() {
   m_varGroup->VarRegister(var_color, {
-      [this](const Var &var) {
-        m_color = var.ToFloat4();
-      },
-      Float4TypeTag{}
+    [this](const Var &var) {
+      m_color = var.ToFloat4();
+    },
+    Float4TypeTag{}
   });
   m_varGroup->VarRegister(var_fill, {
-      [this](const Var &var) {
-        m_fill = var.ToBoolean().b;
-      },
-      BoolTypeTag{}
+    [this](const Var &var) {
+      m_fill = var.ToBoolean().b;
+    },
+    BoolTypeTag{}
+  });
+  m_varGroup->VarRegister(var_to_points, {
+    [this](const Var &var) {
+      m_toPoints = var.ToBoolean().b;
+    },
+    BoolTypeTag{}
   });
 }
 
 void Polygon::draw() {
-  m_model.Use([fill = m_fill, count = m_vertexCount]() {
-    if (fill) {
+  m_model.Use([toPoints = m_toPoints, fill = m_fill, count = m_vertexCount]() {
+    if (toPoints) {
+      glDrawArrays(GL_POINTS, 0, count);
+    } else if (fill) {
       glDrawArrays(GL_TRIANGLE_FAN, 0, count);
     } else {
       glDrawArrays(GL_LINE_LOOP, 0, count);

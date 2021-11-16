@@ -20,6 +20,7 @@ namespace clt {
   ClassDeclare(Polygon)
   VarDeclare(color)
   VarDeclare(fill)
+  VarDeclare(to_points)
 
   public:
     Polygon();
@@ -50,11 +51,14 @@ namespace clt {
     glm::mat4 m_projection;
     Float4 m_color;
     int m_lineWidth;
+    float m_pointSize;
     int m_vertexCount;
     bool m_fill;
+    bool m_toPoints;
 
     GLint m_uniformLocProjection{-1};
     GLint m_uniformLocModel{-1};
     GLint m_uniformLocColor{-1};
+    GLint m_uniformLocPointSize{-1};
   };
 }

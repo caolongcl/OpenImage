@@ -1,4 +1,4 @@
-name: polygon
+name: points
 
 vertex:
   _#1_version 300 es
@@ -12,13 +12,12 @@ vertex:
   uniform mat4 uProjection;
   uniform mat4 uModel;
   uniform vec4 uColor;
-  uniform float uPointSize;
 
   void main() {
   vTexCoords = aTexCoords;
   vColor = uColor;
   gl_Position = uProjection * uModel * vec4(aPosition.xyz, 1.0);
-  gl_PointSize = uPointSize;
+  gl_PointSize = 32.0;
   }
 
 fragment:

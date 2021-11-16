@@ -18,8 +18,9 @@ namespace clt {
                   const std::vector<Float2> &_region,
                   const Float4 &_color,
                   const std::string &_tag,
+                  bool _toPoints = false,
                   bool _fill = false)
-      : canvasSize(_canvasSize), region(_region), color(_color), tag(_tag), fill(_fill) {
+      : canvasSize(_canvasSize), region(_region), color(_color), tag(_tag), toPoints(_toPoints), fill(_fill) {
       for (auto &point : region) {
         point.y = canvasSize.h - point.y;
       }
@@ -29,8 +30,9 @@ namespace clt {
                   const Float4 &_region, // 图像坐标
                   const Float4 &_color,
                   const std::string &_tag,
+                  bool _toPoints = false,
                   bool _fill = false)
-      : canvasSize(_canvasSize), color(_color), tag(_tag), fill(_fill) {
+      : canvasSize(_canvasSize), color(_color), tag(_tag), toPoints(_toPoints), fill(_fill) {
       float x = _region.x;
       float y = canvasSize.h - _region.y;
       float w = _region.z; // width
@@ -46,6 +48,7 @@ namespace clt {
     Float4 color;
     std::string tag;
     bool fill;
+    bool toPoints;
   };
 
   struct BaseModelObject {

@@ -313,6 +313,7 @@ bool ResManager::scanResFiles(const std::string &rootPath) {
   m_resFiles.emplace_back("fire_shader.yml");
   m_resFiles.emplace_back("rgba2gray_shader.yml");
   m_resFiles.emplace_back("polygon_shader.yml");
+  m_resFiles.emplace_back("points_shader.yml");
   m_resFiles.emplace_back("base_model_shader.yml");
 
   m_resFiles.emplace_back("haarcascade_frontalface_alt.xml");
