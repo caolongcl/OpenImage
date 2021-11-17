@@ -10,6 +10,7 @@
 #include <softarch/std.hpp>
 #include <utils/Utils.hpp>
 #include <process/yolov5/ObjectDetector.hpp>
+#include <process/facedetector/FaceLandmarkDetector.hpp>
 
 using namespace clt;
 
@@ -22,6 +23,7 @@ std::shared_ptr<IProcessTask> ProcessFactory::Create(const std::string &name) {
   CreateProcess(name, CalibrateCamera)
   CreateProcess(name, MarkerAR)
   CreateProcess(name, ObjectDetector)
+  CreateProcess(name, FaceLandmarkDetector)
   return nullptr;
 }
 
@@ -34,5 +36,6 @@ ProcessTaskType ProcessFactory::Type(const std::string &name) {
   DetectProcessType(name, CalibrateCamera)
   DetectProcessType(name, MarkerAR)
   DetectProcessType(name, ObjectDetector)
+  DetectProcessType(name, FaceLandmarkDetector)
   return ProcessTaskType::eUnknownTask;
 }

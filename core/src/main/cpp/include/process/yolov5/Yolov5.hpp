@@ -9,8 +9,7 @@
 #include <softarch/IComFunc.hpp>
 
 namespace clt {
-  class Yolov5 : public IComFunc<const std::string &,
-    const std::string &, bool> {
+  class Yolov5 final : public IComFunc<const std::string &, const std::string &, bool> {
   ClassDeclare(Yolov5)
   public:
     using BoxInfo = struct {

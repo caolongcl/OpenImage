@@ -109,12 +109,12 @@ public class Camera2PreviewFragment extends Fragment {
 
     mCalibrateParamsDialog = new CalibrateParamsDialog();
     mCalibrateParamsDialog.SetCallback((confirm, calibrateData) -> {
-          if (confirm) {
-            mPreviewView.SetCalibrateParams(calibrateData.boardSizeWidth, calibrateData.boardSizeHeight,
-                calibrateData.boardSquareWidth, calibrateData.boardSquareHeight,
-                calibrateData.markerWidth, calibrateData.markerHeight);
-          }
+        if (confirm) {
+          mPreviewView.SetCalibrateParams(calibrateData.boardSizeWidth, calibrateData.boardSizeHeight,
+            calibrateData.boardSquareWidth, calibrateData.boardSquareHeight,
+            calibrateData.markerWidth, calibrateData.markerHeight);
         }
+      }
     );
   }
 
@@ -164,9 +164,9 @@ public class Camera2PreviewFragment extends Fragment {
           float markerHeight = (float) paramsJson.getDouble("marker_height");
 
           mCalibrateParamsDialog.UpdateCalibrateData(new CalibrateParamsDialog
-              .CalibrateData(boardSizeWidth, boardSizeHeight,
-              boardSquareWidth, boardSquareHeight,
-              markerWidth, markerHeight));
+            .CalibrateData(boardSizeWidth, boardSizeHeight,
+            boardSquareWidth, boardSquareHeight,
+            markerWidth, markerHeight));
 
           mCalibrateParamsDialog.show(getFragmentManager(), "CalibrateParams");
         } catch (JSONException e) {
@@ -176,7 +176,7 @@ public class Camera2PreviewFragment extends Fragment {
     });
     // 短按开始校正
     mCameraModeSelectV.SetCalibrateFunc(() ->
-        mPreviewView.EnableProcess("CalibrateCamera", true));
+      mPreviewView.EnableProcess("CalibrateCamera", true));
   }
 
   @Override
@@ -364,7 +364,8 @@ public class Camera2PreviewFragment extends Fragment {
         CLog.v(TAG, "face_detector");
         mPreviewView.GetCameraSelector().filterState.face_detect = !mPreviewView.GetCameraSelector().filterState.face_detect;
 //        mPreviewView.EnableProcess("FaceDetector", mPreviewView.GetCameraSelector().filterState.face_detect);
-        mPreviewView.EnableProcess("ObjectDetector", mPreviewView.GetCameraSelector().filterState.face_detect);
+//        mPreviewView.EnableProcess("ObjectDetector", mPreviewView.GetCameraSelector().filterState.face_detect);
+        mPreviewView.EnableProcess("FaceLandmarkDetector", mPreviewView.GetCameraSelector().filterState.face_detect);
       });
       settingsView.findViewById(R.id.opencvar).setOnClickListener(v -> {
         CLog.v(TAG, "opencvar");
@@ -392,8 +393,8 @@ public class Camera2PreviewFragment extends Fragment {
             Toast.makeText(mContext.get(), picture.getAbsolutePath(), Toast.LENGTH_LONG).show();
             String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("jpg");
             MediaScannerConnection.scanFile(mContext.get(),
-                new String[]{picture.getAbsolutePath()},
-                new String[]{mimeType}, null);
+              new String[]{picture.getAbsolutePath()},
+              new String[]{mimeType}, null);
           }
           break;
         case PreviewController.MSG_ADD_VIDEO:
@@ -403,8 +404,8 @@ public class Camera2PreviewFragment extends Fragment {
             Toast.makeText(mContext.get(), video.getAbsolutePath(), Toast.LENGTH_LONG).show();
             String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("mp4");
             MediaScannerConnection.scanFile(mContext.get(),
-                new String[]{video.getAbsolutePath()},
-                new String[]{mimeType}, null);
+              new String[]{video.getAbsolutePath()},
+              new String[]{mimeType}, null);
           }
           break;
       }
