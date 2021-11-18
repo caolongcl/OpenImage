@@ -220,6 +220,17 @@
             android:textSize="12sp"
             app:layout_constraintStart_toStartOf="@id/constrast"
             app:layout_constraintTop_toBottomOf="@id/hue" />
+
+        <Button
+          android:id="@+id/yoloV5"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="10dp"
+          android:text="yoloV5 detect"
+          android:textAllCaps="false"
+          android:textSize="12sp"
+          app:layout_constraintStart_toStartOf="@id/saturation"
+          app:layout_constraintTop_toBottomOf="@id/hue" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>

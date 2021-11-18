@@ -367,6 +367,7 @@ public class CameraSelector {
     public boolean hue = false;
     public boolean face_detect = false;
     public boolean opencv_ar = false;
+    public boolean yoloV5_detect = false;
     public float exposure_value = 0.0f;
     public float brightness_value = 0.0f;
     public float contrast_value = 1.0f;
@@ -398,6 +399,7 @@ public class CameraSelector {
 
       face_detect = false;
       opencv_ar = false;
+      yoloV5_detect = false;
     }
   }
 }

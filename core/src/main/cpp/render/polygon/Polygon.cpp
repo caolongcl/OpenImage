@@ -12,7 +12,7 @@ Polygon::Polygon()
   : PolygonDrawer(target),
     m_color(RedColor),
     m_lineWidth(10),
-    m_pointSize(32.0f),
+    m_pointSize(16.0f),
     m_vertexCount(0),
     m_toPoints(false),
     m_fill(false) {

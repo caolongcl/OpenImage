@@ -103,6 +103,16 @@ void FaceLandmarkDetector::process(const Buffer &buf) {
                          Float4{face.rect.x, face.rect.y, face.rect.width, face.rect.height},
                          Colors[index % ColorsSize],
                          std::to_string(face.prob));
+
+    std::vector<Float2> points;
+    points.reserve(face.points.size());
+    for (auto &point : face.points) {
+      points.emplace_back(point.x, point.y);
+    }
+    objects.emplace_back(Float2(buf.width, buf.height),
+                         std::move(points),
+                         Colors[index % ColorsSize],
+                         "", true);
     ++index;
   }
 

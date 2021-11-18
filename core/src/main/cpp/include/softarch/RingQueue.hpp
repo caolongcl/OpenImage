@@ -81,7 +81,7 @@ namespace clt {
       if (!full()) {
         forward(m_rear);
         ++m_frontSize;
-        Log::d("RingQueue", "push front %d rear %d size %d", m_front, m_rear, m_frontSize);
+        Log::v("RingQueue", "push front %d rear %d size %d", m_front, m_rear, m_frontSize);
       }
     }
 
@@ -89,7 +89,7 @@ namespace clt {
       if (!empty()) {
         forward(m_front);
         --m_frontSize;
-        Log::d("RingQueue", "pop  front %d rear %d size %d", m_front, m_rear, m_frontSize);
+        Log::v("RingQueue", "pop  front %d rear %d size %d", m_front, m_rear, m_frontSize);
       }
     }
 
@@ -98,7 +98,7 @@ namespace clt {
         while (m_frontSize != 1) {
           forward(m_front);
           --m_frontSize;
-          Log::d("RingQueue", "pop0 front %d rear %d size %d", m_front, m_rear, m_frontSize);
+          Log::v("RingQueue", "pop0 front %d rear %d size %d", m_front, m_rear, m_frontSize);
         }
         return true;
       }

@@ -363,8 +363,6 @@ public class Camera2PreviewFragment extends Fragment {
       settingsView.findViewById(R.id.face_detector).setOnClickListener(v -> {
         CLog.v(TAG, "face_detector");
         mPreviewView.GetCameraSelector().filterState.face_detect = !mPreviewView.GetCameraSelector().filterState.face_detect;
-//        mPreviewView.EnableProcess("FaceDetector", mPreviewView.GetCameraSelector().filterState.face_detect);
-//        mPreviewView.EnableProcess("ObjectDetector", mPreviewView.GetCameraSelector().filterState.face_detect);
         mPreviewView.EnableProcess("FaceLandmarkDetector", mPreviewView.GetCameraSelector().filterState.face_detect);
       });
       settingsView.findViewById(R.id.opencvar).setOnClickListener(v -> {
@@ -372,7 +370,11 @@ public class Camera2PreviewFragment extends Fragment {
         mPreviewView.GetCameraSelector().filterState.opencv_ar = !mPreviewView.GetCameraSelector().filterState.opencv_ar;
         mPreviewView.EnableProcess("MarkerAR", mPreviewView.GetCameraSelector().filterState.opencv_ar);
       });
-
+      settingsView.findViewById(R.id.yoloV5).setOnClickListener(v -> {
+        CLog.v(TAG, "yoloV5 detect");
+        mPreviewView.GetCameraSelector().filterState.yoloV5_detect = !mPreviewView.GetCameraSelector().filterState.yoloV5_detect;
+        mPreviewView.EnableProcess("ObjectDetector", mPreviewView.GetCameraSelector().filterState.yoloV5_detect);
+      });
     }
   }
 
