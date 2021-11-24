@@ -34,8 +34,8 @@ bool FaceDetector::Init() {
 
 void FaceDetector::DeInit() {
   // 清空人脸检测绘制消息
-  Flow::Self()->SendMsg(PolygonMsg(Copier::target, Copier::msg_detect_face));
-  Flow::Self()->SendMsg(TextMsg(Copier::target, Copier::msg_detect_face_info));
+  Flow::Self()->SendMsg(PolygonMsg(Copier::target, Copier::msg_process));
+  Flow::Self()->SendMsg(TextMsg(Copier::target, Copier::msg_process_info));
 
   m_faceCascade->DeInit();
   m_timeStatics.DeInit();
@@ -55,7 +55,7 @@ void FaceDetector::Process(std::shared_ptr<Buffer> buf) {
       TextInfo textInfo("face_detect:" + std::to_string(period) + "ms");
       textInfo.position = {100.0f, 200.0f};
       Flow::Self()->SendMsg(
-        TextMsg(Copier::target, Copier::msg_detect_face_info,
+        TextMsg(Copier::target, Copier::msg_process_info,
                 std::make_shared<TextMsgData>(std::move(textInfo))));
     });
   });
@@ -86,7 +86,7 @@ void FaceDetector::process(const Buffer &buf) {
   }
 
   if (faces.empty()) {
-    Flow::Self()->SendMsg(PolygonMsg(Copier::target, Copier::msg_detect_face));
+    Flow::Self()->SendMsg(PolygonMsg(Copier::target, Copier::msg_process));
     return;
   }
 
@@ -103,6 +103,6 @@ void FaceDetector::process(const Buffer &buf) {
   }
 
   Flow::Self()->SendMsg(
-    PolygonMsg(Copier::target, Copier::msg_detect_face,
+    PolygonMsg(Copier::target, Copier::msg_process,
                std::make_shared<PolygonMsgData>(std::move(objects))));
 }

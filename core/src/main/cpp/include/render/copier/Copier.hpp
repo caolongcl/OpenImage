@@ -63,10 +63,8 @@ namespace clt {
                        public Observer<OPreviewSize>,
                        public MsgHandler {
   ClassDeclare(Copier)
-  MsgDefine(detect_face)
-  MsgDefine(detect_face_info)
-  MsgDefine(detect_marker)
-  MsgDefine(detect_marker_info)
+  MsgDefine(process)
+  MsgDefine(process_info)
   public:
     Copier();
 

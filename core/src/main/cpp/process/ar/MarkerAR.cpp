@@ -49,8 +49,8 @@ bool MarkerAR::Init() {
 
 void MarkerAR::DeInit() {
   Flow::Self()->SendMsg(BaseModelMsg(BaseModel::target, BaseModel::msg_marker_ar));
-  Flow::Self()->SendMsg(PolygonMsg(Copier::target, Copier::msg_detect_marker));
-  Flow::Self()->SendMsg(TextMsg(Copier::target, Copier::msg_detect_marker_info));
+  Flow::Self()->SendMsg(PolygonMsg(Copier::target, Copier::msg_process));
+  Flow::Self()->SendMsg(TextMsg(Copier::target, Copier::msg_process_info));
 
   m_timesStatics.DeInit();
   m_marker->DeInit();
@@ -75,7 +75,7 @@ void MarkerAR::Process(std::shared_ptr<Buffer> buf) {
       TextInfo textInfo("marker_detect:" + std::to_string(period) + "ms");
       textInfo.position = {100.0f, 200.0f};
       Flow::Self()->SendMsg(
-        TextMsg(Copier::target, Copier::msg_detect_marker_info,
+        TextMsg(Copier::target, Copier::msg_process_info,
                 std::make_shared<TextMsgData>(std::move(textInfo))));
     });
   });
@@ -102,7 +102,7 @@ void MarkerAR::process(const Buffer &buf) {
 
   auto &makers = m_marker->GetMakers();
   if (makers.empty()) {
-    Flow::Self()->SendMsg(PolygonMsg(Copier::target, Copier::msg_detect_marker));
+    Flow::Self()->SendMsg(PolygonMsg(Copier::target, Copier::msg_process));
     Flow::Self()->SendMsg(BaseModelMsg(BaseModel::target, BaseModel::msg_marker_ar));
     return;
   }
@@ -124,7 +124,7 @@ void MarkerAR::process(const Buffer &buf) {
                                 points, GreenColor, "marker_" + std::to_string(marker.id));
   }
 
-  Flow::Self()->SendMsg(PolygonMsg(Copier::target, Copier::msg_detect_marker,
+  Flow::Self()->SendMsg(PolygonMsg(Copier::target, Copier::msg_process,
                                    std::make_shared<PolygonMsgData>(std::move(polygonObjects))));
 
   /// 2. 绘制 AR 模型
