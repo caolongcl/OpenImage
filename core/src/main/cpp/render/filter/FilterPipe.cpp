@@ -24,7 +24,6 @@ bool FilterPipe::Init(std::shared_ptr<OESCopier> oesCopier,
                       std::shared_ptr<IFeeder> feeder) {
   assert(oesCopier != nullptr);
   assert(copier != nullptr);
-  assert(processTextureReader != nullptr);
 
   Log::v(target, "FilterPipe::Init");
 
