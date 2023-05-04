@@ -139,7 +139,8 @@ Java 层相机预览在 native 层的代理，是整个 native 层逻辑的顶�
 `PolygonDrawer` 支持绘制多边形，比如人脸检测框，Marker 检测框；`BaseModel` 支持绘制基本的几何体，如 Marker AR 中的立方体。
 
 ### FaceDetector
-人脸检测组件，调用 OpenCV API `cv::CascadeClassifier` 进行人脸检测和性能统计。
+- 人脸检测组件，调用 OpenCV API `cv::CascadeClassifier` 进行人脸检测和性能统计。
+- 使用 Yolov5 检测人脸关键点和人脸框
 
 ### CalibrateCamera / Marker / MarkerAR
 `CalibrateCamera` 相机校正组件，校正结果可以获得相机的内参矩阵和畸变参数，进一步可以计算出相机视图矩阵（View，结合 Model、 Projection 矩阵就可以构建模拟真实世界的三维环境了，这是实现 AR 的关键一步）
